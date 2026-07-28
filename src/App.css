@@ -1,25 +1,35 @@
-/* Lock entire viewport background */
-html, body, #root {
-  margin: 0;
-  padding: 0;
+/* Card Container Lock */
+.card {
   width: 100%;
-  height: 100%;
-  min-height: 100vh;
-  background-color: #090d16 !important; /* Prevents white flash or default browser background */
-  color: #f8fafc;
-  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  max-width: 380px;
+  height: 480px; /* Fixed height locks card dimensions */
+  background-color: var(--card-bg, #131c2e);
+  border: 1px solid var(--card-border, #1e293b);
+  border-radius: 28px;
+  padding: 24px;
+  box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
 }
 
-/* Ensure app wrapper fills container */
-.app-container {
-  min-height: 100vh;
-  width: 100%;
+.front-layout {
   display: flex;
+  flex-direction: column;
   align-items: center;
+  justify-content: space-between;
+  height: 100%;
+  width: 100%;
+}
+
+.canvas-wrapper {
+  flex: 1;
+  display: flex;
   justify-content: center;
-  padding: 16px;
-  box-sizing: border-box;
-  background-color: #090d16 !important;
+  align-items: center;
+  width: 100%;
+  margin: 16px 0;
 }

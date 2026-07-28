@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import HanziWriter from 'hanzi-writer';
 
-// Single Character Box with its own Tianzige Grid
-function SingleHanziBox({ char, mode, size = 160 }) {
+// Single Character Tianzige Cell
+function SingleHanziBox({ char, mode, size }) {
   const containerRef = useRef(null);
   const writerRef = useRef(null);
   const [writerLoaded, setWriterLoaded] = useState(false);
@@ -17,7 +17,7 @@ function SingleHanziBox({ char, mode, size = 160 }) {
       const writer = HanziWriter.create(containerRef.current, char, {
         width: size,
         height: size,
-        padding: 10,
+        padding: Math.max(6, Math.floor(size * 0.08)),
         strokeColor: '#f8fafc',
         radicalColor: '#38bdf8',
         outlineColor: '#334155',
@@ -41,7 +41,7 @@ function SingleHanziBox({ char, mode, size = 160 }) {
 
   return (
     <div
-      className="tianzige-container"
+      className="tianzige-cell"
       style={{
         width: `${size}px`,
         height: `${size}px`,
@@ -49,14 +49,15 @@ function SingleHanziBox({ char, mode, size = 160 }) {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#0b1120',
-        borderRadius: '16px',
+        backgroundColor: '#090d16',
+        borderRadius: size > 150 ? '20px' : '14px',
         border: '1px solid #1e293b',
+        boxShadow: 'inset 0 2px 6px rgba(0,0,0,0.6)',
         overflow: 'hidden',
         flexShrink: 0,
       }}
     >
-      {/* Dedicated Tianzige SVG Grid */}
+      {/* Tianzige SVG Grid */}
       <svg
         className="tianzige-grid"
         viewBox="0 0 100 100"
@@ -67,7 +68,7 @@ function SingleHanziBox({ char, mode, size = 160 }) {
           width: '100%',
           height: '100%',
           pointerEvents: 'none',
-          opacity: 0.4,
+          opacity: 0.35,
           zIndex: 1,
         }}
       >
@@ -78,11 +79,11 @@ function SingleHanziBox({ char, mode, size = 160 }) {
         <line x1="100" y1="0" x2="0" y2="100" stroke="#1e293b" strokeWidth="0.75" strokeDasharray="2,4" />
       </svg>
 
-      {/* Immediate Native Text Fallback */}
+      {/* Immediate System Font Fallback */}
       <span
         style={{
           position: 'absolute',
-          fontSize: `${size * 0.55}px`,
+          fontSize: `${size * 0.58}px`,
           color: '#f8fafc',
           zIndex: writerLoaded ? 1 : 2,
           opacity: writerLoaded ? 0 : 1,
@@ -95,7 +96,7 @@ function SingleHanziBox({ char, mode, size = 160 }) {
         {char}
       </span>
 
-      {/* HanziWriter SVG Mount Point */}
+      {/* HanziWriter Render Target */}
       <div
         ref={containerRef}
         style={{
@@ -109,27 +110,28 @@ function SingleHanziBox({ char, mode, size = 160 }) {
   );
 }
 
-// Parent Wrapper: Automatically splits string into individual Tianzige character boxes
+// Parent Wrapper (Maintains Card Container Integrity)
 export default function HanziCanvas({ character, mode = 'view' }) {
   const charString = typeof character === 'string' ? character : String(character || '');
   const charArray = Array.from(charString.trim());
 
-  // Scale box size depending on single vs multi-character words
-  let boxSize = 200;
+  // Strict sizing calculation to fit inside the card padding (Max width ~310px)
+  let boxSize = 210;
   if (charArray.length === 2) boxSize = 135;
-  if (charArray.length >= 3) boxSize = 100;
+  if (charArray.length === 3) boxSize = 92;
+  if (charArray.length >= 4) boxSize = 72;
 
   return (
     <div
-      className="multi-hanzi-wrapper"
+      className="card-canvas-stage"
       style={{
         display: 'flex',
-        gap: '12px',
+        gap: charArray.length > 2 ? '8px' : '12px',
         justifyContent: 'center',
         alignItems: 'center',
         width: '100%',
-        maxWidth: '100%',
-        padding: '10px 0',
+        height: '100%',
+        boxSizing: 'border-box',
       }}
     >
       {charArray.map((char, index) => (
