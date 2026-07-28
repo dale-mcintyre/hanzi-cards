@@ -5,7 +5,7 @@ import useSwipeGesture from './hooks/useSwipeGesture';
 import { calculateSM2 } from './utils/sm2';
 import { getProgress, saveCardProgress } from './utils/storage';
 import { speakText } from './utils/tts';
-import { ColorPinyin } from './utils/pinyinColor'; // 🔴 Pinyin Tone Coloring
+import { ColorPinyin } from './utils/pinyinColor';
 import { getHardwiredDeck } from './data/hskLoader';
 
 export default function App() {
@@ -79,16 +79,20 @@ export default function App() {
     );
   }
 
-  // Parse meanings hierarchy (Primary vs Secondary)
+  // Parse meanings hierarchy
   const meaningList = typeof card.meaning === 'string' ? card.meaning.split(',') : [card.meaning];
   const primaryMeaning = meaningList[0]?.trim();
   const secondaryMeanings = meaningList.slice(1).join(', ').trim();
+
+  // SM-2 Interval Calculations for Button Badges
+  const nextHardInterval = calculateSM2(1, card.stats?.repetitions || 0, card.stats?.interval || 1, card.stats?.easeFactor || 2.5).interval;
+  const nextEasyInterval = calculateSM2(5, card.stats?.repetitions || 0, card.stats?.interval || 1, card.stats?.easeFactor || 2.5).interval;
 
   return (
     <div className="app-container">
       <div className="stage">
         
-        {/* Minimal Header */}
+        {/* Header Bar */}
         <div className="header-bar">
           <div className="level-pills">
             {selectedLevels.map((lvl) => (
@@ -111,15 +115,40 @@ export default function App() {
           {dragX < -30 && <div className="badge badge--again">AGAIN</div>}
 
           {!isFlipped ? (
-            /* FRONT: CLEAN CHARACTER + TIANZIGE */
+            /* FRONT LAYOUT */
             <div className="front-layout">
+              {/* Top Front Bar: Audio Speaker */}
+              <div className="front-top-bar">
+                <button 
+                  className="front-audio-btn" 
+                  onClick={(e) => { 
+                    e.stopPropagation(); 
+                    speakText(card.character); 
+                  }}
+                  title="Listen to pronunciation"
+                >
+                  🔊
+                </button>
+              </div>
+
+              {/* Tianzige Grid Canvas */}
               <div className="canvas-wrapper">
                 <HanziCanvas character={card.character} mode="view" />
               </div>
+
+              {/* Radical Badge Pill */}
+              {card.culturalNote && card.culturalNote.includes('Radical') ? (
+                <div className="radical-badge">
+                  {card.culturalNote.replace('Radical:', '部首 Radical:')}
+                </div>
+              ) : (
+                <div className="radical-badge">HSK Vocabulary</div>
+              )}
+
               <span className="tap-hint">Tap card for details ↺</span>
             </div>
           ) : (
-            /* REVERSE SIDE */
+            /* REVERSE LAYOUT */
             <div className="back-layout">
               <div className="back-header">
                 <div>
@@ -172,7 +201,7 @@ export default function App() {
                 Usage & Example Sentences ↑
               </button>
 
-              {/* Grading Buttons */}
+              {/* Grading Buttons with SM-2 Interval Tags */}
               <div className="grading-row" onClick={(e) => e.stopPropagation()}>
                 <button 
                   className="grade-btn grade-btn--hard" 
@@ -181,7 +210,8 @@ export default function App() {
                     handleNextCard(1); 
                   }}
                 >
-                  ← Hard
+                  <span>← Hard</span>
+                  <small className="interval-tag">{nextHardInterval}d</small>
                 </button>
                 <button 
                   className="grade-btn grade-btn--easy" 
@@ -190,7 +220,8 @@ export default function App() {
                     handleNextCard(5); 
                   }}
                 >
-                  Easy →
+                  <span>Easy →</span>
+                  <small className="interval-tag">{nextEasyInterval}d</small>
                 </button>
               </div>
             </div>

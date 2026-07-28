@@ -1,35 +1,85 @@
-/* Card Container Lock */
-.card {
+/* Front Top Bar & Audio Button */
+.front-top-bar {
   width: 100%;
-  max-width: 380px;
-  height: 480px; /* Fixed height locks card dimensions */
-  background-color: var(--card-bg, #131c2e);
-  border: 1px solid var(--card-border, #1e293b);
-  border-radius: 28px;
-  padding: 24px;
-  box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.6);
   display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  box-sizing: border-box;
-  position: relative;
-  overflow: hidden;
-}
-
-.front-layout {
-  display: flex;
-  flex-direction: column;
+  justify-content: flex-end;
   align-items: center;
-  justify-content: space-between;
-  height: 100%;
-  width: 100%;
+  padding: 0 4px;
 }
 
-.canvas-wrapper {
+.front-audio-btn {
+  background: rgba(30, 41, 59, 0.6);
+  border: 1px solid #334155;
+  border-radius: 50%;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  color: #f8fafc;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.front-audio-btn:active {
+  transform: scale(0.92);
+  background: #38bdf8;
+}
+
+/* Radical Badge Pill */
+.radical-badge {
+  background-color: rgba(56, 189, 248, 0.1);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  color: #38bdf8;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 20px;
+  margin: 6px 0;
+  text-align: center;
+}
+
+/* Grading Buttons with SM-2 Interval Labels */
+.grading-row {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  margin-top: 12px;
+}
+
+.grade-btn {
   flex: 1;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
-  width: 100%;
-  margin: 16px 0;
+  justify-content: center;
+  padding: 10px 14px;
+  border-radius: 16px;
+  border: none;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+
+.grade-btn:active {
+  transform: scale(0.96);
+}
+
+.grade-btn--hard {
+  background-color: #334155;
+  color: #f8fafc;
+}
+
+.grade-btn--easy {
+  background-color: #38bdf8;
+  color: #090d16;
+}
+
+.interval-tag {
+  font-size: 11px;
+  opacity: 0.8;
+  margin-top: 2px;
+  font-weight: 500;
 }
