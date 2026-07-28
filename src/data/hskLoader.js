@@ -19,34 +19,49 @@ export function getHardwiredDeck(activeLevels = ['3']) {
 
   activeLevels.forEach((lvl) => {
     const list = ALL_LEVELS[lvl] || [];
+    
+    // 🔍 DEBUG LOG: Check DevTools Console to inspect the actual raw object keys
+    if (list.length > 0 && lvl === activeLevels[0]) {
+      console.log(`🔍 [HSK ${lvl} Sample Raw JSON Item]:`, list[0]);
+    }
+
     const formatted = list.map((item, idx) => {
-      // 1. Extract simplified character safely as a pure string
-      let char = item.simplified || item.hanzi || item.character || '字';
-      if (typeof char !== 'string') {
-        char = String(char.simplified || char.hanzi || '字');
-      }
+      // Deep key extraction
+      const char = 
+        item.hanzi || 
+        item.simplified || 
+        item.character || 
+        item.word || 
+        item.forms?.[0]?.traditional || 
+        (typeof item === 'string' ? item : '字');
 
-      // 2. Extract pinyin safely
-      let pinyinStr = item.forms?.[0]?.transcriptions?.pinyin || item.pinyin || '';
-      if (typeof pinyinStr !== 'string') pinyinStr = '';
+      const pinyinStr = 
+        item.pinyin || 
+        item.forms?.[0]?.transcriptions?.pinyin || 
+        item.pronunciation || 
+        '';
 
-      // 3. Extract meanings safely
-      let meanings = item.forms?.[0]?.meanings || item.translations || item.meaning || ['meaning'];
+      let meanings = 
+        item.translations || 
+        item.forms?.[0]?.meanings || 
+        item.meanings || 
+        item.meaning || 
+        item.definition || 
+        ['definition'];
+
       if (Array.isArray(meanings)) {
         meanings = meanings.join(', ');
-      } else if (typeof meanings !== 'string') {
-        meanings = String(meanings);
       }
 
       return {
         id: `hsk${lvl}_${idx}_${char}`,
-        character: char,
-        pinyin: pinyinStr,
-        meaning: meanings,
+        character: String(char),
+        pinyin: String(pinyinStr),
+        meaning: String(meanings),
         hskLevel: `HSK ${lvl}`,
-        sentence: `这是“${char}”字。`,
-        sentencePinyin: '',
-        sentenceEnglish: `This is the character for ${meanings.split(',')[0]}.`,
+        sentence: item.sentence || `这是“${char}”字。`,
+        sentencePinyin: item.sentencePinyin || '',
+        sentenceEnglish: item.sentenceEnglish || `This is the character for ${String(meanings).split(',')[0]}.`,
         culturalNote: item.radical ? `Radical: ${item.radical}` : 'Standard HSK vocabulary word.',
       };
     });

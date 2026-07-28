@@ -4,29 +4,30 @@ import HanziWriter from 'hanzi-writer';
 export default function HanziCanvas({ character, mode = 'view', width = 220, height = 220 }) {
   const containerRef = useRef(null);
   const writerRef = useRef(null);
-  const [renderFailed, setRenderFailed] = useState(false);
+  const [writerLoaded, setWriterLoaded] = useState(false);
 
-  // Ensure character is strictly a string
-  const charString = typeof character === 'string' ? character : String(character || '字');
+  const charStr = typeof character === 'string' ? character : String(character || '');
 
   useEffect(() => {
-    if (!containerRef.current || !charString) return;
+    if (!containerRef.current || !charStr) return;
 
     containerRef.current.innerHTML = '';
-    setRenderFailed(false);
+    setWriterLoaded(false);
 
     try {
-      const writer = HanziWriter.create(containerRef.current, charString, {
+      const writer = HanziWriter.create(containerRef.current, charStr, {
         width,
         height,
         padding: 15,
-        strokeColor: '#f8fafc',      // Main character color
-        radicalColor: '#38bdf8',     // Radical highlight
-        outlineColor: '#334155',     // Background character outline
+        strokeColor: '#f8fafc',
+        radicalColor: '#38bdf8',
+        outlineColor: '#334155',
         showOutline: true,
         showCharacter: true,
         delayBetweenStrokes: 50,
         strokeAnimationSpeed: 1.25,
+        onLoadCharDataSuccess: () => setWriterLoaded(true),
+        onLoadCharDataError: (err) => console.warn('HanziWriter stroke data load notice:', err),
       });
 
       writerRef.current = writer;
@@ -35,10 +36,9 @@ export default function HanziCanvas({ character, mode = 'view', width = 220, hei
         writer.animateCharacter();
       }
     } catch (e) {
-      console.warn('HanziWriter render notice:', e);
-      setRenderFailed(true);
+      console.error('HanziWriter creation error:', e);
     }
-  }, [charString, mode, width, height]);
+  }, [charStr, mode, width, height]);
 
   return (
     <div 
@@ -50,6 +50,10 @@ export default function HanziCanvas({ character, mode = 'view', width = 220, hei
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
+        backgroundColor: '#0b1120',
+        borderRadius: '20px',
+        border: '1px solid #1e293b',
+        overflow: 'hidden'
       }}
     >
       {/* Tianzige SVG Background Grid */}
@@ -63,7 +67,8 @@ export default function HanziCanvas({ character, mode = 'view', width = 220, hei
           width: '100%',
           height: '100%',
           pointerEvents: 'none',
-          opacity: 0.5,
+          opacity: 0.4,
+          zIndex: 1,
         }}
       >
         <rect x="1" y="1" width="98" height="98" fill="none" stroke="#334155" strokeWidth="1.5" />
@@ -72,27 +77,34 @@ export default function HanziCanvas({ character, mode = 'view', width = 220, hei
         <line x1="0" y1="0" x2="100" y2="100" stroke="#1e293b" strokeWidth="0.75" strokeDasharray="2,4" />
         <line x1="100" y1="0" x2="0" y2="100" stroke="#1e293b" strokeWidth="0.75" strokeDasharray="2,4" />
       </svg>
+
+      {/* Guaranteed Text Render (Displays immediately) */}
+      <span 
+        style={{ 
+          position: 'absolute',
+          fontSize: '110px', 
+          color: '#f8fafc', 
+          zIndex: writerLoaded ? 1 : 2,
+          opacity: writerLoaded ? 0 : 1,
+          transition: 'opacity 0.2s ease',
+          fontFamily: '"PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif',
+          lineHeight: 1,
+          userSelect: 'none'
+        }}
+      >
+        {charStr || '字'}
+      </span>
       
       {/* HanziWriter Mount Container */}
-      {!renderFailed ? (
-        <div 
-          ref={containerRef} 
-          style={{ width: `${width}px`, height: `${height}px`, position: 'relative', zIndex: 2 }}
-        />
-      ) : (
-        /* Fallback if HanziWriter SVG fails */
-        <span 
-          style={{ 
-            fontSize: '110px', 
-            color: '#f8fafc', 
-            position: 'relative', 
-            zIndex: 2,
-            fontFamily: '"PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif'
-          }}
-        >
-          {charString}
-        </span>
-      )}
+      <div 
+        ref={containerRef} 
+        style={{ 
+          width: `${width}px`, 
+          height: `${height}px`, 
+          position: 'relative', 
+          zIndex: 3 
+        }}
+      />
     </div>
   );
 }
