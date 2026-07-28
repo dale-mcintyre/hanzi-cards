@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react';
+import './App.css';
 import HanziCanvas from './components/HanziCanvas';
 import useSwipeGesture from './hooks/useSwipeGesture';
 import { calculateSM2 } from './utils/sm2';
 import { getProgress, saveCardProgress } from './utils/storage';
 import { speakText } from './utils/tts';
+
+// Local dataset loader
 import { getHardwiredDeck } from './data/hskLoader';
-import './App.css';
+
 export default function App() {
   const [selectedLevels, setSelectedLevels] = useState(['3']);
   const [showSettings, setShowSettings] = useState(false);
@@ -15,10 +18,9 @@ export default function App() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   const [showDrawer, setShowDrawer] = useState(false);
-  
-  // Now only toggles between 'view' and 'animate'
-  const [canvasMode, setCanvasMode] = useState('view'); 
+  const [canvasMode, setCanvasMode] = useState('view');
 
+  // Load hardwired HSK deck locally
   useEffect(() => {
     const localWords = getHardwiredDeck(selectedLevels);
     const savedProgress = getProgress();
@@ -74,7 +76,7 @@ export default function App() {
   if (!card) {
     return (
       <div className="app-container">
-        <div className="card loading-card">Loading hardwired deck...</div>
+        <div className="card loading-card">Loading deck...</div>
       </div>
     );
   }
@@ -93,7 +95,7 @@ export default function App() {
           <button className="gear-btn" onClick={() => setShowSettings(true)}>⚙️</button>
         </div>
 
-        {/* Card Stage */}
+        {/* Main Card Stage */}
         <div
           className={`card ${isFlipped ? 'card--flipped' : ''}`}
           style={{
@@ -121,16 +123,25 @@ export default function App() {
                   <h1 className="pinyin-title">{card.pinyin}</h1>
                   <p className="meaning-title">{card.meaning}</p>
                 </div>
-                <button className="icon-btn" onClick={(e) => { e.stopPropagation(); speakText(card.character); }}>
+                <button 
+                  className="icon-btn" 
+                  onClick={(e) => { 
+                    e.stopPropagation(); 
+                    speakText(card.character); 
+                  }}
+                >
                   🔊
                 </button>
               </div>
 
-              {/* Simplified Writing Controls */}
+              {/* Stroke Order Controls */}
               <div className="writing-controls" onClick={(e) => e.stopPropagation()}>
                 <button
                   className={`mode-btn ${canvasMode === 'animate' ? 'active' : ''}`}
-                  onClick={() => setCanvasMode(canvasMode === 'animate' ? 'view' : 'animate')}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setCanvasMode(canvasMode === 'animate' ? 'view' : 'animate');
+                  }}
                 >
                   🎬 Watch Stroke Order
                 </button>
@@ -142,15 +153,35 @@ export default function App() {
                 </div>
               )}
 
-              <button className="drawer-trigger-btn" onClick={(e) => { e.stopPropagation(); setShowDrawer(true); }}>
+              {/* Drawer Trigger Button (Isolated) */}
+              <button 
+                className="drawer-trigger-btn" 
+                onClick={(e) => { 
+                  e.stopPropagation(); 
+                  setShowDrawer(true); 
+                }}
+              >
                 Usage & Example Sentences ↑
               </button>
 
+              {/* Grading Buttons */}
               <div className="grading-row" onClick={(e) => e.stopPropagation()}>
-                <button className="grade-btn grade-btn--hard" onClick={() => handleNextCard(1)}>
+                <button 
+                  className="grade-btn grade-btn--hard" 
+                  onClick={(e) => { 
+                    e.stopPropagation(); 
+                    handleNextCard(1); 
+                  }}
+                >
                   ← Hard
                 </button>
-                <button className="grade-btn grade-btn--easy" onClick={() => handleNextCard(5)}>
+                <button 
+                  className="grade-btn grade-btn--easy" 
+                  onClick={(e) => { 
+                    e.stopPropagation(); 
+                    handleNextCard(5); 
+                  }}
+                >
                   Easy →
                 </button>
               </div>
@@ -160,7 +191,11 @@ export default function App() {
 
         {/* SETTINGS DRAWER */}
         {showSettings && (
-          <div className="drawer-overlay" onClick={() => setShowSettings(false)}>
+          <div 
+            className="drawer-overlay" 
+            onClick={(e) => { e.stopPropagation(); setShowSettings(false); }}
+            onPointerDown={(e) => e.stopPropagation()}
+          >
             <div className="drawer-sheet" onClick={(e) => e.stopPropagation()}>
               <div className="drawer-handle" />
               <div className="drawer-header">
@@ -205,7 +240,11 @@ export default function App() {
 
         {/* CULTURAL & SENTENCE DRAWER */}
         {showDrawer && (
-          <div className="drawer-overlay" onClick={() => setShowDrawer(false)}>
+          <div 
+            className="drawer-overlay" 
+            onClick={(e) => { e.stopPropagation(); setShowDrawer(false); }}
+            onPointerDown={(e) => e.stopPropagation()}
+          >
             <div className="drawer-sheet" onClick={(e) => e.stopPropagation()}>
               <div className="drawer-handle" />
               <div className="drawer-header">
@@ -221,7 +260,7 @@ export default function App() {
                 <div className="sentence-card">
                   <div className="sentence-row">
                     <p className="chinese">{card.sentence}</p>
-                    <button onClick={() => speakText(card.sentence)}>🔊</button>
+                    <button onClick={(e) => { e.stopPropagation(); speakText(card.sentence); }}>🔊</button>
                   </div>
                   <p className="pinyin">{card.sentencePinyin}</p>
                   <p className="english">{card.sentenceEnglish}</p>
