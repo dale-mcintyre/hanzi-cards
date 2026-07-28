@@ -1,141 +1,48 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
+import HanziWriter from 'hanzi-writer';
 
-const BASE_SIZE = 260;
-
-/**
- * Handles single characters AND multi-character words seamlessly.
- * If passed "准", it renders 1 large 260px canvas.
- * If passed "准备", it renders 2 side-by-side 140px canvases.
- */
-export default function HanziCanvas({ character, mode, replayToken }) {
-  if (!character) return null;
-
-  // Split string into individual characters (e.g. "准备" -> ["准", "备"])
-  const charArray = character.split('');
-  const isMulti = charArray.length > 1;
-
-  // Automatically scale down canvas size for multi-character words so they fit on screen
-  const dynamicSize = isMulti ? Math.max(120, Math.floor(BASE_SIZE / charArray.length)) : BASE_SIZE;
-
-  return (
-    <div 
-      className="hanzi-canvas-container" 
-      style={{ 
-        display: 'flex', 
-        gap: isMulti ? '8px' : '0px', 
-        justifyContent: 'center', 
-        alignItems: 'center',
-        flexWrap: 'nowrap'
-      }}
-    >
-      {charArray.map((singleChar, index) => (
-        <SingleHanziCanvas
-          key={`${singleChar}_${index}_${mode}`}
-          character={singleChar}
-          mode={mode}
-          size={dynamicSize}
-          replayToken={replayToken}
-        />
-      ))}
-    </div>
-  );
-}
-
-/** Renders an individual character box (either static text or HanziWriter instance) */
-function SingleHanziCanvas({ character, mode, size, replayToken }) {
-  if (mode === 'view' || !mode) {
-    return (
-      <div 
-        className="hanzi-canvas hanzi-canvas--static" 
-        style={{ width: size, height: size, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-      >
-        <span className="hanzi-canvas__glyph" style={{ fontSize: `${size * 0.65}px` }}>
-          {character}
-        </span>
-      </div>
-    );
-  }
-
-  return <HanziWriterCanvas character={character} mode={mode} size={size} replayToken={replayToken} />;
-}
-
-/** Isolated HanziWriter instance per character */
-function HanziWriterCanvas({ character, mode, size, replayToken }) {
-  const targetRef = useRef(null);
-  const [status, setStatus] = useState('loading'); // 'loading' | 'ready' | 'failed'
+export default function HanziCanvas({ character, mode = 'view', width = 220, height = 220 }) {
+  const containerRef = useRef(null);
+  const writerRef = useRef(null);
 
   useEffect(() => {
-    if (!targetRef.current || !character) return;
-    setStatus('loading');
-    targetRef.current.innerHTML = '';
+    if (!containerRef.current || !character) return;
 
-    let cancelled = false;
-    let animateTimeout = null;
+    containerRef.current.innerHTML = '';
 
-    import('hanzi-writer')
-      .then(({ default: HanziWriter }) => {
-        if (cancelled || !targetRef.current) return;
+    const writer = HanziWriter.create(containerRef.current, character, {
+      width,
+      height,
+      padding: 15,
+      strokeColor: '#f8fafc',      // Bright main character stroke
+      radicalColor: '#38bdf8',     // Highlighting radical in cyan
+      outlineColor: '#334155',     // Soft guide outline
+      showOutline: true,
+      showCharacter: true,
+      delayBetweenStrokes: 50,
+      strokeAnimationSpeed: 1.25,
+    });
 
-        const writer = HanziWriter.create(targetRef.current, character, {
-          width: size,
-          height: size,
-          padding: Math.floor(size * 0.08),
-          strokeColor: '#ffffff',
-          radicalColor: '#38bdf8',
-          outlineColor: '#64748b',
-          drawingColor: '#22d3ee',
-          strokeAnimationSpeed: 1,
-          delayBetweenStrokes: 150,
-          showOutline: true,
-          showCharacter: mode !== 'practice',
-        });
+    writerRef.current = writer;
 
-        setStatus('ready');
-
-        if (mode === 'practice') {
-          writer.quiz({ onMistake: () => {}, onCorrectStroke: () => {}, onComplete: () => {} });
-        } else {
-          animateTimeout = setTimeout(() => {
-            if (!cancelled) writer.animateCharacter();
-          }, 150);
-        }
-      })
-      .catch(() => {
-        if (!cancelled) setStatus('failed');
-      });
-
-    return () => {
-      cancelled = true;
-      clearTimeout(animateTimeout);
-    };
-  }, [character, mode, size, replayToken]);
-
-  if (status === 'failed') {
-    return (
-      <div className="hanzi-canvas hanzi-canvas--fallback" style={{ width: size, height: size }}>
-        <span className="hanzi-canvas__fallback-char" style={{ fontSize: `${size * 0.6}px` }}>{character}</span>
-        <span className="hanzi-canvas__fallback-note">Offline</span>
-      </div>
-    );
-  }
+    if (mode === 'animate') {
+      writer.animateCharacter();
+    }
+  }, [character, mode, width, height]);
 
   return (
-    <div className="hanzi-canvas-stack" style={{ width: size, height: size, position: 'relative' }}>
-      {status === 'loading' && (
-        <div 
-          className="hanzi-canvas hanzi-canvas--static hanzi-canvas--dim" 
-          style={{ width: size, height: size, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-        >
-          <span className="hanzi-canvas__glyph" style={{ fontSize: `${size * 0.65}px` }}>
-            {character}
-          </span>
-        </div>
-      )}
-      <div
-        ref={targetRef}
-        className="hanzi-canvas"
-        style={{ width: size, height: size, display: status === 'ready' ? 'block' : 'none' }}
-      />
+    <div className="tianzige-container" style={{ width: `${width}px`, height: `${height}px` }}>
+      {/* Tianzige 田字格 SVG Background Grid */}
+      <svg className="tianzige-grid" viewBox="0 0 100 100">
+        <rect x="1" y="1" width="98" height="98" fill="none" stroke="#334155" strokeWidth="1.5" />
+        <line x1="50" y1="0" x2="50" y2="100" stroke="#334155" strokeWidth="1" strokeDasharray="3,3" />
+        <line x1="0" y1="50" x2="100" y2="50" stroke="#334155" strokeWidth="1" strokeDasharray="3,3" />
+        <line x1="0" y1="0" x2="100" y2="100" stroke="#1e293b" strokeWidth="0.75" strokeDasharray="2,4" />
+        <line x1="100" y1="0" x2="0" y2="100" stroke="#1e293b" strokeWidth="0.75" strokeDasharray="2,4" />
+      </svg>
+      
+      {/* Hanzi Writer Mount */}
+      <div ref={containerRef} className="hanzi-writer-box" />
     </div>
   );
 }

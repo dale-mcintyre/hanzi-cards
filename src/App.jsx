@@ -5,8 +5,7 @@ import useSwipeGesture from './hooks/useSwipeGesture';
 import { calculateSM2 } from './utils/sm2';
 import { getProgress, saveCardProgress } from './utils/storage';
 import { speakText } from './utils/tts';
-
-// Local dataset loader
+import { ColorPinyin } from './utils/pinyinColor'; // 🔴 Pinyin Tone Coloring
 import { getHardwiredDeck } from './data/hskLoader';
 
 export default function App() {
@@ -20,7 +19,6 @@ export default function App() {
   const [showDrawer, setShowDrawer] = useState(false);
   const [canvasMode, setCanvasMode] = useState('view');
 
-  // Load hardwired HSK deck locally
   useEffect(() => {
     const localWords = getHardwiredDeck(selectedLevels);
     const savedProgress = getProgress();
@@ -81,6 +79,11 @@ export default function App() {
     );
   }
 
+  // Parse meanings hierarchy (Primary vs Secondary)
+  const meaningList = typeof card.meaning === 'string' ? card.meaning.split(',') : [card.meaning];
+  const primaryMeaning = meaningList[0]?.trim();
+  const secondaryMeanings = meaningList.slice(1).join(', ').trim();
+
   return (
     <div className="app-container">
       <div className="stage">
@@ -108,7 +111,7 @@ export default function App() {
           {dragX < -30 && <div className="badge badge--again">AGAIN</div>}
 
           {!isFlipped ? (
-            /* FRONT: CLEAN CHARACTER */
+            /* FRONT: CLEAN CHARACTER + TIANZIGE */
             <div className="front-layout">
               <div className="canvas-wrapper">
                 <HanziCanvas character={card.character} mode="view" />
@@ -120,8 +123,13 @@ export default function App() {
             <div className="back-layout">
               <div className="back-header">
                 <div>
-                  <h1 className="pinyin-title">{card.pinyin}</h1>
-                  <p className="meaning-title">{card.meaning}</p>
+                  <h1 className="pinyin-title">
+                    <ColorPinyin pinyin={card.pinyin} />
+                  </h1>
+                  <p className="meaning-primary">{primaryMeaning}</p>
+                  {secondaryMeanings && (
+                    <p className="meaning-secondary">{secondaryMeanings}</p>
+                  )}
                 </div>
                 <button 
                   className="icon-btn" 
@@ -153,7 +161,7 @@ export default function App() {
                 </div>
               )}
 
-              {/* Drawer Trigger Button (Isolated) */}
+              {/* Drawer Trigger Button */}
               <button 
                 className="drawer-trigger-btn" 
                 onClick={(e) => { 
@@ -249,7 +257,7 @@ export default function App() {
               <div className="drawer-handle" />
               <div className="drawer-header">
                 <div>
-                  <h2>{card.character} ({card.pinyin})</h2>
+                  <h2>{card.character} (<ColorPinyin pinyin={card.pinyin} />)</h2>
                   <p>{card.meaning}</p>
                 </div>
                 <button className="close-btn" onClick={() => setShowDrawer(false)}>✕</button>
@@ -262,7 +270,7 @@ export default function App() {
                     <p className="chinese">{card.sentence}</p>
                     <button onClick={(e) => { e.stopPropagation(); speakText(card.sentence); }}>🔊</button>
                   </div>
-                  <p className="pinyin">{card.sentencePinyin}</p>
+                  <p className="pinyin"><ColorPinyin pinyin={card.sentencePinyin} /></p>
                   <p className="english">{card.sentenceEnglish}</p>
                 </div>
 
