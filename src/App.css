@@ -1,0 +1,484 @@
+.hc-app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  padding: 14px 16px calc(18px + env(safe-area-inset-bottom));
+}
+
+/* ---------- Top bar: level switcher + progress ---------- */
+
+.hc-topbar {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.hc-levels {
+  display: flex;
+  gap: 6px;
+  background: var(--surface);
+  border-radius: 12px;
+  padding: 4px;
+}
+
+.hc-level-btn {
+  flex: 1;
+  padding: 8px 4px;
+  border-radius: 9px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--font-data);
+  color: var(--ink-dim);
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.hc-level-btn[data-active='true'] {
+  background: var(--surface-raised);
+  color: var(--accent-cyan);
+  box-shadow: 0 0 0 1px var(--surface-line);
+}
+
+.hc-progress-track {
+  height: 3px;
+  border-radius: 3px;
+  background: var(--surface-line);
+  overflow: hidden;
+}
+
+.hc-progress-fill {
+  height: 100%;
+  background: var(--accent-cyan);
+  border-radius: 3px;
+  transition: width 0.25s ease;
+}
+
+/* ---------- Card stage ---------- */
+
+.hc-stage {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hc-card {
+  position: relative;
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--surface-line);
+  border-radius: 24px;
+  padding: 22px 20px 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  touch-action: none;
+  user-select: none;
+  will-change: transform;
+}
+
+.hc-card__badge-row {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.hc-badge {
+  font-family: var(--font-data);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--accent-cyan);
+  background: rgba(56, 189, 248, 0.1);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+.hc-freq {
+  font-family: var(--font-data);
+  font-size: 11px;
+  color: var(--ink-faint);
+}
+
+.hc-canvas-wrap {
+  background: var(--canvas-bg);
+  border-radius: 16px;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hanzi-canvas {
+  display: block;
+}
+
+.hanzi-canvas-stack {
+  position: relative;
+}
+
+.hanzi-canvas--static {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hanzi-canvas--static.hanzi-canvas--dim {
+  position: absolute;
+  inset: 0;
+  opacity: 0.35;
+}
+
+.hanzi-canvas__glyph {
+  font-family: var(--font-hanzi);
+  font-size: 180px;
+  line-height: 1;
+  color: var(--stroke-white);
+}
+
+.hc-mode-row {
+  display: flex;
+  gap: 8px;
+}
+
+.hanzi-canvas--fallback {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.hanzi-canvas__fallback-char {
+  font-family: var(--font-hanzi);
+  font-size: 96px;
+  color: var(--stroke-white);
+}
+
+.hanzi-canvas__fallback-note {
+  font-size: 11px;
+  color: var(--ink-faint);
+}
+
+.hc-practice-toggle {
+  flex: 1;
+  font-family: var(--font-data);
+  font-size: 12px;
+  color: var(--ink-dim);
+  border: 1px solid var(--surface-line);
+  border-radius: 8px;
+  padding: 6px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.hc-practice-toggle[data-on='true'] {
+  color: var(--draw-cyan);
+  border-color: rgba(34, 211, 238, 0.35);
+}
+
+.hc-sentence {
+  font-size: 14px;
+  color: var(--ink-dim);
+  text-align: center;
+  min-height: 20px;
+}
+
+.hc-sentence--empty {
+  color: var(--ink-faint);
+  font-style: italic;
+}
+
+/* ---------- Back of card ---------- */
+
+.hc-back {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 4px 4px;
+}
+
+.hc-pinyin {
+  font-family: var(--font-data);
+  font-size: 28px;
+  font-weight: 500;
+  color: var(--accent-cyan);
+}
+
+.hc-meanings {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+  color: var(--ink);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.hc-meanings li + li {
+  margin-top: 4px;
+  color: var(--ink-dim);
+  font-size: 13px;
+}
+
+.hc-audio-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface-raised);
+  border: 1px solid var(--surface-line);
+  border-radius: 999px;
+  padding: 10px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent-cyan);
+  margin-top: 6px;
+}
+
+.hc-audio-btn:active {
+  transform: scale(0.97);
+}
+
+/* ---------- Grade + detail controls ---------- */
+
+.hc-controls {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.hc-grade-btn {
+  flex: 1;
+  padding: 12px 0;
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.hc-grade-btn--hard {
+  background: var(--hard-dim);
+  color: var(--hard);
+  border: 1px solid rgba(251, 113, 133, 0.3);
+}
+
+.hc-grade-btn--easy {
+  background: var(--easy-dim);
+  color: var(--easy);
+  border: 1px solid rgba(52, 211, 153, 0.3);
+}
+
+.hc-grade-btn:active {
+  transform: scale(0.97);
+}
+
+.hc-detail-btn {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 14px;
+  background: var(--surface-raised);
+  border: 1px solid var(--surface-line);
+  color: var(--ink-dim);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+.hc-hint {
+  font-size: 11px;
+  color: var(--ink-faint);
+  text-align: center;
+}
+
+/* ---------- Edge grading glow (feedback on swipe release) ---------- */
+
+.hc-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: 24px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.hc-glow[data-show='hard'] {
+  opacity: 1;
+  box-shadow: inset 0 0 0 2px var(--hard), inset 60px 0 60px -40px var(--hard);
+}
+
+.hc-glow[data-show='easy'] {
+  opacity: 1;
+  box-shadow: inset 0 0 0 2px var(--easy), inset -60px 0 60px -40px var(--easy);
+}
+
+/* ---------- Bottom sheet (deep dive) ---------- */
+
+.hc-sheet-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(3, 7, 18, 0.6);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  z-index: 10;
+}
+
+.hc-sheet-backdrop[data-open='true'] {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.hc-sheet {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  max-height: 78%;
+  background: var(--surface-raised);
+  border: 1px solid var(--surface-line);
+  border-bottom: none;
+  border-radius: 22px 22px 0 0;
+  padding: 10px 20px calc(20px + env(safe-area-inset-bottom));
+  transform: translateY(100%);
+  transition: transform 0.28s cubic-bezier(0.32, 0.72, 0, 1);
+  z-index: 11;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.hc-sheet[data-open='true'] {
+  transform: translateY(0);
+}
+
+.hc-sheet__handle {
+  width: 36px;
+  height: 4px;
+  border-radius: 3px;
+  background: var(--surface-line);
+  margin: 4px auto 6px;
+}
+
+.hc-sheet__title {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.hc-sheet__hanzi {
+  font-family: var(--font-hanzi);
+  font-size: 40px;
+  color: var(--stroke-white);
+}
+
+.hc-sheet__pinyin {
+  font-family: var(--font-data);
+  color: var(--accent-cyan);
+  font-size: 16px;
+}
+
+.hc-sheet__section-label {
+  font-family: var(--font-data);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin: 0 0 6px;
+}
+
+.hc-sheet__body-text {
+  font-size: 14px;
+  color: var(--ink-dim);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.hc-sheet__body-text--empty {
+  font-style: italic;
+  color: var(--ink-faint);
+}
+
+.hc-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.hc-chip {
+  font-family: var(--font-data);
+  font-size: 12px;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--surface-line);
+  padding: 4px 9px;
+  border-radius: 7px;
+}
+
+/* ---------- Loading / error / empty states ---------- */
+
+.hc-state {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  text-align: center;
+  padding: 32px 20px;
+}
+
+.hc-state__title {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.hc-state__body {
+  font-size: 13px;
+  color: var(--ink-dim);
+  max-width: 280px;
+  line-height: 1.6;
+}
+
+.hc-spinner {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid var(--surface-line);
+  border-top-color: var(--accent-cyan);
+  animation: hc-spin 0.8s linear infinite;
+}
+
+@keyframes hc-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.hc-retry-btn {
+  background: var(--accent-cyan);
+  color: #04121c;
+  font-weight: 700;
+  font-size: 13px;
+  padding: 10px 20px;
+  border-radius: 10px;
+}
+
+.hc-retry-btn:active {
+  transform: scale(0.97);
+}

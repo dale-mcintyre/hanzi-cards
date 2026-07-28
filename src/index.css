@@ -1,0 +1,83 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+  /* Obsidian slate palette */
+  --bg: #090d16;
+  --surface: #131c2e;
+  --surface-raised: #1a2540;
+  --surface-line: #24304d;
+
+  --canvas-bg: #030712;
+  --outline-slate: #64748b;
+  --stroke-white: #ffffff;
+  --accent-cyan: #38bdf8;
+  --draw-cyan: #22d3ee;
+
+  --ink: #f5f7fa;
+  --ink-dim: #8b93a7;
+  --ink-faint: #4b5468;
+
+  --easy: #34d399;
+  --easy-dim: rgba(52, 211, 153, 0.14);
+  --hard: #fb7185;
+  --hard-dim: rgba(251, 113, 133, 0.14);
+
+  --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-data: 'JetBrains Mono', ui-monospace, 'SF Mono', monospace;
+  --font-hanzi: 'PingFang SC', 'Noto Sans SC', 'Microsoft YaHei', 'Heiti SC', sans-serif;
+
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  overscroll-behavior-y: none;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  max-width: 420px;
+  margin: 0 auto;
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+button {
+  font-family: inherit;
+  color: inherit;
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+
+::selection {
+  background: rgba(56, 189, 248, 0.2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent-cyan);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
