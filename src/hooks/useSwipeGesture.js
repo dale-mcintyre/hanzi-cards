@@ -1,75 +1,50 @@
-import { useRef, useState, useCallback } from 'react';
+import { useState, useRef } from 'react';
 
-const SWIPE_X_THRESHOLD = 90;
-const SWIPE_UP_THRESHOLD = 70;
-const TAP_MAX_MOVEMENT = 8;
+export default function useSwipeGesture({ onSwipeLeft, onSwipeRight, onSwipeUp, onTap }) {
+  const [dragX, setDragX] = useState(0);
+  const [dragY, setDragY] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const startPosRef = useRef({ x: 0, y: 0 });
 
-/**
- * Drives the card's drag transform + commits a gesture on release.
- *
- * onSwipeLeft / onSwipeRight — SM-2 grading
- * onSwipeUp — open the deep-dive sheet
- * onTap — flip the card (fires only if the pointer barely moved)
- */
-export function useSwipeGesture({ onSwipeLeft, onSwipeRight, onSwipeUp, onTap, disabled }) {
-  const [drag, setDrag] = useState({ x: 0, y: 0, active: false });
-  const pointerStart = useRef(null);
-  const moved = useRef(false);
+  const handlePointerDown = (e) => {
+    if (e.target.closest('#canvas-box') || e.target.closest('button')) return;
+    setIsDragging(true);
+    startPosRef.current = { x: e.clientX, y: e.clientY };
+  };
 
-  const handlePointerDown = useCallback(
-    (e) => {
-      if (disabled) return;
-      pointerStart.current = { x: e.clientX, y: e.clientY };
-      moved.current = false;
-      setDrag({ x: 0, y: 0, active: true });
-      e.currentTarget.setPointerCapture?.(e.pointerId);
-    },
-    [disabled]
-  );
+  const handlePointerMove = (e) => {
+    if (!isDragging) return;
+    const diffX = e.clientX - startPosRef.current.x;
+    const diffY = e.clientY - startPosRef.current.y;
 
-  const handlePointerMove = useCallback(
-    (e) => {
-      if (!pointerStart.current || disabled) return;
-      const dx = e.clientX - pointerStart.current.x;
-      const dy = e.clientY - pointerStart.current.y;
-      if (Math.abs(dx) > TAP_MAX_MOVEMENT || Math.abs(dy) > TAP_MAX_MOVEMENT) {
-        moved.current = true;
-      }
-      setDrag({ x: dx, y: Math.min(dy, 0), active: true });
-    },
-    [disabled]
-  );
-
-  const handlePointerUp = useCallback(() => {
-    if (!pointerStart.current || disabled) {
-      setDrag({ x: 0, y: 0, active: false });
-      pointerStart.current = null;
-      return;
+    if (Math.abs(diffX) > Math.abs(diffY)) {
+      setDragX(diffX);
+    } else if (diffY < 0) {
+      setDragY(diffY);
     }
+  };
 
-    const { x, y } = drag;
+  const handlePointerUp = () => {
+    if (!isDragging) return;
+    setIsDragging(false);
 
-    if (!moved.current) {
-      onTap?.();
-    } else if (y <= -SWIPE_UP_THRESHOLD && Math.abs(y) > Math.abs(x)) {
-      onSwipeUp?.();
-    } else if (x >= SWIPE_X_THRESHOLD) {
-      onSwipeRight?.();
-    } else if (x <= -SWIPE_X_THRESHOLD) {
-      onSwipeLeft?.();
-    }
+    if (dragX > 90 && onSwipeRight) onSwipeRight();
+    else if (dragX < -90 && onSwipeLeft) onSwipeLeft();
+    else if (dragY < -60 && onSwipeUp) onSwipeUp();
+    else if (Math.abs(dragX) < 10 && Math.abs(dragY) < 10 && onTap) onTap();
 
-    pointerStart.current = null;
-    setDrag({ x: 0, y: 0, active: false });
-  }, [drag, disabled, onSwipeLeft, onSwipeRight, onSwipeUp, onTap]);
+    setDragX(0);
+    setDragY(0);
+  };
 
   return {
-    drag,
-    handlers: {
+    dragX,
+    dragY,
+    isDragging,
+    pointerHandlers: {
       onPointerDown: handlePointerDown,
       onPointerMove: handlePointerMove,
       onPointerUp: handlePointerUp,
-      onPointerCancel: handlePointerUp,
     },
   };
 }
