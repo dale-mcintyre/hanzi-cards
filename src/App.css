@@ -1,66 +1,280 @@
-/* Front Top Bar & Audio Button */
-.front-top-bar {
-  width: 100%;
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  padding: 0 4px;
+/* ==========================================================================
+   APP STAGE & LAYOUT LOCK
+   ========================================================================== */
+:root {
+  --bg-stage: #090d16;
+  --card-bg: #111827;
+  --card-border: #1f2937;
+  --text-main: #f9fafb;
+  --text-sub: #9ca3af;
+  --accent-blue: #38bdf8;
 }
 
-.front-audio-btn {
-  background: rgba(30, 41, 59, 0.6);
-  border: 1px solid #334155;
-  border-radius: 50%;
-  width: 38px;
-  height: 38px;
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100vh;
+  background-color: var(--bg-stage) !important;
+  color: var(--text-main);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+  overflow: hidden;
+}
+
+.app-container {
+  width: 100vw;
+  height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
-  color: #f8fafc;
-  cursor: pointer;
-  transition: all 0.15s ease;
+  background-color: var(--bg-stage);
 }
 
-.front-audio-btn:active {
-  transform: scale(0.92);
-  background: #38bdf8;
-}
-
-/* Radical Badge Pill */
-.radical-badge {
-  background-color: rgba(56, 189, 248, 0.1);
-  border: 1px solid rgba(56, 189, 248, 0.25);
-  color: #38bdf8;
-  font-size: 13px;
-  font-weight: 600;
-  padding: 6px 14px;
-  border-radius: 20px;
-  margin: 6px 0;
-  text-align: center;
-}
-
-/* Grading Buttons with SM-2 Interval Labels */
-.grading-row {
-  display: flex;
-  gap: 12px;
+.stage {
   width: 100%;
-  margin-top: 12px;
+  max-width: 560px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  box-sizing: border-box;
+  position: relative;
 }
 
-.grade-btn {
+/* ==========================================================================
+   HEADER BAR (OUTSIDE CARD)
+   ========================================================================== */
+.header-bar {
+  width: 100%;
+  max-width: 520px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 8px;
+  margin-bottom: 8px;
+}
+
+.level-pills {
+  display: flex;
+  gap: 8px;
+}
+
+.level-pill {
+  background: #1f2937;
+  color: var(--accent-blue);
+  font-size: 13px;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 14px;
+  border: 1px solid #374151;
+  letter-spacing: 0.5px;
+}
+
+.gear-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  opacity: 0.75;
+  transition: opacity 0.2s;
+}
+
+.gear-btn:hover {
+  opacity: 1;
+}
+
+/* ==========================================================================
+   THE FULL-SCREEN IMMERSIVE FLASHCARD
+   ========================================================================== */
+.card {
+  width: 92vw;
+  max-width: 520px;
+  height: 84vh;
+  max-height: 760px;
+  background-color: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 32px;
+  padding: 32px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-sizing: border-box;
+  position: relative;
+  user-select: none;
+  touch-action: none;
+}
+
+/* SWIPE BADGES */
+.badge {
+  position: absolute;
+  top: 28px;
+  padding: 8px 20px;
+  border-radius: 12px;
+  font-weight: 800;
+  font-size: 15px;
+  letter-spacing: 1px;
+  z-index: 50;
+  pointer-events: none;
+}
+
+.badge--know {
+  right: 28px;
+  background: #059669;
+  color: #fff;
+  border: 1px solid #10b981;
+}
+
+.badge--again {
+  left: 28px;
+  background: #dc2626;
+  color: #fff;
+  border: 1px solid #ef4444;
+}
+
+/* ==========================================================================
+   FRONT CARD LAYOUT
+   ========================================================================== */
+.front-layout {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+}
+
+.card-top-controls {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.audio-circle-btn {
+  background: rgba(31, 41, 55, 0.8);
+  border: 1px solid #374151;
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: var(--text-main);
+  cursor: pointer;
+  transition: transform 0.1s ease, background-color 0.15s ease;
+}
+
+.audio-circle-btn:active {
+  transform: scale(0.92);
+  background: var(--accent-blue);
+}
+
+.canvas-inset-box {
+  width: 100%;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 16px 0;
+}
+
+.tap-hint {
+  font-size: 14px;
+  color: var(--text-sub);
+  letter-spacing: 0.3px;
+  font-weight: 500;
+}
+
+/* ==========================================================================
+   BACK CARD LAYOUT
+   ========================================================================== */
+.back-layout {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.back-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.pinyin-title {
+  font-size: 34px;
+  margin: 0 0 8px 0;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.meaning-primary {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text-main);
+  margin: 0;
+}
+
+.meaning-secondary {
+  font-size: 15px;
+  color: var(--text-sub);
+  margin: 6px 0 0 0;
+  line-height: 1.4;
+}
+
+.back-center-stage {
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 10px 14px;
-  border-radius: 16px;
+  gap: 16px;
+  margin: 20px 0;
+}
+
+.drawer-trigger-btn {
+  background: #1f2937;
+  border: 1px solid #374151;
+  color: var(--accent-blue);
+  font-size: 15px;
+  font-weight: 600;
+  padding: 14px 24px;
+  border-radius: 20px;
+  cursor: pointer;
+  width: 100%;
+  text-align: center;
+  transition: background 0.15s;
+}
+
+.drawer-trigger-btn:active {
+  background: #374151;
+}
+
+.grading-row {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+}
+
+.grade-btn {
+  flex: 1;
+  padding: 18px;
+  border-radius: 18px;
   border: none;
   font-weight: 700;
-  font-size: 15px;
+  font-size: 16px;
   cursor: pointer;
   transition: transform 0.1s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
 }
 
 .grade-btn:active {
@@ -68,18 +282,103 @@
 }
 
 .grade-btn--hard {
-  background-color: #334155;
-  color: #f8fafc;
+  background-color: #374151;
+  color: var(--text-main);
 }
 
 .grade-btn--easy {
-  background-color: #38bdf8;
+  background-color: var(--accent-blue);
   color: #090d16;
 }
 
-.interval-tag {
-  font-size: 11px;
-  opacity: 0.8;
-  margin-top: 2px;
-  font-weight: 500;
+/* ==========================================================================
+   DRAWERS & MODALS
+   ========================================================================== */
+.drawer-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  z-index: 100;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+}
+
+.drawer-sheet {
+  width: 100%;
+  max-width: 520px;
+  background-color: #111827;
+  border-top-left-radius: 32px;
+  border-top-right-radius: 32px;
+  border: 1px solid #1f2937;
+  padding: 24px 28px 40px 28px;
+  box-sizing: border-box;
+  animation: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.drawer-handle {
+  width: 40px;
+  height: 5px;
+  background-color: #374151;
+  border-radius: 3px;
+  margin: 0 auto 20px auto;
+}
+
+.drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+
+.drawer-header h2 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: var(--text-sub);
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.sentence-card, .culture-card {
+  background: #1f2937;
+  border-radius: 18px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.sentence-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sentence-row p.chinese {
+  font-size: 20px;
+  margin: 0;
+  font-weight: 600;
+}
+
+.pinyin {
+  margin: 8px 0;
+  font-size: 15px;
+}
+
+.english {
+  margin: 0;
+  color: var(--text-sub);
+  font-size: 14px;
 }
