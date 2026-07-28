@@ -20,25 +20,33 @@ export function getHardwiredDeck(activeLevels = ['3']) {
   activeLevels.forEach((lvl) => {
     const list = ALL_LEVELS[lvl] || [];
     const formatted = list.map((item, idx) => {
-      // 1. Extract simplified character
-      const char = item.simplified || item.hanzi || item.character || '字';
-      
-      // 2. Extract pinyin from nested forms array
-      const pinyinStr = item.forms?.[0]?.transcriptions?.pinyin || item.pinyin || '';
+      // 1. Extract simplified character safely as a pure string
+      let char = item.simplified || item.hanzi || item.character || '字';
+      if (typeof char !== 'string') {
+        char = String(char.simplified || char.hanzi || '字');
+      }
 
-      // 3. Extract meanings list safely
-      const meaningsList = item.forms?.[0]?.meanings || item.translations || item.meaning || ['meaning'];
-      const meaningsJoined = Array.isArray(meaningsList) ? meaningsList.join(', ') : String(meaningsList);
+      // 2. Extract pinyin safely
+      let pinyinStr = item.forms?.[0]?.transcriptions?.pinyin || item.pinyin || '';
+      if (typeof pinyinStr !== 'string') pinyinStr = '';
+
+      // 3. Extract meanings safely
+      let meanings = item.forms?.[0]?.meanings || item.translations || item.meaning || ['meaning'];
+      if (Array.isArray(meanings)) {
+        meanings = meanings.join(', ');
+      } else if (typeof meanings !== 'string') {
+        meanings = String(meanings);
+      }
 
       return {
         id: `hsk${lvl}_${idx}_${char}`,
         character: char,
         pinyin: pinyinStr,
-        meaning: meaningsJoined,
+        meaning: meanings,
         hskLevel: `HSK ${lvl}`,
         sentence: `这是“${char}”字。`,
         sentencePinyin: '',
-        sentenceEnglish: `This is the character for ${Array.isArray(meaningsList) ? meaningsList[0] : meaningsJoined}.`,
+        sentenceEnglish: `This is the character for ${meanings.split(',')[0]}.`,
         culturalNote: item.radical ? `Radical: ${item.radical}` : 'Standard HSK vocabulary word.',
       };
     });

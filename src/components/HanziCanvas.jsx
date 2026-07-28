@@ -1,23 +1,28 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import HanziWriter from 'hanzi-writer';
 
 export default function HanziCanvas({ character, mode = 'view', width = 220, height = 220 }) {
   const containerRef = useRef(null);
   const writerRef = useRef(null);
+  const [renderFailed, setRenderFailed] = useState(false);
+
+  // Ensure character is strictly a string
+  const charString = typeof character === 'string' ? character : String(character || '字');
 
   useEffect(() => {
-    if (!containerRef.current || !character) return;
+    if (!containerRef.current || !charString) return;
 
     containerRef.current.innerHTML = '';
+    setRenderFailed(false);
 
     try {
-      const writer = HanziWriter.create(containerRef.current, character, {
+      const writer = HanziWriter.create(containerRef.current, charString, {
         width,
         height,
         padding: 15,
-        strokeColor: '#f8fafc',      // Bright character strokes
-        radicalColor: '#38bdf8',     // Highlighting radical in cyan
-        outlineColor: '#334155',     // Soft guide outline
+        strokeColor: '#f8fafc',      // Main character color
+        radicalColor: '#38bdf8',     // Radical highlight
+        outlineColor: '#334155',     // Background character outline
         showOutline: true,
         showCharacter: true,
         delayBetweenStrokes: 50,
@@ -30,9 +35,10 @@ export default function HanziCanvas({ character, mode = 'view', width = 220, hei
         writer.animateCharacter();
       }
     } catch (e) {
-      console.error('HanziWriter mount failed:', e);
+      console.warn('HanziWriter render notice:', e);
+      setRenderFailed(true);
     }
-  }, [character, mode, width, height]);
+  }, [charString, mode, width, height]);
 
   return (
     <div 
@@ -68,10 +74,25 @@ export default function HanziCanvas({ character, mode = 'view', width = 220, hei
       </svg>
       
       {/* HanziWriter Mount Container */}
-      <div 
-        ref={containerRef} 
-        style={{ width: `${width}px`, height: `${height}px`, position: 'relative', zIndex: 2 }}
-      />
+      {!renderFailed ? (
+        <div 
+          ref={containerRef} 
+          style={{ width: `${width}px`, height: `${height}px`, position: 'relative', zIndex: 2 }}
+        />
+      ) : (
+        /* Fallback if HanziWriter SVG fails */
+        <span 
+          style={{ 
+            fontSize: '110px', 
+            color: '#f8fafc', 
+            position: 'relative', 
+            zIndex: 2,
+            fontFamily: '"PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif'
+          }}
+        >
+          {charString}
+        </span>
+      )}
     </div>
   );
 }
