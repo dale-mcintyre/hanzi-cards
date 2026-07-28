@@ -8,7 +8,6 @@ import { speakText } from './utils/tts';
 import { ColorPinyin } from './utils/pinyinColor';
 import { getHardwiredDeck } from './data/hskLoader';
 
-// Utility to highlight the target Chinese character in example sentences
 function HighlightedSentence({ sentence, targetChar }) {
   if (!sentence || !targetChar) return <span>{sentence}</span>;
 
@@ -32,17 +31,19 @@ function HighlightedSentence({ sentence, targetChar }) {
 export default function App() {
   const [selectedLevels, setSelectedLevels] = useState(['3']);
   const [showSettings, setShowSettings] = useState(false);
-  const [batchSize, setBatchSize] = useState(5); // Default to 5-card quick session
+
+  // App State: 'home' (session selector) | 'studying' | 'completed'
+  const [appState, setAppState] = useState('home');
 
   const [rawDeck, setRawDeck] = useState([]);
+  const [sessionQueue, setSessionQueue] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [sessionCompleted, setSessionCompleted] = useState(false);
   const [cardsReviewedInSession, setCardsReviewedInSession] = useState(0);
 
   const [isFlipped, setIsFlipped] = useState(false);
   const [showDrawer, setShowDrawer] = useState(false);
 
-  // --- STREAK TRACKING LOGIC (EMBEDDED) ---
+  // Streak Tracking
   const [streak, setStreak] = useState(1);
 
   useEffect(() => {
@@ -71,7 +72,6 @@ export default function App() {
         }
       }
     } catch (e) {
-      console.warn('Streak storage notice:', e);
       setStreak(1);
     }
   }, []);
@@ -106,8 +106,8 @@ export default function App() {
     }
   };
 
-  // Load Deck
-  const loadSessionDeck = () => {
+  // Load All Decks with Progress
+  useEffect(() => {
     const localWords = getHardwiredDeck(selectedLevels);
     const savedProgress = getProgress();
 
@@ -116,21 +116,36 @@ export default function App() {
       stats: savedProgress[card.id] || { repetitions: 0, interval: 1, easeFactor: 2.5 },
     }));
 
-    const shuffled = [...merged].sort(() => 0.5 - Math.random());
-    setRawDeck(shuffled.slice(0, batchSize));
+    setRawDeck(merged);
+  }, [selectedLevels]);
+
+  // Filters & Deck Counters
+  const unseenCards = useMemo(() => rawDeck.filter((c) => c.stats.repetitions === 0), [rawDeck]);
+  const weakCards = useMemo(() => rawDeck.filter((c) => c.stats.repetitions > 0 && c.stats.interval <= 2), [rawDeck]);
+
+  // Session Launchers
+  const startSession = (mode, count = 5) => {
+    let selected = [];
+
+    if (mode === 'unseen') {
+      selected = unseenCards.length > 0 ? unseenCards : rawDeck;
+    } else if (mode === 'weak') {
+      selected = weakCards.length > 0 ? weakCards : rawDeck;
+    } else {
+      selected = [...rawDeck].sort(() => 0.5 - Math.random());
+    }
+
+    const queue = [...selected].sort(() => 0.5 - Math.random()).slice(0, count);
+
+    setSessionQueue(queue);
     setCurrentIndex(0);
     setCardsReviewedInSession(0);
-    setSessionCompleted(false);
     setIsFlipped(false);
+    setAppState('studying');
   };
 
-  useEffect(() => {
-    loadSessionDeck();
-  }, [selectedLevels, batchSize]);
+  const card = sessionQueue[currentIndex];
 
-  const card = rawDeck[currentIndex];
-
-  // Auto-TTS on Flip
   const handleFlip = () => {
     const nextFlipped = !isFlipped;
     setIsFlipped(nextFlipped);
@@ -155,8 +170,8 @@ export default function App() {
     const nextReviewed = cardsReviewedInSession + 1;
     setCardsReviewedInSession(nextReviewed);
 
-    if (nextReviewed >= rawDeck.length) {
-      setSessionCompleted(true);
+    if (nextReviewed >= sessionQueue.length) {
+      setAppState('completed');
     } else {
       setIsFlipped(false);
       setShowDrawer(false);
@@ -195,7 +210,7 @@ export default function App() {
     <div className="app-container">
       <div className="stage">
         
-        {/* HEADER BAR: STREAK BADGE & HSK LEVEL PILLS */}
+        {/* Header Bar */}
         <div className="header-bar">
           <div className="header-left">
             <div className="streak-badge">
@@ -210,36 +225,68 @@ export default function App() {
           <button className="gear-btn" onClick={() => setShowSettings(true)}>⚙️</button>
         </div>
 
-        {/* SESSION PROGRESS BAR */}
-        <div className="progress-bar-container">
-          <div 
-            className="progress-bar-fill" 
-            style={{ width: `${(cardsReviewedInSession / (batchSize || 1)) * 100}%` }}
-          />
-        </div>
+        {/* Progress Bar (Only during studying) */}
+        {appState === 'studying' && (
+          <div className="progress-bar-container">
+            <div 
+              className="progress-bar-fill" 
+              style={{ width: `${(cardsReviewedInSession / (sessionQueue.length || 1)) * 100}%` }}
+            />
+          </div>
+        )}
 
-        {/* SESSION COMPLETION SCREEN */}
-        {sessionCompleted ? (
-          <div className="card completion-card">
-            <div className="completion-content">
-              <span className="celebration-emoji">🎉</span>
-              <h2>Session Complete!</h2>
-              <p>You reviewed <strong>{batchSize}</strong> cards and extended your <strong>{streak} day streak</strong>!</p>
-              
-              <div className="completion-actions">
-                <button className="action-btn primary" onClick={loadSessionDeck}>
-                  ⚡ Start Another 5 Cards
+        {/* 1. HOME SESSION LAUNCHPAD */}
+        {appState === 'home' && (
+          <div className="card launchpad-card">
+            <div className="launchpad-content">
+              <h2>Select Today's Focus</h2>
+              <p className="launchpad-sub">Choose a session tailored to your time and focus:</p>
+
+              <div className="session-grid">
+                <button className="session-option-btn primary" onClick={() => startSession('all', 5)}>
+                  <div className="option-icon">⚡</div>
+                  <div className="option-info">
+                    <h3>Quick Review</h3>
+                    <p>5 random cards (Under 2 mins)</p>
+                  </div>
                 </button>
-                <button className="action-btn secondary" onClick={() => setShowSettings(true)}>
-                  ⚙️ Adjust Settings
+
+                <button 
+                  className="session-option-btn weak-mode" 
+                  onClick={() => startSession('weak', 10)}
+                >
+                  <div className="option-icon">🎯</div>
+                  <div className="option-info">
+                    <h3>Fix Weak Spots</h3>
+                    <p>{weakCards.length > 0 ? `${weakCards.length} cards need practice` : 'Review cards you got wrong'}</p>
+                  </div>
+                </button>
+
+                <button 
+                  className="session-option-btn unseen-mode" 
+                  onClick={() => startSession('unseen', 5)}
+                >
+                  <div className="option-icon">✨</div>
+                  <div className="option-info">
+                    <h3>New Words First</h3>
+                    <p>{unseenCards.length} unseen characters remaining</p>
+                  </div>
+                </button>
+
+                <button className="session-option-btn deep-mode" onClick={() => startSession('all', 20)}>
+                  <div className="option-icon">🔥</div>
+                  <div className="option-info">
+                    <h3>Deep Focus</h3>
+                    <p>20 cards thorough review session</p>
+                  </div>
                 </button>
               </div>
             </div>
           </div>
-        ) : !card ? (
-          <div className="card loading-card">Loading session...</div>
-        ) : (
-          /* MAIN FLASHCARD STAGE */
+        )}
+
+        {/* 2. FLASHCARD STUDY STAGE */}
+        {appState === 'studying' && card && (
           <div
             className={`card ${isFlipped ? 'card--flipped' : ''}`}
             style={{
@@ -252,7 +299,6 @@ export default function App() {
             {dragX < -30 && <div className="badge badge--again">AGAIN</div>}
 
             {!isFlipped ? (
-              /* FRONT LAYOUT */
               <div className="front-layout">
                 <div className="card-top-controls">
                   <button 
@@ -274,7 +320,6 @@ export default function App() {
                 <span className="tap-hint">Tap card to reveal definition ↺</span>
               </div>
             ) : (
-              /* REVERSE LAYOUT */
               <div className="back-layout">
                 <div className="back-header">
                   <div>
@@ -309,7 +354,6 @@ export default function App() {
                   </button>
                 </div>
 
-                {/* Grading Row */}
                 <div className="grading-row" onClick={(e) => e.stopPropagation()}>
                   <button 
                     className="grade-btn grade-btn--hard" 
@@ -335,6 +379,23 @@ export default function App() {
           </div>
         )}
 
+        {/* 3. SESSION COMPLETED CELEBRATION */}
+        {appState === 'completed' && (
+          <div className="card completion-card">
+            <div className="completion-content">
+              <span className="celebration-emoji">🎉</span>
+              <h2>Session Complete!</h2>
+              <p>You maintained your <strong>{streak} day streak</strong>!</p>
+              
+              <div className="completion-actions">
+                <button className="action-btn primary" onClick={() => setAppState('home')}>
+                  🏠 Back to Session Launcher
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* SETTINGS DRAWER */}
         {showSettings && (
           <div 
@@ -345,7 +406,7 @@ export default function App() {
             <div className="drawer-sheet" onClick={(e) => e.stopPropagation()}>
               <div className="drawer-handle" />
               <div className="drawer-header">
-                <h2>Daily Habit & Decks</h2>
+                <h2>Deck Focus</h2>
                 <button className="close-btn" onClick={() => setShowSettings(false)}>✕</button>
               </div>
 
@@ -362,19 +423,6 @@ export default function App() {
                     </button>
                   ))}
                 </div>
-              </div>
-
-              <div className="settings-group">
-                <label className="settings-label">Micro-Session Goal</label>
-                <select 
-                  value={batchSize} 
-                  onChange={(e) => setBatchSize(Number(e.target.value))}
-                  className="clean-select"
-                >
-                  <option value={5}>⚡ 5 Cards (Quick Blitz)</option>
-                  <option value={10}>🎯 10 Cards (Standard)</option>
-                  <option value={20}>🔥 20 Cards (Deep Focus)</option>
-                </select>
               </div>
             </div>
           </div>
