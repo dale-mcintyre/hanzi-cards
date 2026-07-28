@@ -20,24 +20,25 @@ export function getHardwiredDeck(activeLevels = ['3']) {
   activeLevels.forEach((lvl) => {
     const list = ALL_LEVELS[lvl] || [];
     const formatted = list.map((item, idx) => {
-      // Handles downloaded JSON structure options cleanly
-      const char = item.hanzi || item.simplified || item.character || '字';
-      const pinyinStr = item.pinyin || item.forms?.[0]?.transcriptions?.pinyin || '';
+      // 1. Extract simplified character
+      const char = item.simplified || item.hanzi || item.character || '字';
       
-      let meanings = item.translations || item.meanings || item.meaning || ['meaning'];
-      if (Array.isArray(meanings)) {
-        meanings = meanings.join(', ');
-      }
+      // 2. Extract pinyin from nested forms array
+      const pinyinStr = item.forms?.[0]?.transcriptions?.pinyin || item.pinyin || '';
+
+      // 3. Extract meanings list safely
+      const meaningsList = item.forms?.[0]?.meanings || item.translations || item.meaning || ['meaning'];
+      const meaningsJoined = Array.isArray(meaningsList) ? meaningsList.join(', ') : String(meaningsList);
 
       return {
         id: `hsk${lvl}_${idx}_${char}`,
         character: char,
         pinyin: pinyinStr,
-        meaning: meanings,
+        meaning: meaningsJoined,
         hskLevel: `HSK ${lvl}`,
-        sentence: item.example?.hanzi || `这是“${char}”字。`,
-        sentencePinyin: item.example?.pinyin || '',
-        sentenceEnglish: item.example?.translation || `This is the character for ${meanings.split(',')[0]}.`,
+        sentence: `这是“${char}”字。`,
+        sentencePinyin: '',
+        sentenceEnglish: `This is the character for ${Array.isArray(meaningsList) ? meaningsList[0] : meaningsJoined}.`,
         culturalNote: item.radical ? `Radical: ${item.radical}` : 'Standard HSK vocabulary word.',
       };
     });

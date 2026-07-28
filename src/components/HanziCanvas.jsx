@@ -15,9 +15,9 @@ export default function HanziCanvas({ character, mode = 'view', width = 220, hei
         width,
         height,
         padding: 15,
-        strokeColor: '#f8fafc',
-        radicalColor: '#38bdf8',
-        outlineColor: '#334155',
+        strokeColor: '#f8fafc',      // Bright character strokes
+        radicalColor: '#38bdf8',     // Highlighting radical in cyan
+        outlineColor: '#334155',     // Soft guide outline
         showOutline: true,
         showCharacter: true,
         delayBetweenStrokes: 50,
@@ -57,7 +57,7 @@ export default function HanziCanvas({ character, mode = 'view', width = 220, hei
           width: '100%',
           height: '100%',
           pointerEvents: 'none',
-          opacity: 0.4,
+          opacity: 0.5,
         }}
       >
         <rect x="1" y="1" width="98" height="98" fill="none" stroke="#334155" strokeWidth="1.5" />
