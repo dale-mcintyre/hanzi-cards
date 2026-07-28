@@ -4,8 +4,7 @@ import useSwipeGesture from './hooks/useSwipeGesture';
 import { calculateSM2 } from './utils/sm2';
 import { getProgress, saveCardProgress } from './utils/storage';
 import { speakText } from './utils/tts';
-
-const HSK_RAW_CDN = 'https://raw.githubusercontent.com/drkameleon/complete-hsk-vocabulary/main/json/';
+import { getHardwiredDeck } from './data/hskLoader';
 
 export default function App() {
   const [selectedLevels, setSelectedLevels] = useState(['3']);
@@ -17,48 +16,19 @@ export default function App() {
   const [isFlipped, setIsFlipped] = useState(false);
   const [showDrawer, setShowDrawer] = useState(false);
   const [canvasMode, setCanvasMode] = useState('view');
-  const [isLoading, setIsLoading] = useState(true);
 
+  // Hardwired local load — synchronous and instant
   useEffect(() => {
-    async function loadSelectedLevels() {
-      setIsLoading(true);
-      try {
-        let combinedWords = [];
-        for (const level of selectedLevels) {
-          const res = await fetch(`${HSK_RAW_CDN}hsk${level}.json`);
-          const data = await res.json();
-          const formatted = data.map((item, idx) => ({
-            id: `hsk${level}_${idx}_${item.hanzi || item.simplified}`,
-            character: item.hanzi || item.simplified || item.character,
-            pinyin: item.pinyin,
-            meaning: Array.isArray(item.translations) ? item.translations.join(', ') : item.translations || item.meaning,
-            hskLevel: `HSK ${level}`,
-            sentence: item.example?.hanzi || `这是“${item.hanzi || item.simplified}”字。`,
-            sentencePinyin: item.example?.pinyin || '',
-            sentenceEnglish: item.example?.translation || `This is the character for ${item.meaning || 'it'}.`,
-            culturalNote: item.radical ? `Radical: ${item.radical} (${item.strokes || '?'} strokes)` : 'Common HSK vocabulary word.'
-          }));
-          combinedWords = [...combinedWords, ...formatted];
-        }
+    const localWords = getHardwiredDeck(selectedLevels);
+    const savedProgress = getProgress();
 
-        const savedProgress = getProgress();
-        const merged = combinedWords.map((card) => ({
-          ...card,
-          stats: savedProgress[card.id] || { repetitions: 0, interval: 1, easeFactor: 2.5 },
-        }));
+    const merged = localWords.map((card) => ({
+      ...card,
+      stats: savedProgress[card.id] || { repetitions: 0, interval: 1, easeFactor: 2.5 },
+    }));
 
-        setRawDeck(merged.slice(0, batchSize));
-        setCurrentIndex(0);
-      } catch (err) {
-        console.error('Error fetching vocabulary:', err);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    if (selectedLevels.length > 0) {
-      loadSelectedLevels();
-    }
+    setRawDeck(merged.slice(0, batchSize));
+    setCurrentIndex(0);
   }, [selectedLevels, batchSize]);
 
   const card = rawDeck[currentIndex];
@@ -68,9 +38,9 @@ export default function App() {
 
     const newStats = calculateSM2(
       quality,
-      card.stats.repetitions,
-      card.stats.interval,
-      card.stats.easeFactor
+      card.stats?.repetitions || 0,
+      card.stats?.interval || 1,
+      card.stats?.easeFactor || 2.5
     );
 
     saveCardProgress(card.id, newStats);
@@ -100,11 +70,19 @@ export default function App() {
     }
   });
 
+  if (!card) {
+    return (
+      <div className="app-container">
+        <div className="card loading-card">Loading hardwired deck...</div>
+      </div>
+    );
+  }
+
   return (
     <div className="app-container">
       <div className="stage">
         
-        {/* Minimalist Header */}
+        {/* Minimal Header */}
         <div className="header-bar">
           <div className="level-pills">
             {selectedLevels.map((lvl) => (
@@ -114,81 +92,75 @@ export default function App() {
           <button className="gear-btn" onClick={() => setShowSettings(true)}>⚙️</button>
         </div>
 
-        {/* Card State */}
-        {isLoading ? (
-          <div className="card loading-card">Loading Deck...</div>
-        ) : !card ? (
-          <div className="card loading-card">No cards available.</div>
-        ) : (
-          <div
-            className={`card ${isFlipped ? 'card--flipped' : ''}`}
-            style={{
-              transform: `translateX(${dragX}px) translateY(${dragY}px) rotate(${dragX * 0.05}deg)`,
-              transition: isDragging ? 'none' : 'transform 0.2s ease-out',
-            }}
-            {...pointerHandlers}
-          >
-            {dragX > 30 && <div className="badge badge--know">KNOW IT</div>}
-            {dragX < -30 && <div className="badge badge--again">AGAIN</div>}
+        {/* Card Stage */}
+        <div
+          className={`card ${isFlipped ? 'card--flipped' : ''}`}
+          style={{
+            transform: `translateX(${dragX}px) translateY(${dragY}px) rotate(${dragX * 0.05}deg)`,
+            transition: isDragging ? 'none' : 'transform 0.2s ease-out',
+          }}
+          {...pointerHandlers}
+        >
+          {dragX > 30 && <div className="badge badge--know">KNOW IT</div>}
+          {dragX < -30 && <div className="badge badge--again">AGAIN</div>}
 
-            {!isFlipped ? (
-              /* FRONT: 100% CLEAN CHARACTER */
-              <div className="front-layout">
-                <div className="canvas-wrapper">
-                  <HanziCanvas character={card.character} mode="view" />
-                </div>
-                <span className="tap-hint">Tap card for details ↺</span>
+          {!isFlipped ? (
+            /* FRONT: CLEAN CHARACTER */
+            <div className="front-layout">
+              <div className="canvas-wrapper">
+                <HanziCanvas character={card.character} mode="view" />
               </div>
-            ) : (
-              /* REVERSE SIDE */
-              <div className="back-layout">
-                <div className="back-header">
-                  <div>
-                    <h1 className="pinyin-title">{card.pinyin}</h1>
-                    <p className="meaning-title">{card.meaning}</p>
-                  </div>
-                  <button className="icon-btn" onClick={(e) => { e.stopPropagation(); speakText(card.character); }}>
-                    🔊
-                  </button>
+              <span className="tap-hint">Tap card for details ↺</span>
+            </div>
+          ) : (
+            /* REVERSE SIDE */
+            <div className="back-layout">
+              <div className="back-header">
+                <div>
+                  <h1 className="pinyin-title">{card.pinyin}</h1>
+                  <p className="meaning-title">{card.meaning}</p>
                 </div>
-
-                <div className="writing-controls" onClick={(e) => e.stopPropagation()}>
-                  <button
-                    className={`mode-btn ${canvasMode === 'animate' ? 'active' : ''}`}
-                    onClick={() => setCanvasMode(canvasMode === 'animate' ? 'view' : 'animate')}
-                  >
-                    🎬 Stroke Order
-                  </button>
-                  <button
-                    className={`mode-btn ${canvasMode === 'practice' ? 'active' : ''}`}
-                    onClick={() => setCanvasMode(canvasMode === 'practice' ? 'view' : 'practice')}
-                  >
-                    ✍️ Practice Writing
-                  </button>
-                </div>
-
-                {canvasMode !== 'view' && (
-                  <div className="reverse-canvas-box" onClick={(e) => e.stopPropagation()}>
-                    <HanziCanvas character={card.character} mode={canvasMode} />
-                  </div>
-                )}
-
-                <button className="drawer-trigger-btn" onClick={(e) => { e.stopPropagation(); setShowDrawer(true); }}>
-                  Usage & Example Sentences ↑
+                <button className="icon-btn" onClick={(e) => { e.stopPropagation(); speakText(card.character); }}>
+                  🔊
                 </button>
-
-                <div className="grading-row" onClick={(e) => e.stopPropagation()}>
-                  <button className="grade-btn grade-btn--hard" onClick={() => handleNextCard(1)}>
-                    ← Hard
-                  </button>
-                  <button className="grade-btn grade-btn--easy" onClick={() => handleNextCard(5)}>
-                    Easy →
-                  </button>
-                </div>
               </div>
-            )}
-          </div>
-        )}
+
+              <div className="writing-controls" onClick={(e) => e.stopPropagation()}>
+                <button
+                  className={`mode-btn ${canvasMode === 'animate' ? 'active' : ''}`}
+                  onClick={() => setCanvasMode(canvasMode === 'animate' ? 'view' : 'animate')}
+                >
+                  🎬 Stroke Order
+                </button>
+                <button
+                  className={`mode-btn ${canvasMode === 'practice' ? 'active' : ''}`}
+                  onClick={() => setCanvasMode(canvasMode === 'practice' ? 'view' : 'practice')}
+                >
+                  ✍️ Practice Writing
+                </button>
+              </div>
+
+              {canvasMode !== 'view' && (
+                <div className="reverse-canvas-box" onClick={(e) => e.stopPropagation()}>
+                  <HanziCanvas character={card.character} mode={canvasMode} />
+                </div>
+              )}
+
+              <button className="drawer-trigger-btn" onClick={(e) => { e.stopPropagation(); setShowDrawer(true); }}>
+                Usage & Example Sentences ↑
+              </button>
+
+              <div className="grading-row" onClick={(e) => e.stopPropagation()}>
+                <button className="grade-btn grade-btn--hard" onClick={() => handleNextCard(1)}>
+                  ← Hard
+                </button>
+                <button className="grade-btn grade-btn--easy" onClick={() => handleNextCard(5)}>
+                  Easy →
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
 
         {/* SETTINGS DRAWER */}
         {showSettings && (
