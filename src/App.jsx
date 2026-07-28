@@ -79,12 +79,12 @@ export default function App() {
     );
   }
 
-  // Parse meanings hierarchy
+  // Parse meanings hierarchy (Primary vs Secondary)
   const meaningList = typeof card.meaning === 'string' ? card.meaning.split(',') : [card.meaning];
   const primaryMeaning = meaningList[0]?.trim();
   const secondaryMeanings = meaningList.slice(1).join(', ').trim();
 
-  // SM-2 Interval Calculations for Button Badges
+  // SM-2 Intervals for Button Labels
   const nextHardInterval = calculateSM2(1, card.stats?.repetitions || 0, card.stats?.interval || 1, card.stats?.easeFactor || 2.5).interval;
   const nextEasyInterval = calculateSM2(5, card.stats?.repetitions || 0, card.stats?.interval || 1, card.stats?.easeFactor || 2.5).interval;
 
@@ -92,7 +92,7 @@ export default function App() {
     <div className="app-container">
       <div className="stage">
         
-        {/* Header Bar */}
+        {/* Top Header Bar (Deck Info outside the card) */}
         <div className="header-bar">
           <div className="level-pills">
             {selectedLevels.map((lvl) => (
@@ -115,35 +115,31 @@ export default function App() {
           {dragX < -30 && <div className="badge badge--again">AGAIN</div>}
 
           {!isFlipped ? (
-            /* FRONT LAYOUT */
+            /* CLEAN FRONT LAYOUT */
             <div className="front-layout">
-              {/* Top Front Bar: Audio Speaker */}
-              <div className="front-top-bar">
+              <div className="canvas-frame">
+                {/* Floating Audio Button */}
                 <button 
-                  className="front-audio-btn" 
+                  className="floating-audio-btn" 
                   onClick={(e) => { 
                     e.stopPropagation(); 
                     speakText(card.character); 
                   }}
-                  title="Listen to pronunciation"
+                  title="Listen"
                 >
                   🔊
                 </button>
-              </div>
 
-              {/* Tianzige Grid Canvas */}
-              <div className="canvas-wrapper">
+                {/* Tianzige Grid Canvas */}
                 <HanziCanvas character={card.character} mode="view" />
-              </div>
 
-              {/* Radical Badge Pill */}
-              {card.culturalNote && card.culturalNote.includes('Radical') ? (
-                <div className="radical-badge">
-                  {card.culturalNote.replace('Radical:', '部首 Radical:')}
-                </div>
-              ) : (
-                <div className="radical-badge">HSK Vocabulary</div>
-              )}
+                {/* Floating Radical Chip */}
+                {card.culturalNote && card.culturalNote.includes('Radical') && (
+                  <span className="floating-radical">
+                    {card.culturalNote.replace('Radical:', '部首')}
+                  </span>
+                )}
+              </div>
 
               <span className="tap-hint">Tap card for details ↺</span>
             </div>
@@ -171,7 +167,7 @@ export default function App() {
                 </button>
               </div>
 
-              {/* Stroke Order Controls */}
+              {/* Stroke Control Toggle */}
               <div className="writing-controls" onClick={(e) => e.stopPropagation()}>
                 <button
                   className={`mode-btn ${canvasMode === 'animate' ? 'active' : ''}`}
@@ -190,7 +186,7 @@ export default function App() {
                 </div>
               )}
 
-              {/* Drawer Trigger Button */}
+              {/* Usage Drawer Trigger */}
               <button 
                 className="drawer-trigger-btn" 
                 onClick={(e) => { 
@@ -201,7 +197,7 @@ export default function App() {
                 Usage & Example Sentences ↑
               </button>
 
-              {/* Grading Buttons with SM-2 Interval Tags */}
+              {/* Sleek Single-Line Grading Buttons */}
               <div className="grading-row" onClick={(e) => e.stopPropagation()}>
                 <button 
                   className="grade-btn grade-btn--hard" 
@@ -210,8 +206,7 @@ export default function App() {
                     handleNextCard(1); 
                   }}
                 >
-                  <span>← Hard</span>
-                  <small className="interval-tag">{nextHardInterval}d</small>
+                  ← Hard ({nextHardInterval}d)
                 </button>
                 <button 
                   className="grade-btn grade-btn--easy" 
@@ -220,8 +215,7 @@ export default function App() {
                     handleNextCard(5); 
                   }}
                 >
-                  <span>Easy →</span>
-                  <small className="interval-tag">{nextEasyInterval}d</small>
+                  Easy ({nextEasyInterval}d) →
                 </button>
               </div>
             </div>
