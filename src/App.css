@@ -1,48 +1,25 @@
-/* Tianzige (田字格) Canvas Box */
-.tianzige-container {
-  position: relative;
+/* Lock entire viewport background */
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 100vh;
+  background-color: #090d16 !important; /* Prevents white flash or default browser background */
+  color: #f8fafc;
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Ensure app wrapper fills container */
+.app-container {
+  min-height: 100vh;
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #0b1120;
-  border-radius: 20px;
-  overflow: hidden;
-  border: 1px solid #1e293b;
-}
-
-.tianzige-grid {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  opacity: 0.6;
-}
-
-.hanzi-writer-box {
-  position: relative;
-  z-index: 1;
-}
-
-/* Pinyin Tone Colors */
-.tone-1 { color: #ef4444; font-weight: 700; } /* 1st Tone: Red */
-.tone-2 { color: #10b981; font-weight: 700; } /* 2nd Tone: Green */
-.tone-3 { color: #3b82f6; font-weight: 700; } /* 3rd Tone: Blue */
-.tone-4 { color: #a855f7; font-weight: 700; } /* 4th Tone: Purple */
-.tone-neutral { color: #94a3b8; font-weight: 500; } /* Neutral: Slate */
-
-/* Meaning Hierarchy */
-.meaning-primary {
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--text-main);
-  margin: 4px 0 0 0;
-}
-
-.meaning-secondary {
-  font-size: 12px;
-  color: var(--text-sub);
-  margin: 2px 0 0 0;
-  font-style: italic;
+  padding: 16px;
+  box-sizing: border-box;
+  background-color: #090d16 !important;
 }
