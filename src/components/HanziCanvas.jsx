@@ -1,24 +1,23 @@
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import HanziWriter from 'hanzi-writer';
 
-export default function HanziCanvas({ character, mode = 'view', width = 220, height = 220 }) {
+// Single Character Box with its own Tianzige Grid
+function SingleHanziBox({ char, mode, size = 160 }) {
   const containerRef = useRef(null);
   const writerRef = useRef(null);
   const [writerLoaded, setWriterLoaded] = useState(false);
 
-  const charStr = typeof character === 'string' ? character : String(character || '');
-
   useEffect(() => {
-    if (!containerRef.current || !charStr) return;
+    if (!containerRef.current || !char) return;
 
     containerRef.current.innerHTML = '';
     setWriterLoaded(false);
 
     try {
-      const writer = HanziWriter.create(containerRef.current, charStr, {
-        width,
-        height,
-        padding: 15,
+      const writer = HanziWriter.create(containerRef.current, char, {
+        width: size,
+        height: size,
+        padding: 10,
         strokeColor: '#f8fafc',
         radicalColor: '#38bdf8',
         outlineColor: '#334155',
@@ -27,7 +26,7 @@ export default function HanziCanvas({ character, mode = 'view', width = 220, hei
         delayBetweenStrokes: 50,
         strokeAnimationSpeed: 1.25,
         onLoadCharDataSuccess: () => setWriterLoaded(true),
-        onLoadCharDataError: (err) => console.warn('HanziWriter stroke data load notice:', err),
+        onLoadCharDataError: () => setWriterLoaded(false),
       });
 
       writerRef.current = writer;
@@ -36,29 +35,30 @@ export default function HanziCanvas({ character, mode = 'view', width = 220, hei
         writer.animateCharacter();
       }
     } catch (e) {
-      console.error('HanziWriter creation error:', e);
+      console.warn('HanziWriter fallback:', e);
     }
-  }, [charStr, mode, width, height]);
+  }, [char, mode, size]);
 
   return (
-    <div 
-      className="tianzige-container" 
-      style={{ 
-        width: `${width}px`, 
-        height: `${height}px`,
+    <div
+      className="tianzige-container"
+      style={{
+        width: `${size}px`,
+        height: `${size}px`,
         position: 'relative',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: '#0b1120',
-        borderRadius: '20px',
+        borderRadius: '16px',
         border: '1px solid #1e293b',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        flexShrink: 0,
       }}
     >
-      {/* Tianzige SVG Background Grid */}
-      <svg 
-        className="tianzige-grid" 
+      {/* Dedicated Tianzige SVG Grid */}
+      <svg
+        className="tianzige-grid"
         viewBox="0 0 100 100"
         style={{
           position: 'absolute',
@@ -78,33 +78,63 @@ export default function HanziCanvas({ character, mode = 'view', width = 220, hei
         <line x1="100" y1="0" x2="0" y2="100" stroke="#1e293b" strokeWidth="0.75" strokeDasharray="2,4" />
       </svg>
 
-      {/* Guaranteed Text Render (Displays immediately) */}
-      <span 
-        style={{ 
+      {/* Immediate Native Text Fallback */}
+      <span
+        style={{
           position: 'absolute',
-          fontSize: '110px', 
-          color: '#f8fafc', 
+          fontSize: `${size * 0.55}px`,
+          color: '#f8fafc',
           zIndex: writerLoaded ? 1 : 2,
           opacity: writerLoaded ? 0 : 1,
           transition: 'opacity 0.2s ease',
-          fontFamily: '"PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif',
+          fontFamily: '"PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif',
           lineHeight: 1,
-          userSelect: 'none'
+          userSelect: 'none',
         }}
       >
-        {charStr || '字'}
+        {char}
       </span>
-      
-      {/* HanziWriter Mount Container */}
-      <div 
-        ref={containerRef} 
-        style={{ 
-          width: `${width}px`, 
-          height: `${height}px`, 
-          position: 'relative', 
-          zIndex: 3 
+
+      {/* HanziWriter SVG Mount Point */}
+      <div
+        ref={containerRef}
+        style={{
+          width: `${size}px`,
+          height: `${size}px`,
+          position: 'relative',
+          zIndex: 3,
         }}
       />
+    </div>
+  );
+}
+
+// Parent Wrapper: Automatically splits string into individual Tianzige character boxes
+export default function HanziCanvas({ character, mode = 'view' }) {
+  const charString = typeof character === 'string' ? character : String(character || '');
+  const charArray = Array.from(charString.trim());
+
+  // Scale box size depending on single vs multi-character words
+  let boxSize = 200;
+  if (charArray.length === 2) boxSize = 135;
+  if (charArray.length >= 3) boxSize = 100;
+
+  return (
+    <div
+      className="multi-hanzi-wrapper"
+      style={{
+        display: 'flex',
+        gap: '12px',
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: '100%',
+        maxWidth: '100%',
+        padding: '10px 0',
+      }}
+    >
+      {charArray.map((char, index) => (
+        <SingleHanziBox key={`${char}_${index}`} char={char} mode={mode} size={boxSize} />
+      ))}
     </div>
   );
 }
