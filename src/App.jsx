@@ -5,6 +5,7 @@ import { calculateSM2 } from './utils/sm2';
 import { getProgress, saveCardProgress } from './utils/storage';
 import { speakText } from './utils/tts';
 import { getHardwiredDeck } from './data/hskLoader';
+import './App.css'; // <--- Required to render the card shape
 
 export default function App() {
   const [selectedLevels, setSelectedLevels] = useState(['3']);
