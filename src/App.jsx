@@ -31,8 +31,15 @@ export default function App() {
   const [selectedLevels, setSelectedLevels] = useState(['3']);
   const [showSettings, setShowSettings] = useState(false);
 
-  // Experience States: 'launch' | 'studying' | 'completed'
+  // App States: 'launch' | 'countdown' | 'studying' | 'completed'
   const [appState, setAppState] = useState('launch');
+  const [countdownNum, setCountdownNum] = useState(3);
+
+  // Arcade Session State
+  const [score, setScore] = useState(0);
+  const [combo, setCombo] = useState(0);
+  const [maxCombo, setMaxCombo] = useState(0);
+  const [floatingPopups, setFloatingPopups] = useState([]);
 
   const [rawDeck, setRawDeck] = useState([]);
   const [sessionQueue, setSessionQueue] = useState([]);
@@ -42,7 +49,7 @@ export default function App() {
   const [showDrawer, setShowDrawer] = useState(false);
   const [streak, setStreak] = useState(1);
 
-  // Load Decks & Streak
+  // Load Decks & Progress
   useEffect(() => {
     const localWords = getHardwiredDeck(selectedLevels);
     const savedProgress = getProgress();
@@ -54,7 +61,6 @@ export default function App() {
 
     setRawDeck(merged);
 
-    // Streak initialization
     try {
       const savedCount = parseInt(localStorage.getItem('hz_streak_count') || '1', 10);
       setStreak(savedCount);
@@ -65,8 +71,8 @@ export default function App() {
 
   const weakCards = useMemo(() => rawDeck.filter((c) => c.stats.repetitions > 0 && c.stats.interval <= 2), [rawDeck]);
 
-  // Session Launcher
-  const launchSession = (count = 5, mode = 'all') => {
+  // Start Session with Arcade Countdown Sequence
+  const launchArcadeSession = (count = 5, mode = 'all') => {
     let pool = [...rawDeck];
     if (mode === 'weak' && weakCards.length > 0) pool = weakCards;
 
@@ -74,8 +80,26 @@ export default function App() {
     setSessionQueue(queue);
     setCurrentIndex(0);
     setIsFlipped(false);
-    setAppState('studying');
+    setScore(0);
+    setCombo(0);
+    setMaxCombo(0);
+
+    // Trigger Arcade Countdown
+    setAppState('countdown');
+    setCountdownNum(3);
   };
+
+  // Countdown Timer Loop
+  useEffect(() => {
+    if (appState !== 'countdown') return;
+
+    if (countdownNum > 0) {
+      const timer = setTimeout(() => setCountdownNum(countdownNum - 1), 600);
+      return () => clearTimeout(timer);
+    } else {
+      setAppState('studying');
+    }
+  }, [appState, countdownNum]);
 
   const card = sessionQueue[currentIndex];
 
@@ -87,8 +111,26 @@ export default function App() {
     }
   };
 
+  // Gameized Answer Handler
   const handleNextCard = (quality) => {
     if (!card) return;
+
+    const isSuccess = quality >= 4;
+    let newCombo = isSuccess ? combo + 1 : 0;
+    setCombo(newCombo);
+    if (newCombo > maxCombo) setMaxCombo(newCombo);
+
+    const points = isSuccess ? 100 * Math.max(1, newCombo) : 0;
+    setScore((prev) => prev + points);
+
+    // Trigger Arcade Score Popup
+    if (isSuccess) {
+      const newPopup = { id: Date.now(), text: `+${points} XP! ${newCombo > 1 ? `🔥 ${newCombo}x Combo` : ''}` };
+      setFloatingPopups((prev) => [...prev, newPopup]);
+      setTimeout(() => {
+        setFloatingPopups((prev) => prev.filter((p) => p.id !== newPopup.id));
+      }, 1000);
+    }
 
     const newStats = calculateSM2(
       quality,
@@ -130,20 +172,41 @@ export default function App() {
     <div className="app-container">
       <div className="stage">
         
-        {/* Header Bar */}
+        {/* Arcade HUD Header */}
         <div className="header-bar">
           <div className="streak-badge">🔥 {streak} Day Streak</div>
+          {appState === 'studying' && (
+            <div className="arcade-score-pill">
+              <span>⚡ {score} XP</span>
+              {combo > 1 && <span className="combo-tag">🔥 {combo}x</span>}
+            </div>
+          )}
           <button className="gear-btn" onClick={() => setShowSettings(true)}>⚙️</button>
         </div>
 
-        {/* 1. LAUNCH SCREEN: TACTILE STACKED DECK */}
+        {/* Arcade Progress Bar */}
+        {appState === 'studying' && (
+          <div className="progress-bar-container">
+            <div 
+              className="progress-bar-fill" 
+              style={{ width: `${((currentIndex) / (sessionQueue.length || 1)) * 100}%` }}
+            />
+          </div>
+        )}
+
+        {/* Floating Game Popups */}
+        <div className="floating-popups-container">
+          {floatingPopups.map((p) => (
+            <div key={p.id} className="arcade-popup">{p.text}</div>
+          ))}
+        </div>
+
+        {/* 1. LAUNCH LAUNCHPAD */}
         {appState === 'launch' && (
           <div className="launch-deck-container">
-            {/* Background stacked card layers for 3D depth */}
             <div className="deck-layer deck-layer-3" />
             <div className="deck-layer deck-layer-2" />
             
-            {/* Top Deck Card */}
             <div className="card launch-card">
               <div className="launch-card-header">
                 <span className="deck-level-pill">HSK {selectedLevels.join(', ')}</span>
@@ -151,17 +214,17 @@ export default function App() {
               </div>
 
               <div className="launch-card-body">
-                <h1 className="launch-title">Daily Practice</h1>
-                <p className="launch-subtitle">5 cards · estimated 90 seconds</p>
+                <h1 className="launch-title">Daily Blitz</h1>
+                <p className="launch-subtitle">5 cards · 90s session · 500+ XP</p>
               </div>
 
               <div className="launch-card-actions">
-                <button className="primary-launch-btn" onClick={() => launchSession(5, 'all')}>
-                  Start Session ⚡
+                <button className="primary-launch-btn" onClick={() => launchArcadeSession(5, 'all')}>
+                  Start Blitz ⚡
                 </button>
 
                 {weakCards.length > 0 && (
-                  <button className="secondary-launch-btn" onClick={() => launchSession(5, 'weak')}>
+                  <button className="secondary-launch-btn" onClick={() => launchArcadeSession(5, 'weak')}>
                     🎯 Practice {weakCards.length} Weak Spots
                   </button>
                 )}
@@ -170,13 +233,23 @@ export default function App() {
           </div>
         )}
 
-        {/* 2. ACTIVE FLASHCARD SESSION */}
+        {/* 2. ARCADE COUNTDOWN OVERLAY */}
+        {appState === 'countdown' && (
+          <div className="card countdown-card">
+            <div className="countdown-overlay">
+              <span className="countdown-number">{countdownNum > 0 ? countdownNum : 'GO!'}</span>
+              <p className="countdown-subtitle">Get Ready!</p>
+            </div>
+          </div>
+        )}
+
+        {/* 3. ACTIVE GAME SESSION */}
         {appState === 'studying' && card && (
           <div
-            className={`card ${isFlipped ? 'card--flipped' : ''}`}
+            className={`card ${isFlipped ? 'card--flipped' : ''} ${combo > 2 ? 'card--fever-mode' : ''}`}
             style={{
               transform: `translateX(${dragX}px) translateY(${dragY}px) rotate(${dragX * 0.05}deg)`,
-              transition: isDragging ? 'none' : 'transform 0.2s ease-out',
+              transition: isDragging ? 'none' : 'transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
             }}
             {...pointerHandlers}
           >
@@ -225,15 +298,28 @@ export default function App() {
           </div>
         )}
 
-        {/* 3. SESSION COMPLETED CELEBRATION */}
+        {/* 4. GAME OVER / VICTORY SCREEN */}
         {appState === 'completed' && (
-          <div className="card completion-card">
-            <span className="celebration-emoji">🎉</span>
-            <h2>Session Complete!</h2>
-            <p>You maintained your <strong>{streak} day streak</strong>.</p>
-            <button className="primary-launch-btn" onClick={() => setAppState('launch')}>
-              Back to Deck Desk 🏠
-            </button>
+          <div className="card victory-card">
+            <div className="victory-content">
+              <span className="victory-emoji">🏆</span>
+              <h2>Blitz Cleared!</h2>
+
+              <div className="stats-summary-grid">
+                <div className="stat-box">
+                  <span className="stat-label">Total XP</span>
+                  <span className="stat-value">+{score}</span>
+                </div>
+                <div className="stat-box">
+                  <span className="stat-label">Max Combo</span>
+                  <span className="stat-value">🔥 {maxCombo}x</span>
+                </div>
+              </div>
+
+              <button className="primary-launch-btn" onClick={() => setAppState('launch')}>
+                Play Again ⚡
+              </button>
+            </div>
           </div>
         )}
 
