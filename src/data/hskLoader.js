@@ -14,28 +14,30 @@ const ALL_LEVELS = {
   '6': hsk6,
 };
 
-/**
- * Normalizes hardwired HSK JSON datasets into clean flashcard objects.
- */
 export function getHardwiredDeck(activeLevels = ['3']) {
   let combinedRaw = [];
 
   activeLevels.forEach((lvl) => {
     const list = ALL_LEVELS[lvl] || [];
     const formatted = list.map((item, idx) => {
-      const char = item.simplified || item.hanzi || item.character || '字';
-      const pinyinStr = item.forms?.[0]?.transcriptions?.pinyin || item.pinyin || '';
-      const meanings = item.forms?.[0]?.meanings || item.translations || [item.meaning || 'meaning'];
+      // Handles downloaded JSON structure options cleanly
+      const char = item.hanzi || item.simplified || item.character || '字';
+      const pinyinStr = item.pinyin || item.forms?.[0]?.transcriptions?.pinyin || '';
+      
+      let meanings = item.translations || item.meanings || item.meaning || ['meaning'];
+      if (Array.isArray(meanings)) {
+        meanings = meanings.join(', ');
+      }
 
       return {
         id: `hsk${lvl}_${idx}_${char}`,
         character: char,
         pinyin: pinyinStr,
-        meaning: Array.isArray(meanings) ? meanings.join(', ') : meanings,
+        meaning: meanings,
         hskLevel: `HSK ${lvl}`,
-        sentence: `这是“${char}”字。`,
-        sentencePinyin: '',
-        sentenceEnglish: `This is the character for ${Array.isArray(meanings) ? meanings[0] : meanings}.`,
+        sentence: item.example?.hanzi || `这是“${char}”字。`,
+        sentencePinyin: item.example?.pinyin || '',
+        sentenceEnglish: item.example?.translation || `This is the character for ${meanings.split(',')[0]}.`,
         culturalNote: item.radical ? `Radical: ${item.radical}` : 'Standard HSK vocabulary word.',
       };
     });
