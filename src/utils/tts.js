@@ -1,50 +1,21 @@
-let cachedVoice = null;
-let voicesReadyPromise = null;
+/** Safe, cross-browser Web Speech API wrapper for Mandarin (zh-CN) */
+export function speakText(text) {
+  if (!('speechSynthesis' in window)) {
+    console.warn('Speech synthesis not supported in this browser.');
+    return;
+  }
 
-function pickChineseVoice() {
-  const voices = window.speechSynthesis.getVoices();
-  return (
-    voices.find((v) => v.lang === 'zh-CN') ||
-    voices.find((v) => v.lang && v.lang.toLowerCase().startsWith('zh')) ||
-    null
-  );
-}
+  // Cancel any ongoing speech
+  window.speechSynthesis.cancel();
 
-function ensureVoicesLoaded() {
-  if (voicesReadyPromise) return voicesReadyPromise;
-  voicesReadyPromise = new Promise((resolve) => {
-    const existing = window.speechSynthesis.getVoices();
-    if (existing.length > 0) {
-      resolve();
-      return;
-    }
-    const handle = () => {
-      window.speechSynthesis.removeEventListener('voiceschanged', handle);
-      resolve();
-    };
-    window.speechSynthesis.addEventListener('voiceschanged', handle);
-    // Some browsers never fire the event — don't hang forever.
-    setTimeout(resolve, 1000);
-  });
-  return voicesReadyPromise;
-}
-
-export function isSpeechSupported() {
-  return typeof window !== 'undefined' && 'speechSynthesis' in window;
-}
-
-export async function speakMandarin(text) {
-  if (!isSpeechSupported() || !text) return false;
-
-  await ensureVoicesLoaded();
-  if (!cachedVoice) cachedVoice = pickChineseVoice();
-
-  window.speechSynthesis.cancel(); // stop anything mid-utterance first
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = 'zh-CN';
-  utterance.rate = 0.9;
-  if (cachedVoice) utterance.voice = cachedVoice;
+  utterance.rate = 0.85; // Slightly slower for language learners
+
+  // Pick a native Chinese voice if available
+  const voices = window.speechSynthesis.getVoices();
+  const zhVoice = voices.find((v) => v.lang.includes('zh') || v.lang.includes('CN'));
+  if (zhVoice) utterance.voice = zhVoice;
 
   window.speechSynthesis.speak(utterance);
-  return true;
 }
