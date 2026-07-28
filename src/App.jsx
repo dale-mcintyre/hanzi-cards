@@ -8,12 +8,10 @@ import { speakText } from './utils/tts';
 const HSK_RAW_CDN = 'https://raw.githubusercontent.com/drkameleon/complete-hsk-vocabulary/main/json/';
 
 export default function App() {
-  // Settings State
-  const [selectedLevels, setSelectedLevels] = useState(['3']); // Default HSK 3
+  const [selectedLevels, setSelectedLevels] = useState(['3']);
   const [showSettings, setShowSettings] = useState(false);
   const [batchSize, setBatchSize] = useState(20);
 
-  // Deck & Card State
   const [rawDeck, setRawDeck] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
@@ -21,7 +19,6 @@ export default function App() {
   const [canvasMode, setCanvasMode] = useState('view');
   const [isLoading, setIsLoading] = useState(true);
 
-  // Fetch selected HSK levels whenever settings change
   useEffect(() => {
     async function loadSelectedLevels() {
       setIsLoading(true);
@@ -44,7 +41,6 @@ export default function App() {
           combinedWords = [...combinedWords, ...formatted];
         }
 
-        // Merge saved SRS stats from LocalStorage
         const savedProgress = getProgress();
         const merged = combinedWords.map((card) => ({
           ...card,
@@ -87,7 +83,7 @@ export default function App() {
 
   const toggleLevel = (levelStr) => {
     if (selectedLevels.includes(levelStr)) {
-      if (selectedLevels.length === 1) return; // Don't allow deselecting all
+      if (selectedLevels.length === 1) return;
       setSelectedLevels(selectedLevels.filter((l) => l !== levelStr));
     } else {
       setSelectedLevels([...selectedLevels, levelStr]);
@@ -108,25 +104,22 @@ export default function App() {
     <div className="app-container">
       <div className="stage">
         
-        {/* Top Header Bar */}
-        <div className="top-bar">
-          <div className="level-badge-group">
-            {selectedLevels.map(l => (
-              <span key={l} className="active-level-pill">HSK {l}</span>
+        {/* Minimalist Header */}
+        <div className="header-bar">
+          <div className="level-pills">
+            {selectedLevels.map((lvl) => (
+              <span key={lvl} className="level-pill">HSK {lvl}</span>
             ))}
           </div>
-          <button className="settings-icon-btn" onClick={() => setShowSettings(true)}>
-            ⚙️
-          </button>
+          <button className="gear-btn" onClick={() => setShowSettings(true)}>⚙️</button>
         </div>
 
-        {/* Loading State */}
+        {/* Card State */}
         {isLoading ? (
-          <div className="loading-card">Loading Vocabulary...</div>
+          <div className="card loading-card">Loading Deck...</div>
         ) : !card ? (
-          <div className="loading-card">No cards available. Check your settings.</div>
+          <div className="card loading-card">No cards available.</div>
         ) : (
-          /* Main Flashcard */
           <div
             className={`card ${isFlipped ? 'card--flipped' : ''}`}
             style={{
@@ -139,12 +132,12 @@ export default function App() {
             {dragX < -30 && <div className="badge badge--again">AGAIN</div>}
 
             {!isFlipped ? (
-              /* FRONT: DISTRACTION FREE */
+              /* FRONT: 100% CLEAN CHARACTER */
               <div className="front-layout">
                 <div className="canvas-wrapper">
                   <HanziCanvas character={card.character} mode="view" />
                 </div>
-                <span className="tap-hint">Tap to flip ↺</span>
+                <span className="tap-hint">Tap card for details ↺</span>
               </div>
             ) : (
               /* REVERSE SIDE */
@@ -181,7 +174,7 @@ export default function App() {
                 )}
 
                 <button className="drawer-trigger-btn" onClick={(e) => { e.stopPropagation(); setShowDrawer(true); }}>
-                  Cultural Notes & Examples ↑
+                  Usage & Example Sentences ↑
                 </button>
 
                 <div className="grading-row" onClick={(e) => e.stopPropagation()}>
@@ -197,23 +190,23 @@ export default function App() {
           </div>
         )}
 
-        {/* SETTINGS MODAL */}
+        {/* SETTINGS DRAWER */}
         {showSettings && (
           <div className="drawer-overlay" onClick={() => setShowSettings(false)}>
-            <div className="settings-modal" onClick={(e) => e.stopPropagation()}>
-              <div className="settings-header">
-                <h2>Deck Settings</h2>
+            <div className="drawer-sheet" onClick={(e) => e.stopPropagation()}>
+              <div className="drawer-handle" />
+              <div className="drawer-header">
+                <h2>Deck Focus & Settings</h2>
                 <button className="close-btn" onClick={() => setShowSettings(false)}>✕</button>
               </div>
 
-              <div className="settings-section">
-                <h3>Select Vocabulary Levels</h3>
-                <p className="settings-desc">Choose one or mix multiple HSK levels together:</p>
-                <div className="level-grid">
+              <div className="settings-group">
+                <label className="settings-label">Active HSK Levels</label>
+                <div className="pill-grid">
                   {['1', '2', '3', '4', '5', '6'].map((lvl) => (
                     <button
                       key={lvl}
-                      className={`level-toggle-btn ${selectedLevels.includes(lvl) ? 'active' : ''}`}
+                      className={`pill-btn ${selectedLevels.includes(lvl) ? 'active' : ''}`}
                       onClick={() => toggleLevel(lvl)}
                     >
                       HSK {lvl}
@@ -222,23 +215,55 @@ export default function App() {
                 </div>
               </div>
 
-              <div className="settings-section">
-                <h3>Session Batch Size</h3>
+              <div className="settings-group">
+                <label className="settings-label">Session Size</label>
                 <select 
                   value={batchSize} 
                   onChange={(e) => setBatchSize(Number(e.target.value))}
-                  className="settings-select"
+                  className="clean-select"
                 >
-                  <option value={10}>10 Cards / Session</option>
-                  <option value={20}>20 Cards / Session</option>
-                  <option value={50}>50 Cards / Session</option>
-                  <option value={100}>100 Cards / Session</option>
+                  <option value={10}>10 Cards per Session</option>
+                  <option value={20}>20 Cards per Session</option>
+                  <option value={50}>50 Cards per Session</option>
                 </select>
               </div>
 
-              <button className="save-settings-btn" onClick={() => setShowSettings(false)}>
-                Apply & Study Now
+              <button className="action-btn" onClick={() => setShowSettings(false)}>
+                Save & Continue
               </button>
+            </div>
+          </div>
+        )}
+
+        {/* CULTURAL & SENTENCE DRAWER */}
+        {showDrawer && (
+          <div className="drawer-overlay" onClick={() => setShowDrawer(false)}>
+            <div className="drawer-sheet" onClick={(e) => e.stopPropagation()}>
+              <div className="drawer-handle" />
+              <div className="drawer-header">
+                <div>
+                  <h2>{card.character} ({card.pinyin})</h2>
+                  <p>{card.meaning}</p>
+                </div>
+                <button className="close-btn" onClick={() => setShowDrawer(false)}>✕</button>
+              </div>
+
+              <div className="drawer-body">
+                <h3>Example Sentence</h3>
+                <div className="sentence-card">
+                  <div className="sentence-row">
+                    <p className="chinese">{card.sentence}</p>
+                    <button onClick={() => speakText(card.sentence)}>🔊</button>
+                  </div>
+                  <p className="pinyin">{card.sentencePinyin}</p>
+                  <p className="english">{card.sentenceEnglish}</p>
+                </div>
+
+                <h3>Notes</h3>
+                <div className="culture-card">
+                  <p>💡 {card.culturalNote}</p>
+                </div>
+              </div>
             </div>
           </div>
         )}
