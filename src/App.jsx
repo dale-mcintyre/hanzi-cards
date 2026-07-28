@@ -5,7 +5,6 @@ import { calculateSM2 } from './utils/sm2';
 import { getProgress, saveCardProgress } from './utils/storage';
 import { speakText } from './utils/tts';
 import { getHardwiredDeck } from './data/hskLoader';
-import './App.css'; // <--- Required to render the card shape
 
 export default function App() {
   const [selectedLevels, setSelectedLevels] = useState(['3']);
@@ -16,9 +15,10 @@ export default function App() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   const [showDrawer, setShowDrawer] = useState(false);
-  const [canvasMode, setCanvasMode] = useState('view');
+  
+  // Now only toggles between 'view' and 'animate'
+  const [canvasMode, setCanvasMode] = useState('view'); 
 
-  // Hardwired local load — synchronous and instant
   useEffect(() => {
     const localWords = getHardwiredDeck(selectedLevels);
     const savedProgress = getProgress();
@@ -126,18 +126,13 @@ export default function App() {
                 </button>
               </div>
 
+              {/* Simplified Writing Controls */}
               <div className="writing-controls" onClick={(e) => e.stopPropagation()}>
                 <button
                   className={`mode-btn ${canvasMode === 'animate' ? 'active' : ''}`}
                   onClick={() => setCanvasMode(canvasMode === 'animate' ? 'view' : 'animate')}
                 >
-                  🎬 Stroke Order
-                </button>
-                <button
-                  className={`mode-btn ${canvasMode === 'practice' ? 'active' : ''}`}
-                  onClick={() => setCanvasMode(canvasMode === 'practice' ? 'view' : 'practice')}
-                >
-                  ✍️ Practice Writing
+                  🎬 Watch Stroke Order
                 </button>
               </div>
 
