@@ -10,7 +10,6 @@ import { getHardwiredDeck } from './data/hskLoader';
 
 function HighlightedSentence({ sentence, targetChar }) {
   if (!sentence || !targetChar) return <span>{sentence}</span>;
-
   const parts = sentence.split(targetChar);
   if (parts.length === 1) return <span>{sentence}</span>;
 
@@ -32,81 +31,18 @@ export default function App() {
   const [selectedLevels, setSelectedLevels] = useState(['3']);
   const [showSettings, setShowSettings] = useState(false);
 
-  // App State: 'home' (session selector) | 'studying' | 'completed'
-  const [appState, setAppState] = useState('home');
+  // Experience States: 'launch' | 'studying' | 'completed'
+  const [appState, setAppState] = useState('launch');
 
   const [rawDeck, setRawDeck] = useState([]);
   const [sessionQueue, setSessionQueue] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [cardsReviewedInSession, setCardsReviewedInSession] = useState(0);
 
   const [isFlipped, setIsFlipped] = useState(false);
   const [showDrawer, setShowDrawer] = useState(false);
-
-  // Streak Tracking
   const [streak, setStreak] = useState(1);
 
-  useEffect(() => {
-    try {
-      const today = new Date().toISOString().split('T')[0];
-      const lastActive = localStorage.getItem('hz_last_active_date');
-      const savedCount = parseInt(localStorage.getItem('hz_streak_count') || '1', 10);
-
-      if (!lastActive) {
-        localStorage.setItem('hz_last_active_date', today);
-        localStorage.setItem('hz_streak_count', '1');
-        setStreak(1);
-      } else if (lastActive === today) {
-        setStreak(savedCount || 1);
-      } else {
-        const lastDate = new Date(lastActive);
-        const nowDate = new Date(today);
-        const diffDays = Math.round((nowDate - lastDate) / (1000 * 60 * 60 * 24));
-
-        if (diffDays === 1) {
-          setStreak(savedCount || 1);
-        } else if (diffDays > 1) {
-          localStorage.setItem('hz_streak_count', '1');
-          localStorage.setItem('hz_last_active_date', today);
-          setStreak(1);
-        }
-      }
-    } catch (e) {
-      setStreak(1);
-    }
-  }, []);
-
-  const recordActivity = () => {
-    try {
-      const today = new Date().toISOString().split('T')[0];
-      const lastActive = localStorage.getItem('hz_last_active_date');
-      let currentStreak = parseInt(localStorage.getItem('hz_streak_count') || '1', 10);
-
-      if (lastActive !== today) {
-        const lastDate = lastActive ? new Date(lastActive) : null;
-        const nowDate = new Date(today);
-
-        if (lastDate) {
-          const diffDays = Math.round((nowDate - lastDate) / (1000 * 60 * 60 * 24));
-          if (diffDays === 1) {
-            currentStreak += 1;
-          } else {
-            currentStreak = 1;
-          }
-        } else {
-          currentStreak = 1;
-        }
-
-        localStorage.setItem('hz_last_active_date', today);
-        localStorage.setItem('hz_streak_count', String(currentStreak));
-        setStreak(currentStreak);
-      }
-    } catch (e) {
-      console.warn('Streak write error:', e);
-    }
-  };
-
-  // Load All Decks with Progress
+  // Load Decks & Streak
   useEffect(() => {
     const localWords = getHardwiredDeck(selectedLevels);
     const savedProgress = getProgress();
@@ -117,29 +53,26 @@ export default function App() {
     }));
 
     setRawDeck(merged);
+
+    // Streak initialization
+    try {
+      const savedCount = parseInt(localStorage.getItem('hz_streak_count') || '1', 10);
+      setStreak(savedCount);
+    } catch (e) {
+      setStreak(1);
+    }
   }, [selectedLevels]);
 
-  // Filters & Deck Counters
-  const unseenCards = useMemo(() => rawDeck.filter((c) => c.stats.repetitions === 0), [rawDeck]);
   const weakCards = useMemo(() => rawDeck.filter((c) => c.stats.repetitions > 0 && c.stats.interval <= 2), [rawDeck]);
 
-  // Session Launchers
-  const startSession = (mode, count = 5) => {
-    let selected = [];
+  // Session Launcher
+  const launchSession = (count = 5, mode = 'all') => {
+    let pool = [...rawDeck];
+    if (mode === 'weak' && weakCards.length > 0) pool = weakCards;
 
-    if (mode === 'unseen') {
-      selected = unseenCards.length > 0 ? unseenCards : rawDeck;
-    } else if (mode === 'weak') {
-      selected = weakCards.length > 0 ? weakCards : rawDeck;
-    } else {
-      selected = [...rawDeck].sort(() => 0.5 - Math.random());
-    }
-
-    const queue = [...selected].sort(() => 0.5 - Math.random()).slice(0, count);
-
+    const queue = [...pool].sort(() => 0.5 - Math.random()).slice(0, count);
     setSessionQueue(queue);
     setCurrentIndex(0);
-    setCardsReviewedInSession(0);
     setIsFlipped(false);
     setAppState('studying');
   };
@@ -165,26 +98,13 @@ export default function App() {
     );
 
     saveCardProgress(card.id, newStats);
-    recordActivity();
 
-    const nextReviewed = cardsReviewedInSession + 1;
-    setCardsReviewedInSession(nextReviewed);
-
-    if (nextReviewed >= sessionQueue.length) {
+    if (currentIndex + 1 >= sessionQueue.length) {
       setAppState('completed');
     } else {
       setIsFlipped(false);
       setShowDrawer(false);
       setCurrentIndex((prev) => prev + 1);
-    }
-  };
-
-  const toggleLevel = (levelStr) => {
-    if (selectedLevels.includes(levelStr)) {
-      if (selectedLevels.length === 1) return;
-      setSelectedLevels(selectedLevels.filter((l) => l !== levelStr));
-    } else {
-      setSelectedLevels([...selectedLevels, levelStr]);
     }
   };
 
@@ -212,80 +132,45 @@ export default function App() {
         
         {/* Header Bar */}
         <div className="header-bar">
-          <div className="header-left">
-            <div className="streak-badge">
-              🔥 {streak} {streak === 1 ? 'Day' : 'Days'}
-            </div>
-            <div className="level-pills">
-              {selectedLevels.map((lvl) => (
-                <span key={lvl} className="level-pill">HSK {lvl}</span>
-              ))}
-            </div>
-          </div>
+          <div className="streak-badge">🔥 {streak} Day Streak</div>
           <button className="gear-btn" onClick={() => setShowSettings(true)}>⚙️</button>
         </div>
 
-        {/* Progress Bar (Only during studying) */}
-        {appState === 'studying' && (
-          <div className="progress-bar-container">
-            <div 
-              className="progress-bar-fill" 
-              style={{ width: `${(cardsReviewedInSession / (sessionQueue.length || 1)) * 100}%` }}
-            />
-          </div>
-        )}
+        {/* 1. LAUNCH SCREEN: TACTILE STACKED DECK */}
+        {appState === 'launch' && (
+          <div className="launch-deck-container">
+            {/* Background stacked card layers for 3D depth */}
+            <div className="deck-layer deck-layer-3" />
+            <div className="deck-layer deck-layer-2" />
+            
+            {/* Top Deck Card */}
+            <div className="card launch-card">
+              <div className="launch-card-header">
+                <span className="deck-level-pill">HSK {selectedLevels.join(', ')}</span>
+                <span className="deck-ready-tag">5 Cards Ready</span>
+              </div>
 
-        {/* 1. HOME SESSION LAUNCHPAD */}
-        {appState === 'home' && (
-          <div className="card launchpad-card">
-            <div className="launchpad-content">
-              <h2>Select Today's Focus</h2>
-              <p className="launchpad-sub">Choose a session tailored to your time and focus:</p>
+              <div className="launch-card-body">
+                <h1 className="launch-title">Daily Practice</h1>
+                <p className="launch-subtitle">5 cards · estimated 90 seconds</p>
+              </div>
 
-              <div className="session-grid">
-                <button className="session-option-btn primary" onClick={() => startSession('all', 5)}>
-                  <div className="option-icon">⚡</div>
-                  <div className="option-info">
-                    <h3>Quick Review</h3>
-                    <p>5 random cards (Under 2 mins)</p>
-                  </div>
+              <div className="launch-card-actions">
+                <button className="primary-launch-btn" onClick={() => launchSession(5, 'all')}>
+                  Start Session ⚡
                 </button>
 
-                <button 
-                  className="session-option-btn weak-mode" 
-                  onClick={() => startSession('weak', 10)}
-                >
-                  <div className="option-icon">🎯</div>
-                  <div className="option-info">
-                    <h3>Fix Weak Spots</h3>
-                    <p>{weakCards.length > 0 ? `${weakCards.length} cards need practice` : 'Review cards you got wrong'}</p>
-                  </div>
-                </button>
-
-                <button 
-                  className="session-option-btn unseen-mode" 
-                  onClick={() => startSession('unseen', 5)}
-                >
-                  <div className="option-icon">✨</div>
-                  <div className="option-info">
-                    <h3>New Words First</h3>
-                    <p>{unseenCards.length} unseen characters remaining</p>
-                  </div>
-                </button>
-
-                <button className="session-option-btn deep-mode" onClick={() => startSession('all', 20)}>
-                  <div className="option-icon">🔥</div>
-                  <div className="option-info">
-                    <h3>Deep Focus</h3>
-                    <p>20 cards thorough review session</p>
-                  </div>
-                </button>
+                {weakCards.length > 0 && (
+                  <button className="secondary-launch-btn" onClick={() => launchSession(5, 'weak')}>
+                    🎯 Practice {weakCards.length} Weak Spots
+                  </button>
+                )}
               </div>
             </div>
           </div>
         )}
 
-        {/* 2. FLASHCARD STUDY STAGE */}
+        {/* 2. ACTIVE FLASHCARD SESSION */}
         {appState === 'studying' && card && (
           <div
             className={`card ${isFlipped ? 'card--flipped' : ''}`}
@@ -300,77 +185,38 @@ export default function App() {
 
             {!isFlipped ? (
               <div className="front-layout">
-                <div className="card-top-controls">
-                  <button 
-                    className="audio-circle-btn" 
-                    onClick={(e) => { 
-                      e.stopPropagation(); 
-                      speakText(card.character); 
-                    }}
-                    title="Listen"
-                  >
-                    🔊
-                  </button>
-                </div>
+                <button className="audio-icon-btn" onClick={(e) => { e.stopPropagation(); speakText(card.character); }}>
+                  🔊
+                </button>
 
-                <div className="canvas-inset-box">
+                <div className="canvas-frame">
                   <HanziCanvas character={card.character} mode="view" />
                 </div>
 
-                <span className="tap-hint">Tap card to reveal definition ↺</span>
+                <span className="tap-prompt">Tap card to flip ↺</span>
               </div>
             ) : (
               <div className="back-layout">
                 <div className="back-header">
                   <div>
-                    <h1 className="pinyin-title">
-                      <ColorPinyin pinyin={card.pinyin} />
-                    </h1>
+                    <h1 className="pinyin-title"><ColorPinyin pinyin={card.pinyin} /></h1>
                     <p className="meaning-primary">{primaryMeaning}</p>
-                    {secondaryMeanings && (
-                      <p className="meaning-secondary">{secondaryMeanings}</p>
-                    )}
+                    {secondaryMeanings && <p className="meaning-secondary">{secondaryMeanings}</p>}
                   </div>
-                  <button 
-                    className="audio-circle-btn" 
-                    onClick={(e) => { 
-                      e.stopPropagation(); 
-                      speakText(card.character); 
-                    }}
-                  >
+                  <button className="audio-icon-btn" onClick={(e) => { e.stopPropagation(); speakText(card.character); }}>
                     🔊
                   </button>
                 </div>
 
-                <div className="back-center-stage">
-                  <button 
-                    className="drawer-trigger-btn" 
-                    onClick={(e) => { 
-                      e.stopPropagation(); 
-                      setShowDrawer(true); 
-                    }}
-                  >
-                    Context & Example Sentence ↑
-                  </button>
-                </div>
+                <button className="drawer-pill-btn" onClick={(e) => { e.stopPropagation(); setShowDrawer(true); }}>
+                  Context & Example Sentence ↑
+                </button>
 
                 <div className="grading-row" onClick={(e) => e.stopPropagation()}>
-                  <button 
-                    className="grade-btn grade-btn--hard" 
-                    onClick={(e) => { 
-                      e.stopPropagation(); 
-                      handleNextCard(1); 
-                    }}
-                  >
+                  <button className="grade-btn grade-btn--hard" onClick={() => handleNextCard(1)}>
                     ← Hard ({nextHardInterval}d)
                   </button>
-                  <button 
-                    className="grade-btn grade-btn--easy" 
-                    onClick={(e) => { 
-                      e.stopPropagation(); 
-                      handleNextCard(5); 
-                    }}
-                  >
+                  <button className="grade-btn grade-btn--easy" onClick={() => handleNextCard(5)}>
                     Easy ({nextEasyInterval}d) →
                   </button>
                 </div>
@@ -382,91 +228,54 @@ export default function App() {
         {/* 3. SESSION COMPLETED CELEBRATION */}
         {appState === 'completed' && (
           <div className="card completion-card">
-            <div className="completion-content">
-              <span className="celebration-emoji">🎉</span>
-              <h2>Session Complete!</h2>
-              <p>You maintained your <strong>{streak} day streak</strong>!</p>
-              
-              <div className="completion-actions">
-                <button className="action-btn primary" onClick={() => setAppState('home')}>
-                  🏠 Back to Session Launcher
-                </button>
-              </div>
-            </div>
+            <span className="celebration-emoji">🎉</span>
+            <h2>Session Complete!</h2>
+            <p>You maintained your <strong>{streak} day streak</strong>.</p>
+            <button className="primary-launch-btn" onClick={() => setAppState('launch')}>
+              Back to Deck Desk 🏠
+            </button>
           </div>
         )}
 
-        {/* SETTINGS DRAWER */}
-        {showSettings && (
-          <div 
-            className="drawer-overlay" 
-            onClick={() => setShowSettings(false)}
-            onPointerDown={(e) => e.stopPropagation()}
-          >
-            <div className="drawer-sheet" onClick={(e) => e.stopPropagation()}>
-              <div className="drawer-handle" />
-              <div className="drawer-header">
-                <h2>Deck Focus</h2>
-                <button className="close-btn" onClick={() => setShowSettings(false)}>✕</button>
-              </div>
-
-              <div className="settings-group">
-                <label className="settings-label">Active HSK Decks</label>
-                <div className="pill-grid">
-                  {['1', '2', '3', '4', '5', '6'].map((lvl) => (
-                    <button
-                      key={lvl}
-                      className={`pill-btn ${selectedLevels.includes(lvl) ? 'active' : ''}`}
-                      onClick={() => toggleLevel(lvl)}
-                    >
-                      HSK {lvl}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* EXAMPLE SENTENCE DRAWER */}
+        {/* DRAWER: EXAMPLE SENTENCE */}
         {showDrawer && card && (
-          <div 
-            className="drawer-overlay" 
-            onClick={() => setShowDrawer(false)}
-            onPointerDown={(e) => e.stopPropagation()}
-          >
+          <div className="drawer-overlay" onClick={() => setShowDrawer(false)}>
             <div className="drawer-sheet" onClick={(e) => e.stopPropagation()}>
               <div className="drawer-handle" />
-              <div className="drawer-header">
-                <div>
-                  <h2>{card.character} (<ColorPinyin pinyin={card.pinyin} />)</h2>
-                  <p>{card.meaning}</p>
-                </div>
-                <button className="close-btn" onClick={() => setShowDrawer(false)}>✕</button>
-              </div>
+              <h3>Context Example</h3>
+              <p style={{ fontSize: '18px', fontWeight: '600' }}>
+                <HighlightedSentence sentence={card.sentence} targetChar={card.character} />
+              </p>
+              <p><ColorPinyin pinyin={card.sentencePinyin} /></p>
+              <p style={{ color: '#94a3b8' }}>{card.sentenceEnglish}</p>
+            </div>
+          </div>
+        )}
 
-              <div className="drawer-body">
-                <h3>Contextual Example</h3>
-                <div className="sentence-card">
-                  <div className="sentence-row">
-                    <p className="chinese">
-                      <HighlightedSentence sentence={card.sentence} targetChar={card.character} />
-                    </p>
-                    <button 
-                      className="audio-circle-btn" 
-                      onClick={(e) => { e.stopPropagation(); speakText(card.sentence); }}
-                    >
-                      🔊
-                    </button>
-                  </div>
-                  <p className="pinyin"><ColorPinyin pinyin={card.sentencePinyin} /></p>
-                  <p className="english">{card.sentenceEnglish}</p>
-                </div>
-
-                <h3>Notes</h3>
-                <div className="culture-card">
-                  <p>💡 {card.culturalNote}</p>
-                </div>
+        {/* DRAWER: SETTINGS */}
+        {showSettings && (
+          <div className="drawer-overlay" onClick={() => setShowSettings(false)}>
+            <div className="drawer-sheet" onClick={(e) => e.stopPropagation()}>
+              <div className="drawer-handle" />
+              <h3>Select HSK Deck</h3>
+              <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
+                {['1', '2', '3', '4', '5', '6'].map((lvl) => (
+                  <button
+                    key={lvl}
+                    style={{
+                      flex: 1,
+                      padding: '10px',
+                      borderRadius: '8px',
+                      background: selectedLevels.includes(lvl) ? '#38bdf8' : '#1e293b',
+                      color: selectedLevels.includes(lvl) ? '#000' : '#fff',
+                      border: 'none',
+                      fontWeight: '700'
+                    }}
+                    onClick={() => setSelectedLevels([lvl])}
+                  >
+                    HSK {lvl}
+                  </button>
+                ))}
               </div>
             </div>
           </div>
