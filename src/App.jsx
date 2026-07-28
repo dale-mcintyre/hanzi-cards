@@ -5,6 +5,7 @@ import { calculateSM2 } from './utils/sm2';
 import { getProgress, saveCardProgress } from './utils/storage';
 import { speakText } from './utils/tts';
 import { HSK_DECK } from './data/hskData';
+import './App.css'; // <--- Make sure this line exists!
 
 export default function App() {
   const [deck, setDeck] = useState([]);
