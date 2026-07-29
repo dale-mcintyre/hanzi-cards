@@ -8,7 +8,7 @@ import { speakText } from './utils/tts';
 import { ColorPinyin } from './utils/pinyinColor';
 import { getHardwiredDeck } from './data/hskLoader';
 
-function HighlightedSentence({ sentence, targetChar }) {
+function HighlightedSentence({ sentence, targetChar, muted = false }) {
   if (!sentence || !targetChar) return <span>{sentence}</span>;
   const parts = sentence.split(targetChar);
   if (parts.length === 1) return <span>{sentence}</span>;
@@ -19,7 +19,9 @@ function HighlightedSentence({ sentence, targetChar }) {
         <span key={i}>
           {part}
           {i < parts.length - 1 && (
-            <mark className="sentence-highlight">{targetChar}</mark>
+            <mark className={muted ? "sentence-highlight-muted" : "sentence-highlight"}>
+              {targetChar}
+            </mark>
           )}
         </span>
       ))}
@@ -51,7 +53,7 @@ export default function App() {
 
   // Load Decks & Progress
   useEffect(() => {
-    const localWords = getHardwiredDeck(selectedLevels);
+    const localWords = getHardwiredDeck(selectedLevels, 'frequency');
     const savedProgress = getProgress();
 
     const merged = localWords.map((card) => ({
@@ -265,6 +267,15 @@ export default function App() {
                 <div className="canvas-frame">
                   <HanziCanvas character={card.character} mode="view" />
                 </div>
+
+                {/* Context Sentence displayed under character in lighter tone */}
+                {card.sentence && (
+                  <div className="front-context-box">
+                    <p className="front-context-text">
+                      <HighlightedSentence sentence={card.sentence} targetChar={card.character} muted={true} />
+                    </p>
+                  </div>
+                )}
 
                 <span className="tap-prompt">Tap card to flip ↺</span>
               </div>
