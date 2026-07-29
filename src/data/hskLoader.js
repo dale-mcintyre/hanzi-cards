@@ -1,10 +1,10 @@
-import hsk1Data from './hsk1.json';
-import hsk2Data from './hsk2.json';
-import hsk3Data from './hsk3.json';
+import hsk1Data from './hsk/hsk1.json';
+import hsk2Data from './hsk/hsk2.json';
+import hsk3Data from './hsk/hsk3.json';
 
-import hsk1Sentences from './hsk1Sentences.json';
-import hsk2Sentences from './hsk2Sentences.json';
-import hsk3Sentences from './hsk3Sentences.json';
+import hsk1Sentences from './hsk/hsk1Sentences.json';
+import hsk2Sentences from './hsk/hsk2Sentences.json';
+import hsk3Sentences from './hsk/hsk3Sentences.json';
 
 const rawDecks = {
   '1': hsk1Data,
