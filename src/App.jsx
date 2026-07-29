@@ -19,9 +19,9 @@ function HighlightedSentence({ sentence, targetChar, muted = false }) {
         <span key={i}>
           {part}
           {i < parts.length - 1 && (
-            <mark className={muted ? "sentence-highlight-muted" : "sentence-highlight"}>
+            <span className={muted ? "char-highlight-muted" : "char-highlight"}>
               {targetChar}
-            </mark>
+            </span>
           )}
         </span>
       ))}
@@ -33,11 +33,9 @@ export default function App() {
   const [selectedLevels, setSelectedLevels] = useState(['3']);
   const [showSettings, setShowSettings] = useState(false);
 
-  // App States: 'launch' | 'countdown' | 'studying' | 'completed'
   const [appState, setAppState] = useState('launch');
   const [countdownNum, setCountdownNum] = useState(3);
 
-  // Arcade Session State
   const [score, setScore] = useState(0);
   const [combo, setCombo] = useState(0);
   const [maxCombo, setMaxCombo] = useState(0);
@@ -48,10 +46,8 @@ export default function App() {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const [isFlipped, setIsFlipped] = useState(false);
-  const [showDrawer, setShowDrawer] = useState(false);
   const [streak, setStreak] = useState(1);
 
-  // Load Decks & Progress
   useEffect(() => {
     const localWords = getHardwiredDeck(selectedLevels, 'frequency');
     const savedProgress = getProgress();
@@ -73,7 +69,6 @@ export default function App() {
 
   const weakCards = useMemo(() => rawDeck.filter((c) => c.stats.repetitions > 0 && c.stats.interval <= 2), [rawDeck]);
 
-  // Start Session with Arcade Countdown Sequence
   const launchArcadeSession = (count = 5, mode = 'all') => {
     let pool = [...rawDeck];
     if (mode === 'weak' && weakCards.length > 0) pool = weakCards;
@@ -86,12 +81,10 @@ export default function App() {
     setCombo(0);
     setMaxCombo(0);
 
-    // Trigger Arcade Countdown
     setAppState('countdown');
     setCountdownNum(3);
   };
 
-  // Countdown Timer Loop
   useEffect(() => {
     if (appState !== 'countdown') return;
 
@@ -113,7 +106,6 @@ export default function App() {
     }
   };
 
-  // Gameized Answer Handler
   const handleNextCard = (quality) => {
     if (!card) return;
 
@@ -125,9 +117,8 @@ export default function App() {
     const points = isSuccess ? 100 * Math.max(1, newCombo) : 0;
     setScore((prev) => prev + points);
 
-    // Trigger Arcade Score Popup
     if (isSuccess) {
-      const newPopup = { id: Date.now(), text: `+${points} XP! ${newCombo > 1 ? `🔥 ${newCombo}x Combo` : ''}` };
+      const newPopup = { id: Date.now(), text: `+${points} XP! ${newCombo > 1 ? `🔥 ${newCombo}x` : ''}` };
       setFloatingPopups((prev) => [...prev, newPopup]);
       setTimeout(() => {
         setFloatingPopups((prev) => prev.filter((p) => p.id !== newPopup.id));
@@ -147,7 +138,6 @@ export default function App() {
       setAppState('completed');
     } else {
       setIsFlipped(false);
-      setShowDrawer(false);
       setCurrentIndex((prev) => prev + 1);
     }
   };
@@ -155,7 +145,6 @@ export default function App() {
   const { dragX, dragY, isDragging, pointerHandlers } = useSwipeGesture({
     onSwipeLeft: () => handleNextCard(1),
     onSwipeRight: () => handleNextCard(5),
-    onSwipeUp: () => { if (isFlipped) setShowDrawer(true); },
     onTap: handleFlip
   });
 
@@ -172,21 +161,23 @@ export default function App() {
 
   return (
     <div className="app-container">
-      <div className="stage">
-        
-        {/* Arcade HUD Header */}
-        <div className="header-bar">
-          <div className="streak-badge">🔥 {streak} Day Streak</div>
+      {/* Top Navbar: Safely separated from the card interaction zone */}
+      <nav className="top-nav-bar">
+        <div className="nav-left">
+          <span className="streak-badge">🔥 {streak}d</span>
           {appState === 'studying' && (
-            <div className="arcade-score-pill">
-              <span>⚡ {score} XP</span>
-              {combo > 1 && <span className="combo-tag">🔥 {combo}x</span>}
-            </div>
+            <span className="xp-pill">⚡ {score} XP</span>
           )}
-          <button className="gear-btn" onClick={() => setShowSettings(true)}>⚙️</button>
         </div>
+        <div className="nav-right">
+          <button className="settings-trigger-btn" onClick={() => setShowSettings(true)} aria-label="Settings">
+            ⚙️ HSK {selectedLevels.join(',')}
+          </button>
+        </div>
+      </nav>
 
-        {/* Arcade Progress Bar */}
+      <div className="stage">
+        {/* Progress Bar */}
         {appState === 'studying' && (
           <div className="progress-bar-container">
             <div 
@@ -196,38 +187,34 @@ export default function App() {
           </div>
         )}
 
-        {/* Floating Game Popups */}
         <div className="floating-popups-container">
           {floatingPopups.map((p) => (
             <div key={p.id} className="arcade-popup">{p.text}</div>
           ))}
         </div>
 
-        {/* 1. LAUNCH LAUNCHPAD */}
+        {/* 1. LAUNCH SCREEN */}
         {appState === 'launch' && (
           <div className="launch-deck-container">
-            <div className="deck-layer deck-layer-3" />
-            <div className="deck-layer deck-layer-2" />
-            
             <div className="card launch-card">
               <div className="launch-card-header">
-                <span className="deck-level-pill">HSK {selectedLevels.join(', ')}</span>
-                <span className="deck-ready-tag">5 Cards Ready</span>
+                <span className="deck-level-pill">HSK Level {selectedLevels.join(', ')}</span>
+                <span className="deck-ready-tag">{rawDeck.length} Cards Loaded</span>
               </div>
 
               <div className="launch-card-body">
-                <h1 className="launch-title">Daily Blitz</h1>
-                <p className="launch-subtitle">5 cards · 90s session · 500+ XP</p>
+                <h1 className="launch-title">Hanzi Blitz</h1>
+                <p className="launch-subtitle">Frequency-ranked study session</p>
               </div>
 
               <div className="launch-card-actions">
-                <button className="primary-launch-btn" onClick={() => launchArcadeSession(5, 'all')}>
-                  Start Blitz ⚡
+                <button className="primary-launch-btn" onClick={() => launchArcadeSession(10, 'all')}>
+                  Start Session ⚡
                 </button>
 
                 {weakCards.length > 0 && (
-                  <button className="secondary-launch-btn" onClick={() => launchArcadeSession(5, 'weak')}>
-                    🎯 Practice {weakCards.length} Weak Spots
+                  <button className="secondary-launch-btn" onClick={() => launchArcadeSession(10, 'weak')}>
+                    🎯 Review {weakCards.length} Weak Cards
                   </button>
                 )}
               </div>
@@ -235,31 +222,31 @@ export default function App() {
           </div>
         )}
 
-        {/* 2. ARCADE COUNTDOWN OVERLAY */}
+        {/* 2. COUNTDOWN */}
         {appState === 'countdown' && (
           <div className="card countdown-card">
             <div className="countdown-overlay">
               <span className="countdown-number">{countdownNum > 0 ? countdownNum : 'GO!'}</span>
-              <p className="countdown-subtitle">Get Ready!</p>
             </div>
           </div>
         )}
 
-        {/* 3. ACTIVE GAME SESSION */}
+        {/* 3. STUDYING SESSION */}
         {appState === 'studying' && card && (
           <div
-            className={`card ${isFlipped ? 'card--flipped' : ''} ${combo > 2 ? 'card--fever-mode' : ''}`}
+            className={`card ${isFlipped ? 'card--flipped' : ''}`}
             style={{
-              transform: `translateX(${dragX}px) translateY(${dragY}px) rotate(${dragX * 0.05}deg)`,
+              transform: `translateX(${dragX}px) translateY(${dragY}px) rotate(${dragX * 0.03}deg)`,
               transition: isDragging ? 'none' : 'transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
             }}
             {...pointerHandlers}
           >
-            {dragX > 30 && <div className="badge badge--know">KNOW IT</div>}
+            {dragX > 30 && <div className="badge badge--know">KNOW</div>}
             {dragX < -30 && <div className="badge badge--again">AGAIN</div>}
 
             {!isFlipped ? (
-              <div className="front-layout">
+              /* FRONT FACE */
+              <div className="card-face front-face">
                 <button className="audio-icon-btn" onClick={(e) => { e.stopPropagation(); speakText(card.character); }}>
                   🔊
                 </button>
@@ -268,40 +255,51 @@ export default function App() {
                   <HanziCanvas character={card.character} mode="view" />
                 </div>
 
-                {/* Context Sentence displayed under character in lighter tone */}
                 {card.sentence && (
-                  <div className="front-context-box">
+                  <div className="front-context-container">
                     <p className="front-context-text">
                       <HighlightedSentence sentence={card.sentence} targetChar={card.character} muted={true} />
                     </p>
                   </div>
                 )}
 
-                <span className="tap-prompt">Tap card to flip ↺</span>
+                <span className="tap-prompt">Tap to flip card</span>
               </div>
             ) : (
-              <div className="back-layout">
-                <div className="back-header">
-                  <div>
-                    <h1 className="pinyin-title"><ColorPinyin pinyin={card.pinyin} /></h1>
-                    <p className="meaning-primary">{primaryMeaning}</p>
-                    {secondaryMeanings && <p className="meaning-secondary">{secondaryMeanings}</p>}
+              /* BACK FACE - Fully contained within card bounds */
+              <div className="card-face back-face" onClick={(e) => e.stopPropagation()}>
+                <div className="back-scrollable-content">
+                  <div className="back-header-group">
+                    <div>
+                      <h1 className="pinyin-title"><ColorPinyin pinyin={card.pinyin} /></h1>
+                      <p className="meaning-primary">{primaryMeaning}</p>
+                      {secondaryMeanings && <p className="meaning-secondary">{secondaryMeanings}</p>}
+                    </div>
+                    <button className="audio-icon-btn" onClick={() => speakText(card.character)}>
+                      🔊
+                    </button>
                   </div>
-                  <button className="audio-icon-btn" onClick={(e) => { e.stopPropagation(); speakText(card.character); }}>
-                    🔊
-                  </button>
+
+                  <div className="card-internal-divider" />
+
+                  {/* Integrated Sentence Context Box */}
+                  <div className="card-sentence-box">
+                    <span className="box-section-label">Context Example</span>
+                    <p className="sentence-zh">
+                      <HighlightedSentence sentence={card.sentence} targetChar={card.character} muted={false} />
+                    </p>
+                    <p className="sentence-py"><ColorPinyin pinyin={card.sentencePinyin} /></p>
+                    <p className="sentence-en">{card.sentenceEnglish}</p>
+                  </div>
                 </div>
 
-                <button className="drawer-pill-btn" onClick={(e) => { e.stopPropagation(); setShowDrawer(true); }}>
-                  Context & Example Sentence ↑
-                </button>
-
-                <div className="grading-row" onClick={(e) => e.stopPropagation()}>
+                {/* Fixed Grading Action Bar at bottom of card */}
+                <div className="grading-row">
                   <button className="grade-btn grade-btn--hard" onClick={() => handleNextCard(1)}>
-                    ← Hard ({nextHardInterval}d)
+                    Hard ({nextHardInterval}d)
                   </button>
                   <button className="grade-btn grade-btn--easy" onClick={() => handleNextCard(5)}>
-                    Easy ({nextEasyInterval}d) →
+                    Easy ({nextEasyInterval}d)
                   </button>
                 </div>
               </div>
@@ -309,16 +307,15 @@ export default function App() {
           </div>
         )}
 
-        {/* 4. GAME OVER / VICTORY SCREEN */}
+        {/* 4. COMPLETED SCREEN */}
         {appState === 'completed' && (
           <div className="card victory-card">
             <div className="victory-content">
               <span className="victory-emoji">🏆</span>
-              <h2>Blitz Cleared!</h2>
-
+              <h2>Session Complete!</h2>
               <div className="stats-summary-grid">
                 <div className="stat-box">
-                  <span className="stat-label">Total XP</span>
+                  <span className="stat-label">Earned XP</span>
                   <span className="stat-value">+{score}</span>
                 </div>
                 <div className="stat-box">
@@ -326,49 +323,31 @@ export default function App() {
                   <span className="stat-value">🔥 {maxCombo}x</span>
                 </div>
               </div>
-
               <button className="primary-launch-btn" onClick={() => setAppState('launch')}>
-                Play Again ⚡
+                Continue ⚡
               </button>
             </div>
           </div>
         )}
 
-        {/* DRAWER: EXAMPLE SENTENCE */}
-        {showDrawer && card && (
-          <div className="drawer-overlay" onClick={() => setShowDrawer(false)}>
-            <div className="drawer-sheet" onClick={(e) => e.stopPropagation()}>
-              <div className="drawer-handle" />
-              <h3>Context Example</h3>
-              <p style={{ fontSize: '18px', fontWeight: '600' }}>
-                <HighlightedSentence sentence={card.sentence} targetChar={card.character} />
-              </p>
-              <p><ColorPinyin pinyin={card.sentencePinyin} /></p>
-              <p style={{ color: '#94a3b8' }}>{card.sentenceEnglish}</p>
-            </div>
-          </div>
-        )}
-
-        {/* DRAWER: SETTINGS */}
+        {/* SETTINGS DRAWER */}
         {showSettings && (
           <div className="drawer-overlay" onClick={() => setShowSettings(false)}>
             <div className="drawer-sheet" onClick={(e) => e.stopPropagation()}>
               <div className="drawer-handle" />
-              <h3>Select HSK Deck</h3>
-              <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
-                {['1', '2', '3', '4', '5', '6'].map((lvl) => (
+              <h3>Select HSK Levels</h3>
+              <div className="settings-level-grid">
+                {['1', '2', '3'].map((lvl) => (
                   <button
                     key={lvl}
-                    style={{
-                      flex: 1,
-                      padding: '10px',
-                      borderRadius: '8px',
-                      background: selectedLevels.includes(lvl) ? '#38bdf8' : '#1e293b',
-                      color: selectedLevels.includes(lvl) ? '#000' : '#fff',
-                      border: 'none',
-                      fontWeight: '700'
+                    className={`level-toggle-btn ${selectedLevels.includes(lvl) ? 'active' : ''}`}
+                    onClick={() => {
+                      if (selectedLevels.includes(lvl) && selectedLevels.length > 1) {
+                        setSelectedLevels(selectedLevels.filter(l => l !== lvl));
+                      } else if (!selectedLevels.includes(lvl)) {
+                        setSelectedLevels([...selectedLevels, lvl]);
+                      }
                     }}
-                    onClick={() => setSelectedLevels([lvl])}
                   >
                     HSK {lvl}
                   </button>
@@ -381,4 +360,4 @@ export default function App() {
       </div>
     </div>
   );
-}
+} 

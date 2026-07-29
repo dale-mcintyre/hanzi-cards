@@ -1,114 +1,159 @@
-/* Stacked Deck Container */
-.launch-deck-container {
-  position: relative;
+/* Top Navbar */
+.top-nav-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   width: 100%;
-  height: 520px;
+  max-width: 420px;
+  padding: 12px 16px;
+  margin-bottom: 8px;
+  box-sizing: border-box;
+}
+
+.nav-left, .nav-right {
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 8px;
 }
 
-/* Background 3D Stacked Layers */
-.deck-layer {
-  position: absolute;
-  width: 100%;
-  height: 520px;
-  background-color: #111827;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 28px;
+.settings-trigger-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #e2e8f0;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
 }
 
-.deck-layer-2 {
-  transform: translateY(10px) scale(0.96);
-  opacity: 0.6;
-  z-index: 1;
+.settings-trigger-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
 }
 
-.deck-layer-3 {
-  transform: translateY(20px) scale(0.92);
-  opacity: 0.3;
-  z-index: 0;
-}
-
-.launch-card {
-  z-index: 2;
+/* Card Faces */
+.card-face {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  height: 100%;
+  width: 100%;
+  padding: 24px;
+  box-sizing: border-box;
 }
 
-/* Launch Card Content */
-.launch-card-header {
+/* Front Face Context */
+.front-context-container {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 10px 14px;
+  margin-top: auto;
+  margin-bottom: 8px;
+}
+
+.front-context-text {
+  font-size: 15px;
+  color: #94a3b8;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Back Face Contained Scrolling Area */
+.back-scrollable-content {
+  overflow-y: auto;
+  flex-grow: 1;
+  padding-right: 2px;
+  display: flex;
+  flex-direction: column;
+}
+
+.back-header-group {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
 }
 
-.deck-level-pill {
-  background: rgba(56, 189, 248, 0.15);
-  border: 1px solid rgba(56, 189, 248, 0.3);
-  color: var(--accent-blue);
-  font-size: 12px;
-  font-weight: 700;
-  padding: 4px 12px;
+.card-internal-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  width: 100%;
+  margin: 16px 0;
+}
+
+/* Integrated Sentence Box on Back */
+.card-sentence-box {
+  background: rgba(15, 23, 42, 0.4);
   border-radius: 12px;
+  padding: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  margin-bottom: 12px;
 }
 
-.deck-ready-tag {
+.box-section-label {
+  display: block;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #64748b;
+  margin-bottom: 6px;
+  font-weight: 700;
+}
+
+.sentence-zh {
+  font-size: 17px;
+  font-weight: 600;
+  color: #f8fafc;
+  margin: 0 0 4px 0;
+}
+
+.sentence-py {
   font-size: 13px;
-  color: var(--text-sub);
+  color: #cbd5e1;
+  margin: 0 0 4px 0;
 }
 
-.launch-card-body {
-  text-align: center;
-  margin: auto 0;
-}
-
-.launch-title {
-  font-size: 32px;
-  font-weight: 800;
-  margin: 0 0 8px 0;
-  color: var(--text-main);
-}
-
-.launch-subtitle {
-  color: var(--text-sub);
-  font-size: 15px;
+.sentence-en {
+  font-size: 13px;
+  color: #64748b;
   margin: 0;
 }
 
-.launch-card-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  width: 100%;
+/* Sleek Character Highlights */
+.char-highlight {
+  color: #38bdf8;
+  border-bottom: 2px solid #38bdf8;
+  padding-bottom: 1px;
+  font-weight: 700;
 }
 
-.primary-launch-btn {
-  width: 100%;
-  background-color: var(--accent-blue);
-  color: #080c14;
-  border: none;
-  border-radius: 16px;
-  padding: 16px;
-  font-size: 16px;
+.char-highlight-muted {
+  color: #cbd5e1;
+  font-weight: 700;
+}
+
+/* Level Toggle Grid in Settings */
+.settings-level-grid {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.level-toggle-btn {
+  flex: 1;
+  padding: 12px;
+  border-radius: 10px;
+  background: #1e293b;
+  color: #94a3b8;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 8px 20px rgba(56, 189, 248, 0.25);
+  transition: all 0.2s;
 }
 
-.primary-launch-btn:active {
-  transform: scale(0.98);
-}
-
-.secondary-launch-btn {
-  width: 100%;
-  background: rgba(239, 68, 68, 0.1);
-  border: 1px solid rgba(239, 68, 68, 0.3);
-  color: #ef4444;
-  border-radius: 14px;
-  padding: 12px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
+.level-toggle-btn.active {
+  background: #38bdf8;
+  color: #0f172a;
+  border-color: #38bdf8;
 }
