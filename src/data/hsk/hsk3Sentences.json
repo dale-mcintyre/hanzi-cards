@@ -1,0 +1,1442 @@
+{
+  "阿姨": {
+    "zh": "王阿姨今天来我家做客。",
+    "pinyin": "wáng ā yí jīn tiān lái wǒ jiā zuò kè.",
+    "en": "Auntie Wang came to my house as a guest today."
+  },
+  "啊": {
+    "zh": "这里的风景真美啊！",
+    "pinyin": "zhè lǐ de fēng jǐng zhēn měi a!",
+    "en": "The scenery here is so beautiful!"
+  },
+  "矮": {
+    "zh": "弟弟比我矮一点儿。",
+    "pinyin": "dì di bǐ wǒ ǎi yī diǎnr.",
+    "en": "My younger brother is a bit shorter than me."
+  },
+  "爱好": {
+    "zh": "我的爱好是听音乐和看书。",
+    "pinyin": "wǒ de ài hào shì tīng yīn yuè hé kàn shū.",
+    "en": "My hobby is listening to music and reading books."
+  },
+  "安静": {
+    "zh": "请大家在图书馆保持安静。",
+    "pinyin": "qǐng dà jiā zài tú shū guǎn bǎo chí ān jìng.",
+    "en": "Please stay quiet in the library, everyone."
+  },
+  "把": {
+    "zh": "请把门关上。",
+    "pinyin": "qǐng bǎ mén guān shang.",
+    "en": "Please close the door."
+  },
+  "班": {
+    "zh": "我们班一共有二十个学生。",
+    "pinyin": "wǒ men bān yī gòng yǒu èr shí gè xué sheng.",
+    "en": "Our class has twenty students in total."
+  },
+  "搬": {
+    "zh": "我们下个月准备搬家。",
+    "pinyin": "wǒ men xià gè yuè zhǔn bèi bān jiā.",
+    "en": "We plan to move next month."
+  },
+  "办法": {
+    "zh": "这是一个解决问题的好办法。",
+    "pinyin": "zhè shì yī gè jiě jué wèn tí de hǎo bàn fǎ.",
+    "en": "This is a good method to solve the problem."
+  },
+  "办公室": {
+    "zh": "经理正在办公室开会。",
+    "pinyin": "jīng lǐ zhèng zài bàn gōng shì kāi huì.",
+    "en": "The manager is having a meeting in the office."
+  },
+  "半": {
+    "zh": "现在是下午三点半。",
+    "pinyin": "xiàn zài shì xià wǔ sān diǎn bàn.",
+    "en": "It is three thirty in the afternoon right now."
+  },
+  "帮忙": {
+    "zh": "你能帮我一个忙吗？",
+    "pinyin": "nǐ néng bāng wǒ yī gè máng ma?",
+    "en": "Can you do me a favor?"
+  },
+  "包": {
+    "zh": "这个黑色包里有很多书。",
+    "pinyin": "zhè gè hēi sè bāo lǐ yǒu hěn duō shū.",
+    "en": "There are many books in this black bag."
+  },
+  "饱": {
+    "zh": "我吃饱了，谢谢。",
+    "pinyin": "wǒ chī bǎo le, xiè xie.",
+    "en": "I'm full, thank you."
+  },
+  "北方": {
+    "zh": "中国北方的冬天比较冷。",
+    "pinyin": "zhōng guó běi fāng de dōng tiān bǐ jiào lěng.",
+    "en": "Winter in northern China is relatively cold."
+  },
+  "被": {
+    "zh": "我的自行车被他借走了。",
+    "pinyin": "wǒ de zì xíng chē bèi tā jiè zǒu le.",
+    "en": "My bicycle was borrowed by him."
+  },
+  "鼻子": {
+    "zh": "这只小狗的鼻子很可爱。",
+    "pinyin": "zhè zhī xiǎo gǒu de bí zi hěn kě ài.",
+    "en": "This little dog's nose is very cute."
+  },
+  "比较": {
+    "zh": "今天的天气比较凉快。",
+    "pinyin": "jīn tiān de tiān qì bǐ jiào liáng kuai.",
+    "en": "Today's weather is relatively cool."
+  },
+  "比赛": {
+    "zh": "今天的篮球比赛非常精彩。",
+    "pinyin": "jīn tiān de lán qiú bǐ sài fēi cháng jīng cǎi.",
+    "en": "Today's basketball match was very exciting."
+  },
+  "必须": {
+    "zh": "你必须按时完成作业。",
+    "pinyin": "nǐ bì xū àn shí wán chéng zuò yè.",
+    "en": "You must complete the homework on time."
+  },
+  "变化": {
+    "zh": "这个城市的变化很大。",
+    "pinyin": "zhè gè chéng shì de biàn huà hěn dà.",
+    "en": "This city has changed a lot."
+  },
+  "表示": {
+    "zh": "他向大家表示感谢。",
+    "pinyin": "tā xiàng dà jiā biǎo shì gǎn xiè.",
+    "en": "He expressed his thanks to everyone."
+  },
+  "表演": {
+    "zh": "她的精彩表演赢得了掌声。",
+    "pinyin": "tā de jīng cǎi biǎo yǎn yíng dé le zhǎng shēng.",
+    "en": "Her wonderful performance won applause."
+  },
+  "别人": {
+    "zh": "我们要多关心别人。",
+    "pinyin": "wǒ men yào duō guān xīn bié ren.",
+    "en": "We should care more about other people."
+  },
+  "宾馆": {
+    "zh": "我们住在火车站附近的宾馆。",
+    "pinyin": "wǒ men zhù zài huǒ chē zhàn fù jìn de bīn guǎn.",
+    "en": "We stayed at a hotel near the train station."
+  },
+  "冰箱": {
+    "zh": "牛奶放在冰箱里。",
+    "pinyin": "niú nǎi fàng zài bīng xiāng lǐ.",
+    "en": "The milk is inside the refrigerator."
+  },
+  "才": {
+    "zh": "他晚上九点才回到家。",
+    "pinyin": "tā wǎn shang jiǔ diǎn cái huí dào jiā.",
+    "en": "He didn't return home until nine at night."
+  },
+  "菜单": {
+    "zh": "服务员，请拿一下菜单。",
+    "pinyin": "fú wù yuán, qǐng ná yī xià cài dān.",
+    "en": "Waiter, please bring the menu."
+  },
+  "参加": {
+    "zh": "我想参加明天的比赛。",
+    "pinyin": "wǒ xiǎng cān jiā míng tiān de bǐ sài.",
+    "en": "I want to participate in tomorrow's match."
+  },
+  "草": {
+    "zh": "公园里的草很绿。",
+    "pinyin": "gōng yuán lǐ de cǎo hěn lǜ.",
+    "en": "The grass in the park is very green."
+  },
+  "层": {
+    "zh": "我住在三层。",
+    "pinyin": "wǒ zhù zài sān céng.",
+    "en": "I live on the third floor."
+  },
+  "差": {
+    "zh": "现在是差五分八点。",
+    "pinyin": "xiàn zài shì chà wǔ fēn bā diǎn.",
+    "en": "It is five minutes to eight o'clock now."
+  },
+  "超市": {
+    "zh": "我去超市买点东西。",
+    "pinyin": "wǒ qù chāo shì mǎi diǎn dōng xi.",
+    "en": "I am going to the supermarket to buy something."
+  },
+  "衬衫": {
+    "zh": "他穿了一件蓝色的衬衫。",
+    "pinyin": "tā chuān le yī jiàn lán sè de chèn shān.",
+    "en": "He wore a blue shirt."
+  },
+  "成绩": {
+    "zh": "他的考试成绩非常好。",
+    "pinyin": "tā de kǎo shì chéng jì fēi cháng hǎo.",
+    "en": "His test grade is extremely good."
+  },
+  "城市": {
+    "zh": "北京是一个美丽的城市。",
+    "pinyin": "běi jīng shì yī gè měi lì de chéng shì.",
+    "en": "Beijing is a beautiful city."
+  },
+  "迟到": {
+    "zh": "对不起，我今天迟到了。",
+    "pinyin": "duì bu qǐ, wǒ jīn tiān chí dào le.",
+    "en": "Sorry, I arrived late today."
+  },
+  "出现": {
+    "zh": "前面出现了一只可爱的小猫。",
+    "pinyin": "qián miàn chū xiàn le yī zhī kě ài de xiǎo māo.",
+    "en": "A cute kitten appeared ahead."
+  },
+  "除了": {
+    "zh": "除了他，大家都来了。",
+    "pinyin": "chú le tā, dà jiā dōu lái le.",
+    "en": "Except for him, everyone came."
+  },
+  "厨房": {
+    "zh": "妈妈正在厨房做饭。",
+    "pinyin": "mā ma zhèng zài chú fáng zuò fàn.",
+    "en": "Mom is currently cooking meal in the kitchen."
+  },
+  "春": {
+    "zh": "春天到了，天气变暖和了。",
+    "pinyin": "chūn tiān dào le, tiān qì biàn nuǎn huo le.",
+    "en": "Spring has arrived, the weather turned warm."
+  },
+  "词语": {
+    "zh": "请用这个词语造句。",
+    "pinyin": "qǐng yòng zhè gè cí yǔ zào jù.",
+    "en": "Please use this word to make a sentence."
+  },
+  "聪明": {
+    "zh": "他是一个非常聪明的学生。",
+    "pinyin": "tā shì yī gè fēi cháng cōng ming de xué sheng.",
+    "en": "He is a very smart student."
+  },
+  "打扫": {
+    "zh": "请把房间打扫干净。",
+    "pinyin": "qǐng bǎ fáng jiān dǎ sǎo gān jìng.",
+    "en": "Please sweep the room clean."
+  },
+  "打算": {
+    "zh": "你周末打算做什么？",
+    "pinyin": "nǐ zhōu mò dǎ suàn zuò shén me?",
+    "en": "What do you plan to do this weekend?"
+  },
+  "带": {
+    "zh": "出门别忘了带伞。",
+    "pinyin": "chū mén bié wàng le dài sǎn.",
+    "en": "Don't forget to bring an umbrella when leaving."
+  },
+  "担心": {
+    "zh": "别担心，一切都会好的。",
+    "pinyin": "bié dān xīn, yī qiè dōu huì hǎo de.",
+    "en": "Don't worry, everything will be fine."
+  },
+  "蛋糕": {
+    "zh": "祝你生日快乐，请吃蛋糕。",
+    "pinyin": "zhù nǐ shēng rì kuài lè, qǐng chī dàn gāo.",
+    "en": "Happy birthday to you, please eat cake."
+  },
+  "当然": {
+    "zh": "我当然愿意帮你。",
+    "pinyin": "wǒ dāng rán yuàn yì bāng nǐ.",
+    "en": "Of course I am willing to help you."
+  },
+  "地": {
+    "zh": "孩子们快乐地跑着。",
+    "pinyin": "hái zi men kuài lè de pǎo zhe.",
+    "en": "The children are running happily."
+  },
+  "地方": {
+    "zh": "这是一个安静的地方。",
+    "pinyin": "zhè shì yī gè ān jìng de dì fang.",
+    "en": "This is a quiet place."
+  },
+  "地铁": {
+    "zh": "坐地铁去机场很方便。",
+    "pinyin": "zuò dì tiě qù jī chǎng hěn fāng biàn.",
+    "en": "Taking the subway to the airport is convenient."
+  },
+  "地图": {
+    "zh": "请看一下手机上的地图。",
+    "pinyin": "qǐng kàn yī xià shǒu jī shang de dì tú.",
+    "en": "Please look at the map on the phone."
+  },
+  "灯": {
+    "zh": "房间里的灯亮着。",
+    "pinyin": "fáng jiān lǐ de dēng liàng zhe.",
+    "en": "The light in the room is on."
+  },
+  "低": {
+    "zh": "他低着头不说话。",
+    "pinyin": "tā dī zhe tóu bù shuō huà.",
+    "en": "He lowered his head and didn't speak."
+  },
+  "电梯": {
+    "zh": "请坐电梯到五楼。",
+    "pinyin": "qǐng zuò diàn tī dào wǔ lóu.",
+    "en": "Please take the elevator to the 5th floor."
+  },
+  "电子": {
+    "zh": "我现在习惯看电子书。",
+    "pinyin": "wǒ xiàn zài xí guàn kàn diàn zǐ shū.",
+    "en": "I am used to reading e-books now."
+  },
+  "东": {
+    "zh": "太阳从东方升起。",
+    "pinyin": "tài yang cóng dōng fāng shēng qǐ.",
+    "en": "The sun rises from the east."
+  },
+  "冬": {
+    "zh": "冬天的雪非常漂亮。",
+    "pinyin": "dōng tiān de xuě fēi cháng piào liang.",
+    "en": "Winter snow is extremely beautiful."
+  },
+  "动物": {
+    "zh": "熊猫是我最喜欢的动物。",
+    "pinyin": "xióng māo shì wǒ zuì xǐ huan de dòng wù.",
+    "en": "The panda is my favorite animal."
+  },
+  "短": {
+    "zh": "她的头发很短。",
+    "pinyin": "tā de tóu fa hěn duǎn.",
+    "en": "Her hair is very short."
+  },
+  "段": {
+    "zh": "请读一下这段文字。",
+    "pinyin": "qǐng dú yī xià zhè duàn wén zì.",
+    "en": "Please read this paragraph of text."
+  },
+  "锻炼": {
+    "zh": "我每天早上都去锻炼身体。",
+    "pinyin": "wǒ měi tiān zǎo shang dōu qù duàn liàn shēn tǐ.",
+    "en": "I go exercise every morning."
+  },
+  "多么": {
+    "zh": "今天的天气多么好啊！",
+    "pinyin": "jīn tiān de tiān qì duō me hǎo a!",
+    "en": "How wonderful today's weather is!"
+  },
+  "饿": {
+    "zh": "我饿了，想吃面条。",
+    "pinyin": "wǒ è le, xiǎng chī miàn tiáo.",
+    "en": "I am hungry, I want to eat noodles."
+  },
+  "而且": {
+    "zh": "这部电影便宜，而且好看。",
+    "pinyin": "zhè bù diàn yǐng pián yi, ér qiě hǎo kàn.",
+    "en": "This movie is cheap and good to watch."
+  },
+  "耳朵": {
+    "zh": "小白兔的耳朵很长。",
+    "pinyin": "xiǎo bái tù de ěr duo hěn cháng.",
+    "en": "The little white rabbit's ears are very long."
+  },
+  "发烧": {
+    "zh": "他生病发烧了，在家休息。",
+    "pinyin": "tā shēng bìng fā shāo le, zài jiā xiū xi.",
+    "en": "He fell ill with a fever and is resting at home."
+  },
+  "发现": {
+    "zh": "我发现他写错了名字。",
+    "pinyin": "wǒ fā xiàn tā xiě cuò le míng zi.",
+    "en": "I discovered he wrote the name wrong."
+  },
+  "方便": {
+    "zh": "坐地铁去上班很方便。",
+    "pinyin": "zuò dì tiě qù shàng bān hěn fāng biàn.",
+    "en": "Taking the subway to work is very convenient."
+  },
+  "放": {
+    "zh": "请把书放在桌子上。",
+    "pinyin": "qǐng bǎ shū fàng zài zhuō zi shang.",
+    "en": "Please put the book on the table."
+  },
+  "放心": {
+    "zh": "请放心，我会照顾好自己的。",
+    "pinyin": "qǐng fàng xīn, wǒ huì zhào gù hǎo zì jǐ de.",
+    "en": "Please feel reassured, I will take good care of myself."
+  },
+  "分": {
+    "zh": "请把这个苹果分给妹妹。",
+    "pinyin": "qǐng bǎ zhè gè píng guǒ fēn gěi mèi mei.",
+    "en": "Please share this apple with your sister."
+  },
+  "附近": {
+    "zh": "我家附近有一家大超市。",
+    "pinyin": "wǒ jiā fù jìn yǒu yī jiā dà chāo shì.",
+    "en": "There is a big supermarket near my home."
+  },
+  "复习": {
+    "zh": "我们正在复习考试内容。",
+    "pinyin": "wǒ men zhèng zài fù xí kǎo shì nèi róng.",
+    "en": "We are currently reviewing exam material."
+  },
+  "敢": {
+    "zh": "我不敢一个人晚上出门。",
+    "pinyin": "wǒ bù gǎn yī gè rén wǎn shang chū mén.",
+    "en": "I don't dare go out alone at night."
+  },
+  "感冒": {
+    "zh": "天冷了，小心感冒。",
+    "pinyin": "tiān lěng le, xiǎo xīn gǎn mào.",
+    "en": "It's cold, be careful not to catch a cold."
+  },
+  "干净": {
+    "zh": "房间被打扫得非常干净。",
+    "pinyin": "fáng jiān bèi dǎ sǎo de fēi cháng gān jìng.",
+    "en": "The room was swept extremely clean."
+  },
+  "刚才": {
+    "zh": "刚才谁给我打了电话？",
+    "pinyin": "gāng cái shéi gěi wǒ dǎ le diàn huà?",
+    "en": "Who called me just now?"
+  },
+  "根据": {
+    "zh": "根据天气预报，明天会下雨。",
+    "pinyin": "gēn jù tiān qì yù bào, míng tiān huì xià yǔ.",
+    "en": "According to the forecast, it will rain tomorrow."
+  },
+  "跟": {
+    "zh": "请跟我一起读。",
+    "pinyin": "qǐng gēn wǒ yī qǐ dú.",
+    "en": "Please read together with me."
+  },
+  "更": {
+    "zh": "今天比昨天更冷。",
+    "pinyin": "jīn tiān bǐ zuó tiān gèng lěng.",
+    "en": "Today is even colder than yesterday."
+  },
+  "公园": {
+    "zh": "老人喜欢在公园散步。",
+    "pinyin": "lǎo rén xǐ huan zài gōng yuán sàn bù.",
+    "en": "Elderly people like walking in the park."
+  },
+  "故事": {
+    "zh": "妈妈给我讲了一个故事。",
+    "pinyin": "mā ma gěi wǒ jiǎng le yī gè gù shi.",
+    "en": "Mom told me a story."
+  },
+  "刮": {
+    "zh": "外面刮起了大风。",
+    "pinyin": "wài mian guā qǐ le dà fēng.",
+    "en": "A big wind blew up outside."
+  },
+  "关": {
+    "zh": "离开时请关灯。",
+    "pinyin": "lí kāi shí qǐng guān dēng.",
+    "en": "Please turn off the lights when leaving."
+  },
+  "关系": {
+    "zh": "我们之间的关系很好。",
+    "pinyin": "wǒ men zhī jiān de guān xì hěn hǎo.",
+    "en": "The relationship between us is very good."
+  },
+  "关心": {
+    "zh": "老师非常关心学生。",
+    "pinyin": "lǎo shī fēi cháng guān xīn xué sheng.",
+    "en": "The teacher cares very much about students."
+  },
+  "关于": {
+    "zh": "这是一本关于中国历史的书。",
+    "pinyin": "zhè shì yī běn guān yú zhōng guó lì shǐ de shū.",
+    "en": "This is a book about Chinese history."
+  },
+  "国家": {
+    "zh": "我去过很多不同的国家。",
+    "pinyin": "wǒ qù guò hěn duō bù tóng de guó jiā.",
+    "en": "I have been to many different countries."
+  },
+  "果汁": {
+    "zh": "我想喝一杯新鲜果汁。",
+    "pinyin": "wǒ xiǎng hē yī bēi xīn xiān guǒ zhī.",
+    "en": "I want to drink a glass of fresh fruit juice."
+  },
+  "过去": {
+    "zh": "过去的事情就让它过去吧。",
+    "pinyin": "guò qù de shì qing jiù ràng tā guò qù ba.",
+    "en": "Let past matters be in the past."
+  },
+  "还是": {
+    "zh": "你想喝咖啡还是喝茶？",
+    "pinyin": "nǐ xiǎng hē kā fēi hái shi hē chá?",
+    "en": "Do you want to drink coffee or tea?"
+  },
+  "害怕": {
+    "zh": "别害怕，有我在。",
+    "pinyin": "bié hài pà, yǒu wǒ zài.",
+    "en": "Don't be afraid, I am here."
+  },
+  "河": {
+    "zh": "河里有很多鱼。",
+    "pinyin": "hé lǐ yǒu hěn duō yú.",
+    "en": "There are many fish in the river."
+  },
+  "黑板": {
+    "zh": "老师在黑板上写字。",
+    "pinyin": "lǎo shī zài hēi bǎn shang xiě zì.",
+    "en": "The teacher is writing words on the blackboard."
+  },
+  "护照": {
+    "zh": "出国需要带护照。",
+    "pinyin": "chū guó xū yào dài hù zhào.",
+    "en": "Going abroad requires bringing a passport."
+  },
+  "花": {
+    "zh": "花园里的花开了。",
+    "pinyin": "huā yuán lǐ de huā kāi le.",
+    "en": "The flowers in the garden opened."
+  },
+  "花园": {
+    "zh": "我家后面有一个小花园。",
+    "pinyin": "wǒ jiā hòu mian yǒu yī gè xiǎo huā yuán.",
+    "en": "Behind my home there is a small garden."
+  },
+  "画": {
+    "zh": "他画画画得非常好。",
+    "pinyin": "tā huà huà huà de fēi cháng hǎo.",
+    "en": "He draws paintings extremely well."
+  },
+  "坏": {
+    "zh": "我的手表坏了。",
+    "pinyin": "wǒ de shǒu biǎo huài le.",
+    "en": "My wristwatch is broken."
+  },
+  "环境": {
+    "zh": "这里的学习环境非常好。",
+    "pinyin": "zhè lǐ de xué xí huán jìng fēi cháng hǎo.",
+    "en": "The learning environment here is great."
+  },
+  "换": {
+    "zh": "我想换一件干净的衣服。",
+    "pinyin": "wǒ xiǎng huàn yī jiàn gān jìng de yī fu.",
+    "en": "I want to change into a clean piece of clothing."
+  },
+  "黄": {
+    "zh": "秋天树叶变黄了。",
+    "pinyin": "qiū tiān shù yè biàn huáng le.",
+    "en": "Leaves turned yellow in autumn."
+  },
+  "会议": {
+    "zh": "经理正在参加一个重要会议。",
+    "pinyin": "jīng lǐ zhèng zài cān jiā yī gè zhòng yào huì yì.",
+    "en": "The manager is participating in an important meeting."
+  },
+  "或者": {
+    "zh": "我们今天或者明天去买东西。",
+    "pinyin": "wǒ men jīn tiān huò zhě míng tiān qù mǎi dōng xi.",
+    "en": "We will go buy stuff today or tomorrow."
+  },
+  "机会": {
+    "zh": "这是一个很好的学习机会。",
+    "pinyin": "zhè shì yī gè hěn hǎo de xué xí jī huì.",
+    "en": "This is a very good learning opportunity."
+  },
+  "极": {
+    "zh": "今天能见到你，我高兴极了。",
+    "pinyin": "jīn tiān néng jiàn dào nǐ, wǒ gāo xìng jí le.",
+    "en": "Being able to see you today, I'm extremely glad."
+  },
+  "几乎": {
+    "zh": "我几乎忘记了他的名字。",
+    "pinyin": "wǒ jī hū wàng jì le tā de míng zi.",
+    "en": "I almost forgot his name."
+  },
+  "记得": {
+    "zh": "你还记得去火车站的路吗？",
+    "pinyin": "nǐ hái jì de qù huǒ chē zhàn de lù ma?",
+    "en": "Do you still remember the way to the train station?"
+  },
+  "季节": {
+    "zh": "一年有四个季节。",
+    "pinyin": "yī nián yǒu sì gè jì jié.",
+    "en": "A year has four seasons."
+  },
+  "检查": {
+    "zh": "交卷前请仔细检查。",
+    "pinyin": "jiāo juàn qián qǐng zǐ xì jiǎn chá.",
+    "en": "Please inspect carefully before handing in the paper."
+  },
+  "简单": {
+    "zh": "这个数学题很简单。",
+    "pinyin": "zhè gè shù xué tí hěn jiǎn dān.",
+    "en": "This math problem is very simple."
+  },
+  "见面": {
+    "zh": "我们明天下午在咖啡馆见面。",
+    "pinyin": "wǒ men míng tiān xià wǔ zài kā fēi guǎn jiàn miàn.",
+    "en": "We meet at the cafe tomorrow afternoon."
+  },
+  "健康": {
+    "zh": "多吃水果运动对健康有益。",
+    "pinyin": "duō chī shuǐ guǒ yùn dòng duì jiàn kāng yǒu yì.",
+    "en": "Eating more fruit and exercising is good for health."
+  },
+  "讲": {
+    "zh": "老师正在给学生讲课。",
+    "pinyin": "lǎo shī zhèng zài gěi xué sheng jiǎng kè.",
+    "en": "The teacher is lecturing to the students."
+  },
+  "角": {
+    "zh": "这个桌子有一个坏角。",
+    "pinyin": "zhè gè zhuō zi yǒu yī gè huài jiǎo.",
+    "en": "This table has a broken corner."
+  },
+  "脚": {
+    "zh": "我的脚走累了。",
+    "pinyin": "wǒ de jiǎo zǒu lèi le.",
+    "en": "My feet are tired from walking."
+  },
+  "接": {
+    "zh": "我去机场接我朋友。",
+    "pinyin": "wǒ qù jī chǎng jiē wǒ péng you.",
+    "en": "I go to the airport to pick up my friend."
+  },
+  "街道": {
+    "zh": "这条街道非常干净。",
+    "pinyin": "zhè tiáo jiē dào fēi cháng gān jìng.",
+    "en": "This street is extremely clean."
+  },
+  "节目": {
+    "zh": "今晚电视上有精彩的节目。",
+    "pinyin": "jīn wǎn diàn shì shang yǒu jīng cǎi de jié mù.",
+    "en": "There is a wonderful show on TV tonight."
+  },
+  "节日": {
+    "zh": "春节是中国人最重要的节日。",
+    "pinyin": "chūn jié shì zhōng guó rén zuì zhòng yào de jié rì.",
+    "en": "Spring Festival is the most important holiday for Chinese people."
+  },
+  "结婚": {
+    "zh": "他们准备明年结婚。",
+    "pinyin": "tā men zhǔn bèi míng nián jié hūn.",
+    "en": "They plan to get married next year."
+  },
+  "结束": {
+    "zh": "会议已经结束了。",
+    "pinyin": "huì yì yǐ jīng jié shù le.",
+    "en": "The meeting has already ended."
+  },
+  "解决": {
+    "zh": "问题终于解决了。",
+    "pinyin": "wèn tí zhōng yú jiě jué le.",
+    "en": "The problem is finally solved."
+  },
+  "借": {
+    "zh": "我想借几本汉语书。",
+    "pinyin": "wǒ xiǎng jiè jǐ běn hàn yǔ shū.",
+    "en": "I want to borrow a few Chinese books."
+  },
+  "经常": {
+    "zh": "我经常去那家咖啡馆看书。",
+    "pinyin": "wǒ jīng cháng qù nà jiā kā fēi guǎn kàn shū.",
+    "en": "I frequently go to that cafe to read."
+  },
+  "经过": {
+    "zh": "经过努力，他的成绩提高了。",
+    "pinyin": "jīng guò nǔ lì, tā de chéng jì tí gāo le.",
+    "en": "Through hard work, his grades improved."
+  },
+  "经理": {
+    "zh": "张经理在办公室写报告。",
+    "pinyin": "zhāng jīng lǐ zài bàn gōng shì xiě bào gào.",
+    "en": "Manager Zhang is writing a report in the office."
+  },
+  "久": {
+    "zh": "好久不见，你近来怎么样？",
+    "pinyin": "hǎo jiǔ bù jiàn, nǐ jìn lái zěn me yàng?",
+    "en": "Long time no see, how are you recently?"
+  },
+  "旧": {
+    "zh": "这本字典太旧了。",
+    "pinyin": "zhè běn zì diǎn tài jiù le.",
+    "en": "This dictionary is too old."
+  },
+  "举行": {
+    "zh": "学校明天举行体育比赛。",
+    "pinyin": "xué xiào míng tiān jǔ xíng tǐ yù bǐ sài.",
+    "en": "The school will hold sports match tomorrow."
+  },
+  "句子": {
+    "zh": "这个句子很难理解。",
+    "pinyin": "zhè gè jù zi hěn nán lǐ jiě.",
+    "en": "This sentence is difficult to understand."
+  },
+  "决定": {
+    "zh": "我决定去中国留学。",
+    "pinyin": "wǒ jué dìng qù zhōng guó liú xué.",
+    "en": "I decided to go study abroad in China."
+  },
+  "渴": {
+    "zh": "我渴了，想喝一口水。",
+    "pinyin": "wǒ kě le, xiǎng hē yī kǒu shuǐ.",
+    "en": "I am thirsty, I want to drink a gulp of water."
+  },
+  "刻": {
+    "zh": "现在是六点一刻。",
+    "pinyin": "xiàn zài shì liù diǎn yī kè.",
+    "en": "It is a quarter past six right now."
+  },
+  "客人": {
+    "zh": "家里来了几位客人。",
+    "pinyin": "jiā lǐ lái le jǐ wèi kè ren.",
+    "en": "A few guests came to the house."
+  },
+  "空调": {
+    "zh": "夏天开空调很凉快。",
+    "pinyin": "xià tiān kāi kōng tiáo hěn liáng kuai.",
+    "en": "Turning on the air conditioner in summer is cool."
+  },
+  "哭": {
+    "zh": "小孩子找不到妈妈，哭了。",
+    "pinyin": "xiǎo hái zi zhǎo bù dào mā ma, kū le.",
+    "en": "The little child couldn't find mom and cried."
+  },
+  "裤子": {
+    "zh": "这条裤子有点长。",
+    "pinyin": "zhè tiáo kù zi yǒu diǎn cháng.",
+    "en": "These pants are a bit long."
+  },
+  "筷子": {
+    "zh": "中国人用筷子吃饭。",
+    "pinyin": "zhōng guó rén yòng kuài zi chī fàn.",
+    "en": "Chinese people use chopsticks to eat."
+  },
+  "蓝": {
+    "zh": "今天的天空非常蓝。",
+    "pinyin": "jīn tiān de tiān kōng fēi cháng lán.",
+    "en": "Today's sky is extremely blue."
+  },
+  "老": {
+    "zh": "这位老人喜欢运动。",
+    "pinyin": "zhè wèi lǎo rén xǐ huan yùn dòng.",
+    "en": "This elderly person likes exercise."
+  },
+  "了解": {
+    "zh": "我很了解他的性格。",
+    "pinyin": "wǒ hěn liǎo jiě tā de xìng gé.",
+    "en": "I understand his personality very well."
+  },
+  "离开": {
+    "zh": "他已经离开北京了。",
+    "pinyin": "tā yǐ jīng lí kāi běi jīng le.",
+    "en": "He has already left Beijing."
+  },
+  "礼物": {
+    "zh": "谢谢你送给我的生日礼物。",
+    "pinyin": "xiè xie nǐ sòng gěi wǒ de shēng rì lǐ wù.",
+    "en": "Thank you for the birthday gift you gave me."
+  },
+  "历史": {
+    "zh": "我对中国历史很感兴趣。",
+    "pinyin": "wǒ duì zhōng guó lì shǐ hěn gǎn xìng qù.",
+    "en": "I am very interested in Chinese history."
+  },
+  "脸": {
+    "zh": "洗完脸后感觉很舒服。",
+    "pinyin": "xǐ wán liǎn hòu gǎn jué hěn shū fu.",
+    "en": "After washing my face I feel very comfortable."
+  },
+  "练习": {
+    "zh": "我们需要多练习听力。",
+    "pinyin": "wǒ men xū yào duō liàn xí tīng lì.",
+    "en": "We need to practice listening comprehension more."
+  },
+  "辆": {
+    "zh": "路边停着一辆黑色汽车。",
+    "pinyin": "lù biān tíng zhe yī liàng hēi sè qì chē.",
+    "en": "A black car is parked beside the road."
+  },
+  "邻居": {
+    "zh": "我的邻居非常有热情。",
+    "pinyin": "wǒ de lín jū fēi cháng yǒu rè qíng.",
+    "en": "My neighbor is extremely enthusiastic."
+  },
+  "楼": {
+    "zh": "我家住在五楼。",
+    "pinyin": "wǒ jiā zhù zài wǔ lóu.",
+    "en": "My family lives on the 5th floor."
+  },
+  "绿": {
+    "zh": "春天来了，草变绿了。",
+    "pinyin": "chūn tiān lái le, cǎo biàn lǜ le.",
+    "en": "Spring came, grass turned green."
+  },
+  "马": {
+    "zh": "草地上有一匹马。",
+    "pinyin": "cǎo dì shang yǒu yī pǐ mǎ.",
+    "en": "There is a horse on the grass field."
+  },
+  "满意": {
+    "zh": "他对这个结果非常满意。",
+    "pinyin": "tā duì zhè gè jié guǒ fēi cháng mǎn yì.",
+    "en": "He is extremely satisfied with this result."
+  },
+  "帽子": {
+    "zh": "夏天出门戴一顶帽子。",
+    "pinyin": "xià tiān chū mén dài yī dǐng mào zi.",
+    "en": "Wear a hat when going out in summer."
+  },
+  "面包": {
+    "zh": "早上我吃面包喝牛奶。",
+    "pinyin": "zǎo shang wǒ chī miàn bāo hē niú nǎi.",
+    "en": "In the morning I eat bread and drink milk."
+  },
+  "面条": {
+    "zh": "中午我们吃了一碗面条。",
+    "pinyin": "zhōng wǔ wǒ men chī le yī wǎn miàn tiáo.",
+    "en": "At noon we ate a bowl of noodles."
+  },
+  "明白": {
+    "zh": "这个问题我已经明白了。",
+    "pinyin": "zhè gè wèn tí wǒ yǐ jīng míng bai le.",
+    "en": "I have already understood this problem."
+  },
+  "拿": {
+    "zh": "请帮我拿一下手机。",
+    "pinyin": "qǐng bāng wǒ ná yī xià shǒu jī.",
+    "en": "Please help me hold my cell phone."
+  },
+  "奶奶": {
+    "zh": "奶奶在花园里花前休息。",
+    "pinyin": "nǎi nai zài huā yuán lǐ huā qián xiū xi.",
+    "en": "Grandma is resting in the garden."
+  },
+  "南": {
+    "zh": "大雁冬天飞向南方。",
+    "pinyin": "dà yàn dōng tiān fēi xiàng nán fāng.",
+    "en": "Wild geese fly towards the south in winter."
+  },
+  "难": {
+    "zh": "这个汉字不难写。",
+    "pinyin": "zhè gè hàn zì bù nán xiě.",
+    "en": "This Chinese character is not hard to write."
+  },
+  "难过": {
+    "zh": "听到这个消息他很难过。",
+    "pinyin": "tīng dào zhè gè xiāo xi tā hěn nán guò.",
+    "en": "Hearing this news he was very sad."
+  },
+  "年级": {
+    "zh": "我弟弟在读三年级。",
+    "pinyin": "wǒ dì di zài dú sān nián jí.",
+    "en": "My younger brother is studying in 3rd grade."
+  },
+  "年轻": {
+    "zh": "王老师看起来很年轻。",
+    "pinyin": "wáng lǎo shī kàn qǐ lai hěn nián qīng.",
+    "en": "Teacher Wang looks very young."
+  },
+  "鸟": {
+    "zh": "树上有许多鸟在唱歌。",
+    "pinyin": "shù shang yǒu xǔ duō niǎo zài chàng gē.",
+    "en": "There are many birds singing on the tree."
+  },
+  "努力": {
+    "zh": "只有努力学习才能提高成绩。",
+    "pinyin": "zhǐ yǒu nǔ lì xué xí cái néng tí gāo chéng jì.",
+    "en": "Only working hard at studying can improve grades."
+  },
+  "爬山": {
+    "zh": "周末我和朋友去爬山。",
+    "pinyin": "zhōu mò wǒ hé péng you qù pá shān.",
+    "en": "This weekend I go hiking with friends."
+  },
+  "盘子": {
+    "zh": "把苹果装在盘子里。",
+    "pinyin": "bǎ píng guǒ zhuāng zài pán zi lǐ.",
+    "en": "Put the apples on the plate."
+  },
+  "胖": {
+    "zh": "这只小猫有点胖。",
+    "pinyin": "zhè zhī xiǎo māo yǒu diǎn pàng.",
+    "en": "This kitten is a bit fat."
+  },
+  "啤酒": {
+    "zh": "爸爸喜欢在晚上喝啤酒。",
+    "pinyin": "bà ba xǐ huan zài wǎn shang hē pí jiǔ.",
+    "en": "Dad likes to drink beer in the evening."
+  },
+  "葡萄": {
+    "zh": "这些紫色的葡萄很甜。",
+    "pinyin": "zhè xiē zǐ sè de pú tao hěn tián.",
+    "en": "These purple grapes are very sweet."
+  },
+  "普通话": {
+    "zh": "请用标准普通话说话。",
+    "pinyin": "qǐng yòng biāo zhǔn pǔ tōng huà shuō huà.",
+    "en": "Please speak using standard Mandarin."
+  },
+  "其实": {
+    "zh": "其实这个任务并不难。",
+    "pinyin": "qí shí zhè gè rèn wu bìng bù nán.",
+    "en": "In fact, this task isn't hard at all."
+  },
+  "其他": {
+    "zh": "除了他，其他人都到了。",
+    "pinyin": "chú le tā, qí tā rén dōu dào le.",
+    "en": "Except for him, other people all arrived."
+  },
+  "奇怪": {
+    "zh": "这件事听起来很奇怪。",
+    "pinyin": "zhè jiàn shì tīng qǐ lai hěn qí guài.",
+    "en": "This matter sounds very strange."
+  },
+  "骑": {
+    "zh": "我喜欢骑自行车去学校。",
+    "pinyin": "wǒ xǐ huan qí zì xíng chē qù xué xiào.",
+    "en": "I like riding a bicycle to school."
+  },
+  "铅笔": {
+    "zh": "请用铅笔写答案。",
+    "pinyin": "qǐng yòng qiān bǐ xiě dá àn.",
+    "en": "Please write the answer using a pencil."
+  },
+  "清楚": {
+    "zh": "请说清楚一点。",
+    "pinyin": "qǐng shuō qīng chu yī diǎn.",
+    "en": "Please speak a bit clearer."
+  },
+  "秋": {
+    "zh": "秋天是收获的季节。",
+    "pinyin": "qiū tiān shì shōu huò de jì jié.",
+    "en": "Autumn is the season of harvest."
+  },
+  "裙子": {
+    "zh": "她穿了一条红色的裙子。",
+    "pinyin": "tā chuān le yī tiáo hóng sè de qún zi.",
+    "en": "She wore a red skirt."
+  },
+  "然后": {
+    "zh": "先洗手，然后吃饭。",
+    "pinyin": "xiān xǐ shǒu, rán hòu chī fàn.",
+    "en": "First wash hands, then eat meal."
+  },
+  "热情": {
+    "zh": "服务员态度非常热情。",
+    "pinyin": "fú wù yuán tài du fēi cháng rè qíng.",
+    "en": "The waiter's attitude is very warm."
+  },
+  "认为": {
+    "zh": "我认为这个决定是对的。",
+    "pinyin": "wǒ rèn wéi zhè gè jué dìng shì duì de.",
+    "en": "I believe this decision is correct."
+  },
+  "认真": {
+    "zh": "同学们正在认真听课。",
+    "pinyin": "tóng xué men zhèng zài rèn zhēn tīng kè.",
+    "en": "Students are currently listening attentively."
+  },
+  "容易": {
+    "zh": "汉语拼音比较容易学。",
+    "pinyin": "hàn yǔ pīn yīn bǐ jiào róng yì xué.",
+    "en": "Chinese Pinyin is relatively easy to learn."
+  },
+  "如果": {
+    "zh": "如果明天不下雨，我们就去公园。",
+    "pinyin": "rú guǒ míng tiān bù xià yǔ, wǒ men jiù qù gōng yuán.",
+    "en": "If it doesn't rain tomorrow, we go to the park."
+  },
+  "伞": {
+    "zh": "下雨了，请带一把伞。",
+    "pinyin": "xià yǔ le, qǐng dài yī bǎ sǎn.",
+    "en": "It rained, please bring an umbrella."
+  },
+  "上网": {
+    "zh": "我喜欢在周末上网看新闻。",
+    "pinyin": "wǒ xǐ huan zài zhōu mò shàng wǎng kàn xīn wén.",
+    "en": "I like to go online to read news on weekends."
+  },
+  "生气": {
+    "zh": "别生气了，是我不对。",
+    "pinyin": "bié shēng qì le, shì wǒ bù duì.",
+    "en": "Don't be angry anymore, it's my fault."
+  },
+  "声音": {
+    "zh": "请放大一点声音。",
+    "pinyin": "qǐng fàng dà yī diǎn shēn yīn.",
+    "en": "Please turn up the sound volume a bit."
+  },
+  "使": {
+    "zh": "这个好消息使大家高兴极了。",
+    "pinyin": "zhè gè hǎo xiāo xi shǐ dà jiā gāo xìng jí le.",
+    "en": "This good news made everyone extremely happy."
+  },
+  "世界": {
+    "zh": "世界上有很多美丽的城市。",
+    "pinyin": "shì jiè shang yǒu hěn duō měi lì de chéng shì.",
+    "en": "There are many beautiful cities in the world."
+  },
+  "瘦": {
+    "zh": "他最近运动，瘦了五公斤。",
+    "pinyin": "tā zuì jìn yùn dòng, shòu le wǔ gōng jīn.",
+    "en": "He exercised recently and lost five kg."
+  },
+  "叔叔": {
+    "zh": "王叔叔在医院当医生。",
+    "pinyin": "wáng shū shu zài yī yuàn dāng yī shēng.",
+    "en": "Uncle Wang works as a doctor in a hospital."
+  },
+  "舒服": {
+    "zh": "今天生病，身体不舒服。",
+    "pinyin": "jīn tiān shēng bìng, shēn tǐ bù shū fu.",
+    "en": "Fell ill today, body doesn't feel comfortable."
+  },
+  "树": {
+    "zh": "树上结满了新鲜水果。",
+    "pinyin": "shù shang jiē mǎn le xīn xiān shuǐ guǒ.",
+    "en": "The tree is filled with fresh fruit."
+  },
+  "数学": {
+    "zh": "我的数学成绩非常提高了。",
+    "pinyin": "wǒ de shù xué chéng jì fēi cháng tí gāo le.",
+    "en": "My math grade has improved greatly."
+  },
+  "刷": {
+    "zh": "早晚刷牙对牙齿好。",
+    "pinyin": "zǎo wǎn shuā yá duì yá chǐ hǎo.",
+    "en": "Brushing teeth morning and night is good for teeth."
+  },
+  "双": {
+    "zh": "我买了一双黑色的鞋子。",
+    "pinyin": "wǒ mǎi le yī shuāng hēi sè de xié zi.",
+    "en": "I bought a pair of black shoes."
+  },
+  "水平": {
+    "zh": "他的汉语水平非常高。",
+    "pinyin": "tā de hàn yǔ shuǐ píng fēi cháng gāo.",
+    "en": "His Chinese level is extremely high."
+  },
+  "司机": {
+    "zh": "出租车司机对这条路很熟悉。",
+    "pinyin": "chū zū chē sī jī duì zhè tiáo lù hěn shú xī.",
+    "en": "The taxi driver is familiar with this road."
+  },
+  "太阳": {
+    "zh": "今天的太阳非常大。",
+    "pinyin": "jīn tiān de tài yang fēi cháng dà.",
+    "en": "Today's sun is very strong."
+  },
+  "糖": {
+    "zh": "吃太多糖对身体不好。",
+    "pinyin": "chī tài duō táng duì shēn tǐ bù hǎo.",
+    "en": "Eating too much sugar is bad for health."
+  },
+  "特别": {
+    "zh": "这家饭馆的菜特别好吃。",
+    "pinyin": "zhè jiā fàn guǎn de cài tè bié hǎo chī.",
+    "en": "The dishes at this restaurant are especially tasty."
+  },
+  "疼": {
+    "zh": "生病了，肚子有点疼。",
+    "pinyin": "shēng bìng le, dù zi yǒu diǎn téng.",
+    "en": "Fell ill, my stomach hurts a bit."
+  },
+  "提高": {
+    "zh": "努力练习能提高汉语水平。",
+    "pinyin": "nǔ lì liàn xí néng tí gāo hàn yǔ shuǐ píng.",
+    "en": "Hard practice can raise Chinese level."
+  },
+  "体育": {
+    "zh": "我喜欢参加体育运动。",
+    "pinyin": "wǒ xǐ huan cān jiā tǐ yù yùn dòng.",
+    "en": "I like participating in sports."
+  },
+  "甜": {
+    "zh": "这个西瓜非常甜。",
+    "pinyin": "zhè gè xī guā fēi cháng tián.",
+    "en": "This watermelon is extremely sweet."
+  },
+  "条": {
+    "zh": "这条裤子很合适。",
+    "pinyin": "zhè tiáo kù zi hěn hé shì.",
+    "en": "These pair of trousers fit well."
+  },
+  "同事": {
+    "zh": "我和同事们一起在公司工作。",
+    "pinyin": "wǒ hé tóng shì men yī qǐ zài gōng sī gōng zuò.",
+    "en": "My colleagues and I work at the company together."
+  },
+  "同意": {
+    "zh": "经理同意了我的打算。",
+    "pinyin": "jīng lǐ tóng yì le wǒ de dǎ suàn.",
+    "en": "The manager agreed with my plan."
+  },
+  "头发": {
+    "zh": "她的头发变长了。",
+    "pinyin": "tā de tóu fa biàn cháng le.",
+    "en": "Her hair grew longer."
+  },
+  "突然": {
+    "zh": "天气突然下起了大雨。",
+    "pinyin": "tiān qì tū rán xià qǐ le dà yǔ.",
+    "en": "The weather suddenly started raining heavily."
+  },
+  "图书馆": {
+    "zh": "我们在图书馆看书。",
+    "pinyin": "wǒ men zài tú shū guǎn kàn shū.",
+    "en": "We read books at the library."
+  },
+  "腿": {
+    "zh": "跑步后我的腿有点疼。",
+    "pinyin": "pǎo bù hòu wǒ de tuǐ yǒu diǎn téng.",
+    "en": "After running my leg hurts a bit."
+  },
+  "完成": {
+    "zh": "我按时完成了这项工作。",
+    "pinyin": "wǒ àn shí wán chéng le zhè xiàng gōng zuò.",
+    "en": "I completed this task on time."
+  },
+  "碗": {
+    "zh": "请给我拿一碗米饭。",
+    "pinyin": "qǐng gěi wǒ ná yī wǎn mǐ fàn.",
+    "en": "Please bring me a bowl of rice."
+  },
+  "万": {
+    "zh": "这台汽车卖十万块。",
+    "pinyin": "zhè tái qì chē mài shí wàn kuài.",
+    "en": "This car sells for one hundred thousand yuan."
+  },
+  "忘记": {
+    "zh": "请不要忘记关灯。",
+    "pinyin": "qǐng bù yào wàng jì guān dēng.",
+    "en": "Please do not forget to turn off lights."
+  },
+  "为了": {
+    "zh": "为了提高汉语，他每天都练习。",
+    "pinyin": "wèi le tí gāo hàn yǔ, tā měi tiān dōu liàn xí.",
+    "en": "In order to improve Chinese, he practices daily."
+  },
+  "为": {
+    "zh": "大家都在为考试做准备。",
+    "pinyin": "dà jiā dōu zài wèi kǎo shì zuò zhǔn bèi.",
+    "en": "Everyone is making preparations for the exam."
+  },
+  "文化": {
+    "zh": "我对中国传统文化感兴趣。",
+    "pinyin": "wǒ duì zhōng guó chuán tǒng wén huà gǎn xìng qù.",
+    "en": "I am interested in traditional Chinese culture."
+  },
+  "习惯": {
+    "zh": "我已经习惯了这里的环境。",
+    "pinyin": "wǒ yǐ jīng xí guàn le zhè lǐ de huán jìng.",
+    "en": "I have already gotten used to the environment here."
+  },
+  "洗手间": {
+    "zh": "请问洗手间在哪里？",
+    "pinyin": "qǐng wèn xǐ shǒu jiān zài nǎ lǐ?",
+    "en": "Excuse me, where is the restroom?"
+  },
+  "洗澡": {
+    "zh": "运动后洗澡很舒服。",
+    "pinyin": "yùn dòng hòu xǐ zǎo hěn shū fu.",
+    "en": "Showering after exercise feels very comfortable."
+  },
+  "夏": {
+    "zh": "夏天的天气非常热。",
+    "pinyin": "xià tiān de tiān qì fēi cháng rè.",
+    "en": "Summer weather is extremely hot."
+  },
+  "先": {
+    "zh": "请先洗手，然后再吃饭。",
+    "pinyin": "qǐng xiān xǐ shǒu, rán hòu zài chī fàn.",
+    "en": "Please wash hands first, then eat."
+  },
+  "相同": {
+    "zh": "我们俩的选择是相同的。",
+    "pinyin": "wǒ men liǎ de xuǎn zé shì xiāng tóng de.",
+    "en": "The choices of the two of us are identical."
+  },
+  "相信": {
+    "zh": "我相信你一定能解决问题。",
+    "pinyin": "wǒ xiāng xìn nǐ yī dìng néng jiě jué wèn tí.",
+    "en": "I believe you can certainly solve the problem."
+  },
+  "香蕉": {
+    "zh": "猴子最喜欢吃香蕉。",
+    "pinyin": "hóu zi zuì xǐ huan chī xiāng jiāo.",
+    "en": "Monkeys like eating bananas the most."
+  },
+  "像": {
+    "zh": "他长得很像他的爸爸。",
+    "pinyin": "tā zhǎng de hěn xiàng tā de bà ba.",
+    "en": "He grows up looking very much like his dad."
+  },
+  "小心": {
+    "zh": "过马路要多加小心。",
+    "pinyin": "guò mǎ lù yào duō jiā xiǎo xīn.",
+    "en": "Be extra careful when crossing the road."
+  },
+  "校长": {
+    "zh": "校长在会上讲了话。",
+    "pinyin": "xiào zhǎng zài huì shang jiǎng le huà.",
+    "en": "The principal gave a speech at the meeting."
+  },
+  "鞋": {
+    "zh": "这双运动鞋非常舒服。",
+    "pinyin": "zhè shuāng yùn dòng xié fēi cháng shū fu.",
+    "en": "This pair of sports shoes is very comfortable."
+  },
+  "新闻": {
+    "zh": "我每天晚上看电视新闻。",
+    "pinyin": "wǒ měi tiān wǎn shang kàn diàn shì xīn wén.",
+    "en": "I watch TV news every evening."
+  },
+  "新鲜": {
+    "zh": "超市里的水果很新鲜。",
+    "pinyin": "chāo shì lǐ de shuǐ guǒ hěn xīn xiān.",
+    "en": "Fruit in the supermarket is fresh."
+  },
+  "信": {
+    "zh": "我收到了一封朋友寄来的信。",
+    "pinyin": "wǒ shōu dào le yī fēng péng you jì lái de xìn.",
+    "en": "I received a letter sent by a friend."
+  },
+  "行李箱": {
+    "zh": "请把衣服放在行李箱里。",
+    "pinyin": "qǐng bǎ yī fu fàng zài xíng li xiāng lǐ.",
+    "en": "Please put clothing in the suitcase."
+  },
+  "兴趣": {
+    "zh": "我对学习汉语很感兴趣。",
+    "pinyin": "wǒ duì xué xí hàn yǔ hěn gǎn xìng qù.",
+    "en": "I am very interested in learning Chinese."
+  },
+  "熊猫": {
+    "zh": "大熊猫是中国著名的动物。",
+    "pinyin": "dà xióng māo shì zhōng guó zhù míng de dòng wù.",
+    "en": "The giant panda is a famous animal in China."
+  },
+  "需要": {
+    "zh": "你需要帮忙吗？",
+    "pinyin": "nǐ xū yào bāng máng ma?",
+    "en": "Do you need help?"
+  },
+  "选择": {
+    "zh": "这是一个正确的选择。",
+    "pinyin": "zhè shì yī gè zhèng què de xuǎn zé.",
+    "en": "This is a correct choice."
+  },
+  "眼镜": {
+    "zh": "他戴着一副黑色的眼镜。",
+    "pinyin": "tā dài zhe yī fù hēi sè de yǎn jìng.",
+    "en": "He wears a pair of black glasses."
+  },
+  "要求": {
+    "zh": "经理对工作要求很严格。",
+    "pinyin": "jīng lǐ duì gōng zuò yāo qiú hěn yán gé.",
+    "en": "The manager's demands for work are strict."
+  },
+  "爷爷": {
+    "zh": "爷爷在公园里散步锻炼。",
+    "pinyin": "yé ye zài gōng yuán lǐ sàn bù duàn liàn.",
+    "en": "Grandpa walks and exercises in the park."
+  },
+  "一般": {
+    "zh": "我一般早上七点起床。",
+    "pinyin": "wǒ yī bān zǎo shang qī diǎn qǐ chuáng.",
+    "en": "I generally get up at seven in the morning."
+  },
+  "一边": {
+    "zh": "他喜欢一边听音乐一边跑步。",
+    "pinyin": "tā xǐ huan yī biān tīng yīn yuè yī biān pǎo bù.",
+    "en": "He likes to run while listening to music."
+  },
+  "一定": {
+    "zh": "我们一定能完成任务。",
+    "pinyin": "wǒ men yī dìng néng wán chéng rèn wu.",
+    "en": "We can definitely complete the task."
+  },
+  "一共": {
+    "zh": "这些水果一共五十块钱。",
+    "pinyin": "zhè xiē shuǐ guǒ yī gòng wǔ shí kuài qián.",
+    "en": "These fruits are 50 yuan in total."
+  },
+  "一会儿": {
+    "zh": "请稍等一会儿，马上就好。",
+    "pinyin": "qǐng shāo děng yī huì r, mǎ shàng jiù hǎo.",
+    "en": "Please wait a little while, it will be ready soon."
+  },
+  "一样": {
+    "zh": "这两个手机价格是一样的。",
+    "pinyin": "zhè liǎng gè shǒu jī jià gé shì yī yàng de.",
+    "en": "The prices of these two phones are the same."
+  },
+  "一直": {
+    "zh": "沿着这条路一直走就到了。",
+    "pinyin": "yán zhe zhè tiáo lù yī zhí zǒu jiù dào le.",
+    "en": "Walk continuously along this road and you'll arrive."
+  },
+  "以后": {
+    "zh": "以后我有空再去旅游。",
+    "pinyin": "yǐ hòu wǒ yǒu kòng zài qù lǚ yóu.",
+    "en": "In the future when I have time, I'll travel again."
+  },
+  "以前": {
+    "zh": "以前他住在北京。",
+    "pinyin": "yǐ qián tā zhù zài běi jīng.",
+    "en": "Previously he lived in Beijing."
+  },
+  "以为": {
+    "zh": "我以为今天会下雨。",
+    "pinyin": "wǒ yǐ wéi jīn tiān huì xià yǔ.",
+    "en": "I mistakenly thought it would rain today."
+  },
+  "银行": {
+    "zh": "我需要去银行取点钱。",
+    "pinyin": "wǒ xū yào qù yín háng qǔ diǎn qián.",
+    "en": "I need to go to the bank to withdraw money."
+  },
+  "应该": {
+    "zh": "你应该多休息，多喝水。",
+    "pinyin": "nǐ yīng gāi duō xiū xi, duō hē shuǐ.",
+    "en": "You should rest more and drink more water."
+  },
+  "影响": {
+    "zh": "天气影响了我们的出行计划。",
+    "pinyin": "tiān qì yǐng xiǎng le wǒ men de chū xíng jì huà.",
+    "en": "Weather affected our travel plans."
+  },
+  "用": {
+    "zh": "请用铅笔写答案。",
+    "pinyin": "qǐng yòng qiān bǐ xiě dá àn.",
+    "en": "Please use a pencil to write the answer."
+  },
+  "游戏": {
+    "zh": "孩子们正在玩电子游戏。",
+    "pinyin": "hái zi men zhèng zài wán diàn zǐ yóu xì.",
+    "en": "The children are playing video games."
+  },
+  "有名": {
+    "zh": "这是一座非常有名的城市。",
+    "pinyin": "zhè shì yī zuò fēi cháng yǒu míng de chéng shì.",
+    "en": "This is a very famous city."
+  },
+  "又": {
+    "zh": "今天又下雨了。",
+    "pinyin": "jīn tiān yòu xià yǔ le.",
+    "en": "It rained again today."
+  },
+  "遇到": {
+    "zh": "我在超市遇到了老同学。",
+    "pinyin": "wǒ zài chāo shì yù dào le lǎo tóng xué.",
+    "en": "I ran into an old classmate at the supermarket."
+  },
+  "愿意": {
+    "zh": "你愿意和我一起去吗？",
+    "pinyin": "nǐ yuàn yì hé wǒ yī qǐ qù ma?",
+    "en": "Are you willing to go with me?"
+  },
+  "月亮": {
+    "zh": "今晚的月亮特别圆特别亮。",
+    "pinyin": "jīn wǎn de yuè liang tè bié yuán tè bié liàng.",
+    "en": "Tonight's moon is especially round and bright."
+  },
+  "越": {
+    "zh": "雨越下越大了。",
+    "pinyin": "yǔ yuè xià yuè dà le.",
+    "en": "The rain is falling harder and harder."
+  },
+  "云": {
+    "zh": "天空中有几朵白云。",
+    "pinyin": "tiān kōng zhōng yǒu jǐ duǒ bái yún.",
+    "en": "There are a few white clouds in the sky."
+  },
+  "站": {
+    "zh": "下一站就是火车站。",
+    "pinyin": "xià yī zhàn jiù shì huǒ chē zhàn.",
+    "en": "The next stop is the train station."
+  },
+  "照顾": {
+    "zh": "生病时需要好好照顾自己。",
+    "pinyin": "shēng bìng shí xū yào hǎo hǎo zhào gù zì jǐ.",
+    "en": "When ill you need to take good care of yourself."
+  },
+  "照片": {
+    "zh": "这张照片拍得非常漂亮。",
+    "pinyin": "zhè zhāng zhào piàn pāi de fēi cháng piào liang.",
+    "en": "This photo was taken very beautifully."
+  },
+  "照相机": {
+    "zh": "他买了一架新照相机。",
+    "pinyin": "tā mǎi le yī jià xīn zhào xiàng jī.",
+    "en": "He bought a new camera."
+  },
+  "着急": {
+    "zh": "别着急，时间还来得及。",
+    "pinyin": "bié zháo jí, shí jiān hái lái de jí.",
+    "en": "Don't worry, there is still enough time."
+  },
+  "中间": {
+    "zh": "桌子中间放着新鲜水果。",
+    "pinyin": "zhuō zi zhōng jiān fàng zhe xīn xiān shuǐ guǒ.",
+    "en": "Fresh fruit is placed in the middle of table."
+  },
+  "终于": {
+    "zh": "经过努力，我们终于成功了。",
+    "pinyin": "jīng guò nǔ lì, wǒ men zhōng yú chéng gōng le.",
+    "en": "Through hard work, we finally succeeded."
+  },
+  "种": {
+    "zh": "这种水果味道非常甜。",
+    "pinyin": "zhè zhǒng shuǐ guǒ wèi dào fēi cháng tián.",
+    "en": "This kind of fruit tastes very sweet."
+  },
+  "重要": {
+    "zh": "这是一件非常重要的事情。",
+    "pinyin": "zhè shì yī jiàn fēi cháng zhòng yào de shì qing.",
+    "en": "This is a very important matter."
+  },
+  "周末": {
+    "zh": "祝你周末愉快！",
+    "pinyin": "zhù nǐ zhōu mò yú kuài!",
+    "en": "Wish you a happy weekend!"
+  },
+  "主要": {
+    "zh": "这是我们今天的主要任务。",
+    "pinyin": "zhè shì wǒ men jīn tiān de zhǔ yào rèn wu.",
+    "en": "This is our primary task today."
+  },
+  "注意": {
+    "zh": "请注意身体健康。",
+    "pinyin": "qǐng zhù yì shēn tǐ jiàn kāng.",
+    "en": "Please pay attention to your health."
+  },
+  "祝": {
+    "zh": "祝你生日快乐！",
+    "pinyin": "zhù nǐ shēng rì kuài lè!",
+    "en": "Wish you a happy birthday!"
+  },
+  "字典": {
+    "zh": "遇到不认识的字请查字典。",
+    "pinyin": "yù dào bù rèn shi de zì qǐng chá zì diǎn.",
+    "en": "When encountering unfamiliar characters, check a dictionary."
+  },
+  "自己": {
+    "zh": "这件事情要靠你自己解决。",
+    "pinyin": "zhè jiàn shì qing yào kào nǐ zì jǐ jiě jué.",
+    "en": "This matter relies on yourself to solve."
+  },
+  "总是": {
+    "zh": "他总是按时来到公司。",
+    "pinyin": "tā zǒng shì àn shí lái dào gōng sī.",
+    "en": "He always comes to the company on time."
+  },
+  "最近": {
+    "zh": "我最近工作比较忙。",
+    "pinyin": "wǒ zuì jìn gōng zuò bǐ jiào máng.",
+    "en": "My work has been relatively busy recently."
+  },
+  "作业": {
+    "zh": "请大家按时交作业。",
+    "pinyin": "qǐng dà jiā àn shí jiāo zuò yè.",
+    "en": "Please hand in homework on time, everyone."
+  },
+  "作用": {
+    "zh": "这种药对感冒很有效作用。",
+    "pinyin": "zhè zhǒng yào duì gǎn mào hěn yǒu xiào zuò yòng.",
+    "en": "This medicine has a great effect on colds."
+  }
+}

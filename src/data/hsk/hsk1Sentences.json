@@ -1,0 +1,752 @@
+{
+  "爱": {
+    "zh": "我很爱我的家和朋友。",
+    "pinyin": "wǒ hěn ài wǒ de jiā hé péng you.",
+    "en": "I love my family and friends very much."
+  },
+  "八": {
+    "zh": "桌子上有八个大苹果。",
+    "pinyin": "zhuō zi shang yǒu bā gè dà píng guǒ.",
+    "en": "There are eight big apples on the table."
+  },
+  "爸爸": {
+    "zh": "我爸爸每天都去工作。",
+    "pinyin": "wǒ bà ba měi tiān dōu qù gōng zuò.",
+    "en": "My dad goes to work every day."
+  },
+  "杯子": {
+    "zh": "请给我一个喝水的杯子。",
+    "pinyin": "qǐng gěi wǒ yī gè hē shuǐ de bēi zi.",
+    "en": "Please give me a cup for drinking water."
+  },
+  "北京": {
+    "zh": "我们下个月要去北京。",
+    "pinyin": "wǒ men xià gè yuè yào qù běi jīng.",
+    "en": "We are going to Beijing next month."
+  },
+  "本": {
+    "zh": "我买了一本新书。",
+    "pinyin": "wǒ mǎi le yī běn xīn shū.",
+    "en": "I bought a new book."
+  },
+  "不": {
+    "zh": "今天天气不太冷。",
+    "pinyin": "jīn tiān tiān qì bù tài lěng.",
+    "en": "The weather is not too cold today."
+  },
+  "不客气": {
+    "zh": "不客气，这是我应该做的。",
+    "pinyin": "bù kè qi, zhè shì wǒ yīng gāi zuò de.",
+    "en": "You're welcome, this is what I should do."
+  },
+  "菜": {
+    "zh": "妈妈做的菜非常好吃。",
+    "pinyin": "mā ma zuò de cài fēi cháng hǎo chī.",
+    "en": "The dish my mom cooked is delicious."
+  },
+  "茶": {
+    "zh": "你想喝茶还是喝水？",
+    "pinyin": "nǐ xiǎng hē chá hái shi hē shuǐ?",
+    "en": "Do you want to drink tea or water?"
+  },
+  "吃": {
+    "zh": "我们中午去吃米饭吧。",
+    "pinyin": "wǒ men zhōng wǔ qù chī mǐ fàn ba.",
+    "en": "Let's go eat rice at noon."
+  },
+  "出租车": {
+    "zh": "我们坐出租车去火车站。",
+    "pinyin": "wǒ men zuò chū zū chē qù huǒ chē zhàn.",
+    "en": "We will take a taxi to the train station."
+  },
+  "打电话": {
+    "zh": "我晚上给你打电话。",
+    "pinyin": "wǒ wǎn shang gěi nǐ dǎ diàn huà.",
+    "en": "I will give you a phone call in the evening."
+  },
+  "大": {
+    "zh": "这个学校非常大。",
+    "pinyin": "zhè gè xué xiào fēi cháng dà.",
+    "en": "This school is very big."
+  },
+  "的": {
+    "zh": "这是我的汉语老师。",
+    "pinyin": "zhè shì wǒ de hàn yǔ lǎo shī.",
+    "en": "This is my Chinese teacher."
+  },
+  "点": {
+    "zh": "现在是上午九点。",
+    "pinyin": "xiàn zài shì shàng wǔ jiǔ diǎn.",
+    "en": "It is nine o'clock in the morning right now."
+  },
+  "电脑": {
+    "zh": "他在用电脑工作。",
+    "pinyin": "tā zài yòng diàn nǎo gōng zuò.",
+    "en": "He is using the computer to work."
+  },
+  "电视": {
+    "zh": "我们一起看电视吧。",
+    "pinyin": "wǒ men yī qǐ kàn diàn shì ba.",
+    "en": "Let's watch television together."
+  },
+  "电影": {
+    "zh": "这部电影好看吗？",
+    "pinyin": "zhè bù diàn yǐng hǎo kàn ma?",
+    "en": "Is this movie good to watch?"
+  },
+  "东西": {
+    "zh": "你在商店买了什么东西？",
+    "pinyin": "nǐ zài shāng diàn mǎi le shén me dōng xi?",
+    "en": "What stuff did you buy at the store?"
+  },
+  "都": {
+    "zh": "我们都是汉语学生。",
+    "pinyin": "wǒ men dōu shì hàn yǔ xué sheng.",
+    "en": "We are all Chinese students."
+  },
+  "读": {
+    "zh": "请读一下这个汉字。",
+    "pinyin": "qǐng dú yī xià zhè gè hàn zì.",
+    "en": "Please read this Chinese character aloud."
+  },
+  "对不起": {
+    "zh": "对不起，我今天迟到了。",
+    "pinyin": "duì bu qǐ, wǒ jīn tiān chí dào le.",
+    "en": "I'm sorry, I arrived late today."
+  },
+  "多": {
+    "zh": "桌子上有很多人。",
+    "pinyin": "zhuō zi shang yǒu hěn duō rén.",
+    "en": "There are many people here."
+  },
+  "多少": {
+    "zh": "请问这个苹果多少钱？",
+    "pinyin": "qǐng wèn zhè gè píng guǒ duō shao qián?",
+    "en": "Excuse me, how much money is this apple?"
+  },
+  "儿子": {
+    "zh": "我的儿子今年四岁了。",
+    "pinyin": "wǒ de ér zi jīn nián sì suì le.",
+    "en": "My son is four years old this year."
+  },
+  "二": {
+    "zh": "我有两个杯子。",
+    "pinyin": "wǒ yǒu èr gè bēi zi.",
+    "en": "I have two cups."
+  },
+  "饭馆": {
+    "zh": "这家饭馆的菜很好吃。",
+    "pinyin": "zhè jiā fàn guǎn de cài hěn hǎo chī.",
+    "en": "The food at this restaurant is delicious."
+  },
+  "飞机": {
+    "zh": "我明天坐飞机去北京。",
+    "pinyin": "wǒ míng tiān zuò fēi jī qù běi jīng.",
+    "en": "I am taking an airplane to Beijing tomorrow."
+  },
+  "分钟": {
+    "zh": "请等我五分钟。",
+    "pinyin": "qǐng děng wǒ wǔ fēn zhōng.",
+    "en": "Please wait for me for five minutes."
+  },
+  "高兴": {
+    "zh": "很高兴认识你！",
+    "pinyin": "hěn gāo xìng rèn shi nǐ!",
+    "en": "Nice to meet you!"
+  },
+  "个": {
+    "zh": "我吃了一个苹果。",
+    "pinyin": "wǒ chī le yī gè píng guǒ.",
+    "en": "I ate an apple."
+  },
+  "工作": {
+    "zh": "我的工作非常忙。",
+    "pinyin": "wǒ de gōng zuò fēi cháng máng.",
+    "en": "My job is very busy."
+  },
+  "狗": {
+    "zh": "那只小狗非常漂亮。",
+    "pinyin": "nà zhī xiǎo gǒu fēi cháng piào liang.",
+    "en": "That little dog is very pretty."
+  },
+  "汉语": {
+    "zh": "学习汉语很有意思。",
+    "pinyin": "xué xí hàn yǔ hěn yǒu yì si.",
+    "en": "Learning Chinese language is very interesting."
+  },
+  "好": {
+    "zh": "今天天气很好。",
+    "pinyin": "jīn tiān tiān qì hěn hǎo.",
+    "en": "The weather is very good today."
+  },
+  "喝": {
+    "zh": "你想喝点什么？",
+    "pinyin": "nǐ xiǎng hē diǎn shén me?",
+    "en": "What would you like to drink?"
+  },
+  "和": {
+    "zh": "我和老师一起去看电影。",
+    "pinyin": "wǒ hé lǎo shī yī qǐ qù kàn diàn yǐng.",
+    "en": "I and my teacher go to watch a movie together."
+  },
+  "很": {
+    "zh": "我今天高兴极了。",
+    "pinyin": "wǒ jīn tiān hěn gāo xìng.",
+    "en": "I am very happy today."
+  },
+  "后面": {
+    "zh": "他在学校后面等我。",
+    "pinyin": "tā zài xué xiào hòu mian děng wǒ.",
+    "en": "He is waiting for me behind the school."
+  },
+  "回": {
+    "zh": "我下午回家吃米饭。",
+    "pinyin": "wǒ xià wǔ huí jiā chī mǐ fàn.",
+    "en": "I am going back home in the afternoon to eat rice."
+  },
+  "会": {
+    "zh": "你会说汉语吗？",
+    "pinyin": "nǐ huì shuō hàn yǔ ma?",
+    "en": "Can you speak Chinese?"
+  },
+  "火车站": {
+    "zh": "火车站就在前面。",
+    "pinyin": "huǒ chē zhàn jiù zài qián miàn.",
+    "en": "The train station is right ahead."
+  },
+  "几": {
+    "zh": "现在几点了？",
+    "pinyin": "xiàn zài jǐ diǎn le?",
+    "en": "What time is it now?"
+  },
+  "家": {
+    "zh": "我的家在北京。",
+    "pinyin": "wǒ de jiā zài běi jīng.",
+    "en": "My home is in Beijing."
+  },
+  "叫": {
+    "zh": "你叫什么名字？",
+    "pinyin": "nǐ jiào shén me míng zi?",
+    "en": "What is your name?"
+  },
+  "今天": {
+    "zh": "今天天气非常热。",
+    "pinyin": "jīn tiān tiān qì fēi cháng rè.",
+    "en": "Today the weather is very hot."
+  },
+  "九": {
+    "zh": "桌子上有九本书。",
+    "pinyin": "zhuō zi shang yǒu jiǔ běn shū.",
+    "en": "There are nine books on the table."
+  },
+  "开": {
+    "zh": "请开一下门。",
+    "pinyin": "qǐng kāi yī xià mén.",
+    "en": "Please open the door."
+  },
+  "看": {
+    "zh": "你在看什么书？",
+    "pinyin": "nǐ zài kàn shén me shū?",
+    "en": "What book are you reading?"
+  },
+  "看见": {
+    "zh": "我看见了一只猫。",
+    "pinyin": "wǒ kàn jiàn le yī zhī māo.",
+    "en": "I caught sight of a cat."
+  },
+  "块": {
+    "zh": "这个水果十块钱。",
+    "pinyin": "zhè gè shuǐ guǒ shí kuài qián.",
+    "en": "This fruit is ten yuan."
+  },
+  "来": {
+    "zh": "欢迎来到我家！",
+    "pinyin": "huān yíng lái dào wǒ jiā!",
+    "en": "Welcome to come to my home!"
+  },
+  "老师": {
+    "zh": "李老师教我们汉语。",
+    "pinyin": "lǐ lǎo shī jiāo wǒ men hàn yǔ.",
+    "en": "Teacher Li teaches us Chinese."
+  },
+  "了": {
+    "zh": "我今天买了一本书。",
+    "pinyin": "wǒ jīn tiān mǎi le yī běn shū.",
+    "en": "I bought a book today."
+  },
+  "冷": {
+    "zh": "今天外面很冷。",
+    "pinyin": "jīn tiān wài mian hěn lěng.",
+    "en": "It is very cold outside today."
+  },
+  "里": {
+    "zh": "杯子里有热水。",
+    "pinyin": "bēi zi lǐ yǒu rè shuǐ.",
+    "en": "There is hot water inside the cup."
+  },
+  "零": {
+    "zh": "现在是零下五度。",
+    "pinyin": "xiàn zài shì líng xià wǔ dù.",
+    "en": "It is five degrees below zero right now."
+  },
+  "六": {
+    "zh": "我六点钟回家。",
+    "pinyin": "wǒ liù diǎn zhōng huí jiā.",
+    "en": "I go home at six o'clock."
+  },
+  "妈妈": {
+    "zh": "我妈妈在做菜。",
+    "pinyin": "wǒ mā ma zài zuò cài.",
+    "en": "My mother is cooking a dish."
+  },
+  "吗": {
+    "zh": "你是学生吗？",
+    "pinyin": "nǐ shì xué sheng ma?",
+    "en": "Are you a student?"
+  },
+  "买": {
+    "zh": "我想买一些水果。",
+    "pinyin": "wǒ xiǎng mǎi yī xiē shuǐ guǒ.",
+    "en": "I want to buy some fruit."
+  },
+  "猫": {
+    "zh": "我家有一只小猫。",
+    "pinyin": "wǒ jiā yǒu yī zhī xiǎo māo.",
+    "en": "My family has a little cat."
+  },
+  "没": {
+    "zh": "我今天没去学校。",
+    "pinyin": "wǒ jīn tiān méi qù xué xiào.",
+    "en": "I didn't go to school today."
+  },
+  "没关系": {
+    "zh": "没关系，我不累。",
+    "pinyin": "méi guān xì, wǒ bù lèi.",
+    "en": "It doesn't matter, I am not tired."
+  },
+  "米饭": {
+    "zh": "中午我们吃米饭。",
+    "pinyin": "zhōng wǔ wǒ men chī mǐ fàn.",
+    "en": "We eat cooked rice at noon."
+  },
+  "名字": {
+    "zh": "你的名字很好听。",
+    "pinyin": "nǐ de míng zi hěn hǎo tīng.",
+    "en": "Your name sounds very nice."
+  },
+  "明天": {
+    "zh": "明天下午有汉语课。",
+    "pinyin": "míng tiān xià wǔ yǒu hàn yǔ kè.",
+    "en": "There is a Chinese class tomorrow afternoon."
+  },
+  "哪": {
+    "zh": "你喜欢哪本书？",
+    "pinyin": "nǐ xǐ huan nǎ běn shū?",
+    "en": "Which book do you like?"
+  },
+  "那": {
+    "zh": "那是我们学校。",
+    "pinyin": "nà shì wǒ men xué xiào.",
+    "en": "That is our school."
+  },
+  "呢": {
+    "zh": "你在做什么呢？",
+    "pinyin": "nǐ zài zuò shén me ne?",
+    "en": "What are you doing right now?"
+  },
+  "能": {
+    "zh": "你能能帮我吗？",
+    "pinyin": "nǐ néng bāng wǒ ma?",
+    "en": "Can you help me?"
+  },
+  "你": {
+    "zh": "你好，认识你很高兴！",
+    "pinyin": "nǐ hǎo, rèn shi nǐ hěn gāo xìng!",
+    "en": "Hello, nice to meet you!"
+  },
+  "年": {
+    "zh": "我今年二十岁。",
+    "pinyin": "wǒ jīn nián èr shí suì.",
+    "en": "I am twenty years old this year."
+  },
+  "女儿": {
+    "zh": "他的女儿很漂亮。",
+    "pinyin": "tā de nǚ ér hěn piào liang.",
+    "en": "His daughter is very pretty."
+  },
+  "朋友": {
+    "zh": "他是我的好朋友。",
+    "pinyin": "tā shì wǒ de hǎo péng you.",
+    "en": "He is my good friend."
+  },
+  "漂亮": {
+    "zh": "这里的风景很漂亮。",
+    "pinyin": "zhè lǐ de fēng jǐng hěn piào liang.",
+    "en": "The scenery here is very beautiful."
+  },
+  "苹果": {
+    "zh": "我想吃红苹果。",
+    "pinyin": "wǒ xiǎng chī hóng píng guǒ.",
+    "en": "I want to eat a red apple."
+  },
+  "七": {
+    "zh": "一个星期有七天。",
+    "pinyin": "yī gè xīng qī yǒu qī tiān.",
+    "en": "A week has seven days."
+  },
+  "前面": {
+    "zh": "他在我前面说话。",
+    "pinyin": "tā zài wǒ qián miàn shuō huà.",
+    "en": "He is speaking in front of me."
+  },
+  "钱": {
+    "zh": "我口袋里没有钱。",
+    "pinyin": "wǒ kǒu dai lǐ méi yǒu qián.",
+    "en": "I have no money in my pocket."
+  },
+  "请": {
+    "zh": "请坐，喝杯茶吧。",
+    "pinyin": "qǐng zuò, hē bēi chá ba.",
+    "en": "Please sit, have a cup of tea."
+  },
+  "去": {
+    "zh": "我们去商店买东西。",
+    "pinyin": "wǒ men qù shāng diàn mǎi dōng xi.",
+    "en": "We go to the store to buy things."
+  },
+  "热": {
+    "zh": "请喝点热茶。",
+    "pinyin": "qǐng hē diǎn rè chá.",
+    "en": "Please drink some hot tea."
+  },
+  "人": {
+    "zh": "中国有很多自由和美丽的人。",
+    "pinyin": "zhōng guó yǒu hěn duō rén.",
+    "en": "There are many people in China."
+  },
+  "认识": {
+    "zh": "我不认识那个人。",
+    "pinyin": "wǒ bù rèn shi nà gè rén.",
+    "en": "I do not know that person."
+  },
+  "日": {
+    "zh": "今天是六月一号。",
+    "pinyin": "jīn tiān shì liù yuè yī rì.",
+    "en": "Today is June 1st."
+  },
+  "三": {
+    "zh": "这里有三个人。",
+    "pinyin": "zhè lǐ yǒu sān gè rén.",
+    "en": "There are three people here."
+  },
+  "商店": {
+    "zh": "这家商店卖苹果。",
+    "pinyin": "zhè jiā shāng diàn mài píng guǒ.",
+    "en": "This store sells apples."
+  },
+  "上": {
+    "zh": "桌子上有一本书。",
+    "pinyin": "zhuō zi shang yǒu yī běn shū.",
+    "en": "There is a book on the table."
+  },
+  "上午": {
+    "zh": "我们上午十点见。",
+    "pinyin": "wǒ men shàng wǔ shí diǎn jiàn.",
+    "en": "We meet at ten o'clock in the morning."
+  },
+  "少": {
+    "zh": "今天来的学生很少。",
+    "pinyin": "jīn tiān lái de xué sheng hěn shǎo.",
+    "en": "Few students came today."
+  },
+  "什么": {
+    "zh": "你在吃什么食物？",
+    "pinyin": "nǐ zài chī shén me?",
+    "en": "What are you eating?"
+  },
+  "十": {
+    "zh": "我有十本汉语书。",
+    "pinyin": "wǒ yǒu shí běn hàn yǔ shū.",
+    "en": "I have ten Chinese books."
+  },
+  "时候": {
+    "zh": "你什么时候回家？",
+    "pinyin": "nǐ shén me shí hou huí jiā?",
+    "en": "What time will you go home?"
+  },
+  "是": {
+    "zh": "他是我们的汉语老师。",
+    "pinyin": "tā shì wǒ men de hàn yǔ lǎo shī.",
+    "en": "He is our Chinese teacher."
+  },
+  "书": {
+    "zh": "我喜欢看汉语书。",
+    "pinyin": "wǒ xǐ huan kàn hàn yǔ shū.",
+    "en": "I like reading Chinese books."
+  },
+  "谁": {
+    "zh": "那是谁的杯子？",
+    "pinyin": "nà shì shéi de bēi zi?",
+    "en": "Whose cup is that?"
+  },
+  "水": {
+    "zh": "请给我一杯水。",
+    "pinyin": "qǐng gěi wǒ yī bēi shuǐ.",
+    "en": "Please give me a glass of water."
+  },
+  "水果": {
+    "zh": "多吃水果对身体好。",
+    "pinyin": "duō chī shuǐ guǒ duì shēn tǐ hǎo.",
+    "en": "Eating more fruit is good for your health."
+  },
+  "睡觉": {
+    "zh": "我现在想去睡觉。",
+    "pinyin": "wǒ xiàn zài xiǎng qù shuì jiào.",
+    "en": "I want to go to sleep now."
+  },
+  "说话": {
+    "zh": "请不要在教室说话。",
+    "pinyin": "qǐng bù yào zài jiào shì shuō huà.",
+    "en": "Please do not talk in the classroom."
+  },
+  "四": {
+    "zh": "一年有四个季节。",
+    "pinyin": "yī nián yǒu sì gè jì jié.",
+    "en": "A year has four seasons."
+  },
+  "岁": {
+    "zh": "我的女儿今年七岁。",
+    "pinyin": "wǒ de nǚ ér jīn nián qī suì.",
+    "en": "My daughter is seven years old this year."
+  },
+  "他": {
+    "zh": "他是我的大学同学。",
+    "pinyin": "tā shì wǒ de dà xué tóng xué.",
+    "en": "He is my college classmate."
+  },
+  "她": {
+    "zh": "她是一个漂亮的医生。",
+    "pinyin": "tā shì yī gè piào liang de yī shēng.",
+    "en": "She is a pretty doctor."
+  },
+  "太": {
+    "zh": "这个苹果太贵了。",
+    "pinyin": "zhè gè píng guǒ tài guì le.",
+    "en": "This apple is too expensive."
+  },
+  "天气": {
+    "zh": "今天的天气非常好。",
+    "pinyin": "jīn tiān de tiān qì fēi cháng hǎo.",
+    "en": "Today's weather is very good."
+  },
+  "听": {
+    "zh": "我喜欢听中国音乐。",
+    "pinyin": "wǒ xǐ huan tīng zhōng guó yīn yuè.",
+    "en": "I like to listen to Chinese music."
+  },
+  "同学": {
+    "zh": "他们都是我的同学。",
+    "pinyin": "tā men dōu shì wǒ de tóng xué.",
+    "en": "They are all my classmates."
+  },
+  "喂": {
+    "zh": "喂，请问张老师在吗？",
+    "pinyin": "wéi, qǐng wèn zhāng lǎo shī zài ma?",
+    "en": "Hello, is Teacher Zhang there?"
+  },
+  "我": {
+    "zh": "我是中国人。",
+    "pinyin": "wǒ shì zhōng guó rén.",
+    "en": "I am Chinese."
+  },
+  "我们": {
+    "zh": "我们一起去学校吧。",
+    "pinyin": "wǒ men yī qǐ qù xué xiào ba.",
+    "en": "Let's go to school together."
+  },
+  "五": {
+    "zh": "这台电脑五千块。",
+    "pinyin": "zhè tái diàn nǎo wǔ qiān kuài.",
+    "en": "This computer costs five thousand yuan."
+  },
+  "喜欢": {
+    "zh": "我很喜欢学习汉语。",
+    "pinyin": "wǒ hěn xǐ huan xué xí hàn yǔ.",
+    "en": "I really like learning Chinese."
+  },
+  "下": {
+    "zh": "请在前面下车。",
+    "pinyin": "qǐng zài qián miàn xià chē.",
+    "en": "Please get off the car up ahead."
+  },
+  "下午": {
+    "zh": "我下午三点去买东西。",
+    "pinyin": "wǒ xià wǔ sān diǎn qù mǎi dōng xi.",
+    "en": "I am going to buy things at three p.m."
+  },
+  "下雨": {
+    "zh": "今天外面下雨了。",
+    "pinyin": "jīn tiān wài mian xià yǔ le.",
+    "en": "It is raining outside today."
+  },
+  "先生": {
+    "zh": "王先生是我们的医生。",
+    "pinyin": "wáng xiān sheng shì wǒ men de yī shēng.",
+    "en": "Mr. Wang is our doctor."
+  },
+  "现在": {
+    "zh": "我们现在去吃饭吧。",
+    "pinyin": "wǒ men xiàn zài qù chī fàn ba.",
+    "en": "Let's go eat a meal right now."
+  },
+  "想": {
+    "zh": "我想去中国旅游。",
+    "pinyin": "wǒ xiǎng qù zhōng guó lǚ yóu.",
+    "en": "I want to go to China for travel."
+  },
+  "小": {
+    "zh": "这只猫非常小。",
+    "pinyin": "zhè zhī māo fēi cháng xiǎo.",
+    "en": "This cat is very small."
+  },
+  "小姐": {
+    "zh": "李小姐在商店工作。",
+    "pinyin": "lǐ xiǎo jie zài shāng diàn gōng zuò.",
+    "en": "Miss Li works at the store."
+  },
+  "些": {
+    "zh": "我想买一些水果。",
+    "pinyin": "wǒ xiǎng mǎi yī xiē shuǐ guǒ.",
+    "en": "I want to buy some fruit."
+  },
+  "写": {
+    "zh": "请在纸上写名字。",
+    "pinyin": "qǐng zài zhǐ shang xiě míng zi.",
+    "en": "Please write your name on the paper."
+  },
+  "谢谢": {
+    "zh": "谢谢你帮我找到钥匙。",
+    "pinyin": "xiè xie nǐ bāng wǒ zhǎo dào yào shi.",
+    "en": "Thank you for helping me find my keys."
+  },
+  "星期": {
+    "zh": "星期天我们去公园。",
+    "pinyin": "xīng qī tiān wǒ men qù gōng yuán.",
+    "en": "We go to the park on Sunday."
+  },
+  "学生": {
+    "zh": "学校里有很多学生。",
+    "pinyin": "xué xiào lǐ yǒu hěn duō xué sheng.",
+    "en": "There are many students in the school."
+  },
+  "学习": {
+    "zh": "他在房间里学习。",
+    "pinyin": "tā zài fáng jiān lǐ xué xí.",
+    "en": "He is studying in the room."
+  },
+  "学校": {
+    "zh": "我们的学校非常大。",
+    "pinyin": "wǒ men de xué xiào fēi cháng dà.",
+    "en": "Our school is very big."
+  },
+  "一": {
+    "zh": "桌子上有一本书。",
+    "pinyin": "zhuō zi shang yǒu yī běn shū.",
+    "en": "There is one book on the table."
+  },
+  "衣服": {
+    "zh": "这件衣服很漂亮。",
+    "pinyin": "zhè jiàn yī fu hěn piào liang.",
+    "en": "These clothes are very pretty."
+  },
+  "医生": {
+    "zh": "他在医院当医生。",
+    "pinyin": "tā zài yī yuàn dāng yī shēng.",
+    "en": "He works as a doctor in the hospital."
+  },
+  "医院": {
+    "zh": "妈妈今天去医院了。",
+    "pinyin": "mā ma jīn tiān qù yī yuàn le.",
+    "en": "Mom went to the hospital today."
+  },
+  "椅子": {
+    "zh": "请坐在椅子上。",
+    "pinyin": "qǐng zuò zài yǐ zi shang.",
+    "en": "Please sit on the chair."
+  },
+  "有": {
+    "zh": "我有一只小狗。",
+    "pinyin": "wǒ yǒu yī zhī xiǎo gǒu.",
+    "en": "I have a little dog."
+  },
+  "月": {
+    "zh": "八月天气很热。",
+    "pinyin": "bā yuè tiān qì hěn rè.",
+    "en": "The weather is very hot in August."
+  },
+  "再见": {
+    "zh": "老师，明天再见！",
+    "pinyin": "lǎo shī, míng tiān zài jiàn!",
+    "en": "Teacher, see you again tomorrow!"
+  },
+  "在": {
+    "zh": "妈妈在厨房做饭。",
+    "pinyin": "mā ma zài chú fáng zuò fàn.",
+    "en": "Mom is in the kitchen cooking meal."
+  },
+  "怎么": {
+    "zh": "这个字怎么读？",
+    "pinyin": "zhè gè zì zěn me dú?",
+    "en": "How do you read this character?"
+  },
+  "怎么样": {
+    "zh": "今天天气怎么样？",
+    "pinyin": "jīn tiān tiān qì zěn me yàng?",
+    "en": "How is the weather today?"
+  },
+  "这": {
+    "zh": "这是我的电脑。",
+    "pinyin": "zhè shì wǒ de diàn nǎo.",
+    "en": "This is my computer."
+  },
+  "中国": {
+    "zh": "我想去中国学汉语。",
+    "pinyin": "wǒ xiǎng qù zhōng guó xué hàn yǔ.",
+    "en": "I want to go to China to learn Chinese."
+  },
+  "中午": {
+    "zh": "我们中午十二点吃饭。",
+    "pinyin": "wǒ men zhōng wǔ shí èr diǎn chī fàn.",
+    "en": "We eat a meal at twelve o'clock noon."
+  },
+  "住": {
+    "zh": "我住在北京。",
+    "pinyin": "wǒ zhù zài běi jīng.",
+    "en": "I live in Beijing."
+  },
+  "桌子": {
+    "zh": "书在桌子上。",
+    "pinyin": "shū zài zhuō zi shang.",
+    "en": "The book is on the table."
+  },
+  "字": {
+    "zh": "这个汉字很难写。",
+    "pinyin": "zhè gè hàn zì hěn nán xiě.",
+    "en": "This Chinese character is hard to write."
+  },
+  "昨天": {
+    "zh": "昨天下了一场大雨。",
+    "pinyin": "zuó tiān xià le yī chǎng dà yǔ.",
+    "en": "It rained heavily yesterday."
+  },
+  "坐": {
+    "zh": "请坐出租车去车站。",
+    "pinyin": "qǐng zuò chū zū chē qù chē zhàn.",
+    "en": "Please take a taxi to the station."
+  },
+  "做": {
+    "zh": "你在做什么菜？",
+    "pinyin": "nǐ zài zuò shén me cài?",
+    "en": "What dish are you making?"
+  }
+}
