@@ -3,10 +3,10 @@ import './App.css';
 import HanziCanvas from './components/HanziCanvas';
 import useSwipeGesture from './hooks/useSwipeGesture';
 import { calculateSM2 } from './utils/sm2';
-import { getProgress, saveCardProgress } from './utils/storage';
+import { getProgress, saveCardProgress, getCardMasteryStats } from './utils/storage';
 import { speakText } from './utils/tts';
 import { ColorPinyin } from './utils/pinyinColor';
-import { getHardwiredDeck } from './data/hskLoader';
+import { getHardwiredDeck, getHardModeDeck } from './data/hskLoader';
 
 function HighlightedSentence({ sentence, targetChar, muted = false }) {
   if (!sentence || !targetChar) return <span>{sentence}</span>;
@@ -29,9 +29,26 @@ function HighlightedSentence({ sentence, targetChar, muted = false }) {
   );
 }
 
+function getMultipleChoiceOptions(currentCard, fullDeck) {
+  if (!currentCard || !fullDeck || fullDeck.length < 4) return [];
+
+  const correctMeaning = currentCard.meaning.split(',')[0].trim();
+  
+  const wrongPool = fullDeck
+    .filter((c) => c.id !== currentCard.id)
+    .map((c) => c.meaning.split(',')[0].trim())
+    .filter((m) => m && m !== correctMeaning);
+
+  const shuffledWrong = [...wrongPool].sort(() => 0.5 - Math.random()).slice(0, 3);
+  const options = [...shuffledWrong, correctMeaning].sort(() => 0.5 - Math.random());
+  
+  return options;
+}
+
 export default function App() {
   const [selectedLevels, setSelectedLevels] = useState(['3']);
   const [showSettings, setShowSettings] = useState(false);
+  const [activeMasteryTab, setActiveMasteryTab] = useState('struggling');
 
   const [appState, setAppState] = useState('launch');
   const [countdownNum, setCountdownNum] = useState(3);
@@ -68,6 +85,10 @@ export default function App() {
   }, [selectedLevels]);
 
   const weakCards = useMemo(() => rawDeck.filter((c) => c.stats.repetitions > 0 && c.stats.interval <= 2), [rawDeck]);
+  
+  const mastery = useMemo(() => {
+    return getCardMasteryStats(rawDeck);
+  }, [rawDeck]);
 
   const launchArcadeSession = (count = 5, mode = 'all') => {
     let pool = [...rawDeck];
@@ -75,6 +96,23 @@ export default function App() {
 
     const queue = [...pool].sort(() => 0.5 - Math.random()).slice(0, count);
     setSessionQueue(queue);
+    setCurrentIndex(0);
+    setIsFlipped(false);
+    setScore(0);
+    setCombo(0);
+    setMaxCombo(0);
+
+    setAppState('countdown');
+    setCountdownNum(3);
+  };
+
+  const launchHardModeSession = () => {
+    const savedProgress = getProgress();
+    const hardQueue = getHardModeDeck(rawDeck, savedProgress);
+    
+    if (hardQueue.length === 0) return;
+
+    setSessionQueue(hardQueue);
     setCurrentIndex(0);
     setIsFlipped(false);
     setScore(0);
@@ -97,6 +135,10 @@ export default function App() {
   }, [appState, countdownNum]);
 
   const card = sessionQueue[currentIndex];
+
+  const multipleChoiceOptions = useMemo(() => {
+    return getMultipleChoiceOptions(card, rawDeck);
+  }, [card, rawDeck]);
 
   const handleFlip = () => {
     const nextFlipped = !isFlipped;
@@ -161,7 +203,7 @@ export default function App() {
 
   return (
     <div className="app-container">
-      {/* Top Navbar: Safely separated from the card interaction zone */}
+      {/* Top Navbar */}
       <nav className="top-nav-bar">
         <div className="nav-left">
           <span className="streak-badge">🔥 {streak}d</span>
@@ -177,7 +219,6 @@ export default function App() {
       </nav>
 
       <div className="stage">
-        {/* Progress Bar */}
         {appState === 'studying' && (
           <div className="progress-bar-container">
             <div 
@@ -195,29 +236,31 @@ export default function App() {
 
         {/* 1. LAUNCH SCREEN */}
         {appState === 'launch' && (
-          <div className="launch-deck-container">
-            <div className="card launch-card">
-              <div className="launch-card-header">
-                <span className="deck-level-pill">HSK Level {selectedLevels.join(', ')}</span>
-                <span className="deck-ready-tag">{rawDeck.length} Cards Loaded</span>
-              </div>
+          <div className="card launch-card">
+            <div className="launch-card-header">
+              <span className="deck-level-pill">HSK Level {selectedLevels.join(', ')}</span>
+              <span className="deck-ready-tag">{rawDeck.length} Cards Loaded</span>
+            </div>
 
-              <div className="launch-card-body">
-                <h1 className="launch-title">Hanzi Blitz</h1>
-                <p className="launch-subtitle">Frequency-ranked study session</p>
-              </div>
+            <div className="launch-card-body">
+              <h1 className="launch-title">Hanzi Blitz</h1>
+              <p className="launch-subtitle">Frequency-ranked study session</p>
+            </div>
 
-              <div className="launch-card-actions">
-                <button className="primary-launch-btn" onClick={() => launchArcadeSession(10, 'all')}>
-                  Start Session ⚡
+            <div className="launch-card-actions">
+              <button className="primary-launch-btn" onClick={() => launchArcadeSession(10, 'all')}>
+                Start Session ⚡
+              </button>
+
+              <button className="hard-mode-btn" onClick={launchHardModeSession}>
+                🔥 Hard Mode (10 Confusables & Weak Spots)
+              </button>
+
+              {weakCards.length > 0 && (
+                <button className="secondary-launch-btn" onClick={() => launchArcadeSession(10, 'weak')}>
+                  🎯 Review {weakCards.length} Weak Cards
                 </button>
-
-                {weakCards.length > 0 && (
-                  <button className="secondary-launch-btn" onClick={() => launchArcadeSession(10, 'weak')}>
-                    🎯 Review {weakCards.length} Weak Cards
-                  </button>
-                )}
-              </div>
+              )}
             </div>
           </div>
         )}
@@ -245,28 +288,41 @@ export default function App() {
             {dragX < -30 && <div className="badge badge--again">AGAIN</div>}
 
             {!isFlipped ? (
-              /* FRONT FACE */
               <div className="card-face front-face">
                 <button className="audio-icon-btn" onClick={(e) => { e.stopPropagation(); speakText(card.character); }}>
                   🔊
                 </button>
 
-                <div className="canvas-frame">
+                <div className="canvas-frame" style={{ transform: 'scale(0.85)', margin: '0 auto' }}>
                   <HanziCanvas character={card.character} mode="view" />
                 </div>
 
-                {card.sentence && (
-                  <div className="front-context-container">
-                    <p className="front-context-text">
-                      <HighlightedSentence sentence={card.sentence} targetChar={card.character} muted={true} />
-                    </p>
-                  </div>
-                )}
+                <div className="mcq-options-container" onClick={(e) => e.stopPropagation()}>
+                  {multipleChoiceOptions.map((option, idx) => {
+                    const isCorrect = option === card.meaning.split(',')[0].trim();
+                    return (
+                      <button
+                        key={idx}
+                        className="mcq-option-btn"
+                        onClick={() => {
+                          if (isCorrect) {
+                            handleNextCard(5);
+                          } else {
+                            handleNextCard(1);
+                          }
+                        }}
+                      >
+                        {option}
+                      </button>
+                    );
+                  })}
+                </div>
 
-                <span className="tap-prompt">Tap to flip card</span>
+                <span className="tap-prompt" style={{ cursor: 'pointer', marginTop: '6px' }} onClick={handleFlip}>
+                  Or tap card to flip manually ↺
+                </span>
               </div>
             ) : (
-              /* BACK FACE - Fully contained within card bounds */
               <div className="card-face back-face" onClick={(e) => e.stopPropagation()}>
                 <div className="back-scrollable-content">
                   <div className="back-header-group">
@@ -282,7 +338,6 @@ export default function App() {
 
                   <div className="card-internal-divider" />
 
-                  {/* Integrated Sentence Context Box */}
                   <div className="card-sentence-box">
                     <span className="box-section-label">Context Example</span>
                     <p className="sentence-zh">
@@ -293,7 +348,6 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* Fixed Grading Action Bar at bottom of card */}
                 <div className="grading-row">
                   <button className="grade-btn grade-btn--hard" onClick={() => handleNextCard(1)}>
                     Hard ({nextHardInterval}d)
@@ -335,24 +389,74 @@ export default function App() {
           <div className="drawer-overlay" onClick={() => setShowSettings(false)}>
             <div className="drawer-sheet" onClick={(e) => e.stopPropagation()}>
               <div className="drawer-handle" />
-              <h3>Select HSK Levels</h3>
-              <div className="settings-level-grid">
-                {['1', '2', '3'].map((lvl) => (
-                  <button
-                    key={lvl}
-                    className={`level-toggle-btn ${selectedLevels.includes(lvl) ? 'active' : ''}`}
-                    onClick={() => {
-                      if (selectedLevels.includes(lvl) && selectedLevels.length > 1) {
-                        setSelectedLevels(selectedLevels.filter(l => l !== lvl));
-                      } else if (!selectedLevels.includes(lvl)) {
-                        setSelectedLevels([...selectedLevels, lvl]);
-                      }
-                    }}
-                  >
-                    HSK {lvl}
-                  </button>
-                ))}
+              <h3>Settings & Character Mastery</h3>
+
+              <div style={{ marginTop: '12px' }}>
+                <label className="box-section-label">Active HSK Decks</label>
+                <div className="settings-level-grid">
+                  {['1', '2', '3'].map((lvl) => (
+                    <button
+                      key={lvl}
+                      className={`level-toggle-btn ${selectedLevels.includes(lvl) ? 'active' : ''}`}
+                      onClick={() => {
+                        if (selectedLevels.includes(lvl) && selectedLevels.length > 1) {
+                          setSelectedLevels(selectedLevels.filter(l => l !== lvl));
+                        } else if (!selectedLevels.includes(lvl)) {
+                          setSelectedLevels([...selectedLevels, lvl]);
+                        }
+                      }}
+                    >
+                      HSK {lvl}
+                    </button>
+                  ))}
+                </div>
               </div>
+
+              <div className="card-internal-divider" />
+
+              <div>
+                <label className="box-section-label">Character Mastery Matrix</label>
+                
+                <div style={{ display: 'flex', gap: '6px', margin: '8px 0' }}>
+                  <button 
+                    className={`level-toggle-btn ${activeMasteryTab === 'struggling' ? 'active' : ''}`}
+                    onClick={() => setActiveMasteryTab('struggling')}
+                    style={{ fontSize: '12px', padding: '8px' }}
+                  >
+                    ⚠️ Struggling ({mastery.struggling.length})
+                  </button>
+                  <button 
+                    className={`level-toggle-btn ${activeMasteryTab === 'practicing' ? 'active' : ''}`}
+                    onClick={() => setActiveMasteryTab('practicing')}
+                    style={{ fontSize: '12px', padding: '8px' }}
+                  >
+                    ⚖️ Practicing ({mastery.practicing.length})
+                  </button>
+                  <button 
+                    className={`level-toggle-btn ${activeMasteryTab === 'nailed' ? 'active' : ''}`}
+                    onClick={() => setActiveMasteryTab('nailed')}
+                    style={{ fontSize: '12px', padding: '8px' }}
+                  >
+                    🔥 Nailed ({mastery.nailed.length})
+                  </button>
+                </div>
+
+                <div className="mastery-list-box">
+                  {mastery[activeMasteryTab].length === 0 ? (
+                    <p className="empty-mastery-text">No characters in this category yet!</p>
+                  ) : (
+                    <div className="mastery-grid-chips">
+                      {mastery[activeMasteryTab].map((c) => (
+                        <div key={c.id} className="mastery-chip" title={`${c.pinyin} - ${c.meaning}`}>
+                          <span className="chip-char">{c.character}</span>
+                          <span className="chip-py">{c.pinyin}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
             </div>
           </div>
         )}
@@ -360,4 +464,4 @@ export default function App() {
       </div>
     </div>
   );
-} 
+}
