@@ -8,6 +8,7 @@ import { speakText } from './utils/tts';
 import { ColorPinyin } from './utils/pinyinColor';
 import { getFilteredDeck } from './data/vocabLoader';
 import { getHardModeDeck } from './data/hskLoader';
+import { buildLearnQueue } from './utils/sessionQueue';
 
 function HighlightedSentence({ sentence, targetChar, muted = false }) {
   if (!sentence || !targetChar) return <span>{sentence}</span>;
@@ -30,24 +31,11 @@ function HighlightedSentence({ sentence, targetChar, muted = false }) {
   );
 }
 
-function getMultipleChoiceOptions(currentCard, fullDeck) {
-  if (!currentCard || !fullDeck || fullDeck.length < 4) return [];
-
-  const correctMeaning = currentCard.meaning.split(',')[0].trim();
-  
-  const wrongPool = fullDeck
-    .filter((c) => c.id !== currentCard.id)
-    .map((c) => c.meaning.split(',')[0].trim())
-    .filter((m) => m && m !== correctMeaning);
-
-  const shuffledWrong = [...wrongPool].sort(() => 0.5 - Math.random()).slice(0, 3);
-  const options = [...shuffledWrong, correctMeaning].sort(() => 0.5 - Math.random());
-  
-  return options;
-}
-
 export default function App() {
-  const [selectedLevels, setSelectedLevels] = useState(['1']);
+  // Empty = no filter, learn from the full frequency-ranked deck. A
+  // non-empty selection (set from Settings) narrows to specific HSK levels
+  // for targeted revision.
+  const [revisionLevels, setRevisionLevels] = useState([]);
   const [showSettings, setShowSettings] = useState(false);
   const [activeMasteryTab, setActiveMasteryTab] = useState('struggling');
 
@@ -67,11 +55,11 @@ export default function App() {
   const [streak, setStreak] = useState(1);
   const [isLoadingDeck, setIsLoadingDeck] = useState(true);
 
-  // Load deck asynchronously from unified_vocab.json whenever selectedLevels change
+  // Load deck asynchronously from unified_vocab.json whenever revisionLevels change
   useEffect(() => {
     async function loadDeck() {
       setIsLoadingDeck(true);
-      const localWords = await getFilteredDeck(selectedLevels);
+      const localWords = await getFilteredDeck(revisionLevels);
       
       const savedProgress = getProgress();
 
@@ -80,7 +68,7 @@ export default function App() {
         return {
           ...card,
           id: cardId,
-          stats: savedProgress[cardId] || { repetitions: 0, interval: 1, easeFactor: 2.5 },
+          stats: savedProgress[cardId] || { repetitions: 0, interval: 1, easeFactor: 2.5, lastReviewed: null },
         };
       });
 
@@ -96,7 +84,7 @@ export default function App() {
     } catch (e) {
       setStreak(1);
     }
-  }, [selectedLevels]);
+  }, [revisionLevels]);
 
   const weakCards = useMemo(() => rawDeck.filter((c) => c.stats.repetitions > 0 && c.stats.interval <= 2), [rawDeck]);
   
@@ -104,11 +92,15 @@ export default function App() {
     return getCardMasteryStats(rawDeck);
   }, [rawDeck]);
 
-  const launchArcadeSession = (count = 5, mode = 'all') => {
-    let pool = [...rawDeck];
-    if (mode === 'weak' && weakCards.length > 0) pool = weakCards;
-
-    const queue = [...pool].sort(() => 0.5 - Math.random()).slice(0, count);
+  const launchArcadeSession = (count = 20, mode = 'all') => {
+    let queue;
+    if (mode === 'weak' && weakCards.length > 0) {
+      queue = [...weakCards].sort(() => 0.5 - Math.random()).slice(0, count);
+    } else {
+      // Due-for-review cards first (most overdue first), then never-studied
+      // cards introduced in frequency order - not a flat random shuffle.
+      queue = buildLearnQueue(rawDeck, count);
+    }
     setSessionQueue(queue);
     setCurrentIndex(0);
     setIsFlipped(false);
@@ -150,10 +142,6 @@ export default function App() {
 
   const card = sessionQueue[currentIndex];
 
-  const multipleChoiceOptions = useMemo(() => {
-    return getMultipleChoiceOptions(card, rawDeck);
-  }, [card, rawDeck]);
-
   const handleFlip = () => {
     const nextFlipped = !isFlipped;
     setIsFlipped(nextFlipped);
@@ -188,7 +176,11 @@ export default function App() {
       card.stats?.easeFactor || 2.5
     );
 
-    saveCardProgress(card.id, newStats);
+    const stamped = saveCardProgress(card.id, newStats);
+    // Keep rawDeck in sync so a subsequent session (built from rawDeck)
+    // sees this card's real lastReviewed/interval - otherwise it'd still
+    // look "never studied" until the next full deck reload.
+    setRawDeck((prev) => prev.map((c) => (c.id === card.id ? { ...c, stats: stamped } : c)));
 
     if (currentIndex + 1 >= sessionQueue.length) {
       setAppState('completed');
@@ -199,21 +191,18 @@ export default function App() {
   };
 
   const { dragX, dragY, isDragging, pointerHandlers } = useSwipeGesture({
-    onSwipeLeft: () => handleNextCard(1),
-    onSwipeRight: () => handleNextCard(5),
+    onSwipeLeft: () => handleNextCard(5),
+    onSwipeRight: () => handleNextCard(1),
     onTap: handleFlip
   });
 
   const meaningList = useMemo(() => {
     if (!card?.meaning) return ['meaning'];
-    return typeof card.meaning === 'string' ? card.meaning.split(',') : [card.meaning];
+    return typeof card.meaning === 'string' ? card.meaning.split(';') : [card.meaning];
   }, [card]);
 
   const primaryMeaning = meaningList[0]?.trim();
-  const secondaryMeanings = meaningList.slice(1).join(', ').trim();
-
-  const nextHardInterval = card ? calculateSM2(1, card.stats?.repetitions || 0, card.stats?.interval || 1, card.stats?.easeFactor || 2.5).interval : 1;
-  const nextEasyInterval = card ? calculateSM2(5, card.stats?.repetitions || 0, card.stats?.interval || 1, card.stats?.easeFactor || 2.5).interval : 4;
+  const secondaryMeanings = meaningList.slice(1).join('; ').trim();
 
   return (
     <div className="app-container">
@@ -227,7 +216,7 @@ export default function App() {
         </div>
         <div className="nav-right">
           <button className="settings-trigger-btn" onClick={() => setShowSettings(true)} aria-label="Settings">
-            ⚙️ HSK {selectedLevels.join(',')}
+            ⚙️ {revisionLevels.length > 0 ? `HSK ${revisionLevels.join(',')}` : 'Settings'}
           </button>
         </div>
       </nav>
@@ -252,7 +241,9 @@ export default function App() {
         {appState === 'launch' && (
           <div className="card launch-card">
             <div className="launch-card-header">
-              <span className="deck-level-pill">HSK Level {selectedLevels.join(', ')}</span>
+              <span className="deck-level-pill">
+                {revisionLevels.length > 0 ? `Revising HSK ${revisionLevels.join(', ')}` : 'All Levels'}
+              </span>
               <span className="deck-ready-tag">
                 {isLoadingDeck ? 'Loading database...' : `${rawDeck.length} Cards Loaded`}
               </span>
@@ -264,12 +255,12 @@ export default function App() {
             </div>
 
             <div className="launch-card-actions">
-              <button 
-                className="primary-launch-btn" 
+              <button
+                className="primary-launch-btn"
                 disabled={isLoadingDeck || rawDeck.length === 0}
-                onClick={() => launchArcadeSession(10, 'all')}
+                onClick={() => launchArcadeSession(20, 'all')}
               >
-                {isLoadingDeck ? 'Preparing Deck...' : 'Start Session ⚡'}
+                {isLoadingDeck ? 'Preparing Deck...' : 'Learn ⚡'}
               </button>
 
               <button className="hard-mode-btn" onClick={launchHardModeSession}>
@@ -277,7 +268,7 @@ export default function App() {
               </button>
 
               {weakCards.length > 0 && (
-                <button className="secondary-launch-btn" onClick={() => launchArcadeSession(10, 'weak')}>
+                <button className="secondary-launch-btn" onClick={() => launchArcadeSession(20, 'weak')}>
                   🎯 Review {weakCards.length} Weak Cards
                 </button>
               )}
@@ -297,53 +288,45 @@ export default function App() {
         {/* 3. STUDYING SESSION */}
         {appState === 'studying' && card && (
           <div
-            className={`card ${isFlipped ? 'card--flipped' : ''}`}
+            className="card card--study"
             style={{
               transform: `translateX(${dragX}px) translateY(${dragY}px) rotate(${dragX * 0.03}deg)`,
-              transition: isDragging ? 'none' : 'transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+              transition: isDragging ? 'none' : 'transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
             }}
             {...pointerHandlers}
           >
-            {dragX > 30 && <div className="badge badge--know">KNOW</div>}
-            {dragX < -30 && <div className="badge badge--again">AGAIN</div>}
+            {dragX < -30 && <div className="badge badge--know">KNOW</div>}
+            {dragX > 30 && <div className="badge badge--again">AGAIN</div>}
 
-            {!isFlipped ? (
+            <div className={`card-flip-inner ${isFlipped ? 'is-flipped' : ''}`}>
               <div className="card-face front-face">
-                <button className="audio-icon-btn" onClick={(e) => { e.stopPropagation(); speakText(card.character); }}>
+                <button
+                  className="audio-icon-btn"
+                  onClick={(e) => { e.stopPropagation(); speakText(card.character); }}
+                  aria-label="Play pronunciation"
+                >
                   🔊
                 </button>
 
-                <div className="canvas-frame" style={{ transform: 'scale(0.85)', margin: '0 auto' }}>
+                <div className="canvas-frame">
                   <HanziCanvas character={card.character} mode="view" />
                 </div>
 
-                <div className="mcq-options-container" onClick={(e) => e.stopPropagation()}>
-                  {multipleChoiceOptions.map((option, idx) => {
-                    const isCorrect = option === card.meaning.split(',')[0].trim();
-                    return (
-                      <button
-                        key={idx}
-                        className="mcq-option-btn"
-                        onClick={() => {
-                          if (isCorrect) {
-                            handleNextCard(5);
-                          } else {
-                            handleNextCard(1);
-                          }
-                        }}
-                      >
-                        {option}
-                      </button>
-                    );
-                  })}
-                </div>
-
-                <span className="tap-prompt" style={{ cursor: 'pointer', marginTop: '6px' }} onClick={handleFlip}>
-                  Or tap card to flip manually ↺
-                </span>
+                <button
+                  className="flip-hint-btn"
+                  onClick={(e) => { e.stopPropagation(); handleFlip(); }}
+                  aria-label="Flip card"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M3 12a9 9 0 0 1 15-6.7L21 8" />
+                    <path d="M21 3v5h-5" />
+                    <path d="M21 12a9 9 0 0 1-15 6.7L3 16" />
+                    <path d="M8 16H3v5" />
+                  </svg>
+                </button>
               </div>
-            ) : (
-              <div className="card-face back-face" onClick={(e) => e.stopPropagation()}>
+
+              <div className="card-face back-face">
                 <div className="back-scrollable-content">
                   <div className="back-header-group">
                     <div>
@@ -351,9 +334,14 @@ export default function App() {
                       <p className="meaning-primary">{primaryMeaning}</p>
                       {secondaryMeanings && <p className="meaning-secondary">{secondaryMeanings}</p>}
                     </div>
-                    <button className="audio-icon-btn" onClick={() => speakText(card.character)}>
+                    <button className="audio-icon-btn" onClick={() => speakText(card.character)} aria-label="Play pronunciation">
                       🔊
                     </button>
+                  </div>
+
+                  <div className="card-meta-row">
+                    {card.level && <span className="meta-pill meta-pill--hsk">HSK {card.level}</span>}
+                    {card.freq_rank && <span className="meta-pill meta-pill--freq">Freq #{card.freq_rank}</span>}
                   </div>
 
                   <div className="card-internal-divider" />
@@ -367,17 +355,8 @@ export default function App() {
                     <p className="sentence-en">{card.sentenceEnglish}</p>
                   </div>
                 </div>
-
-                <div className="grading-row">
-                  <button className="grade-btn grade-btn--hard" onClick={() => handleNextCard(1)}>
-                    Hard ({nextHardInterval}d)
-                  </button>
-                  <button className="grade-btn grade-btn--easy" onClick={() => handleNextCard(5)}>
-                    Easy ({nextEasyInterval}d)
-                  </button>
-                </div>
               </div>
-            )}
+            </div>
           </div>
         )}
 
@@ -412,17 +391,22 @@ export default function App() {
               <h3>Settings & Character Mastery</h3>
 
               <div style={{ marginTop: '12px' }}>
-                <label className="box-section-label">Active HSK Decks</label>
+                <label className="box-section-label">Revision: Filter by HSK Level</label>
+                <p style={{ fontSize: '12px', color: 'var(--ink-faint)', margin: '4px 0 0' }}>
+                  {revisionLevels.length === 0
+                    ? 'Learning from all levels. Select levels below to revise a specific one.'
+                    : `Only reviewing HSK ${revisionLevels.join(', ')}. Deselect all to go back to learning from every level.`}
+                </p>
                 <div className="settings-level-grid">
                   {['1', '2', '3', '4', '5', '6'].map((lvl) => (
                     <button
                       key={lvl}
-                      className={`level-toggle-btn ${selectedLevels.includes(lvl) ? 'active' : ''}`}
+                      className={`level-toggle-btn ${revisionLevels.includes(lvl) ? 'active' : ''}`}
                       onClick={() => {
-                        if (selectedLevels.includes(lvl) && selectedLevels.length > 1) {
-                          setSelectedLevels(selectedLevels.filter(l => l !== lvl));
-                        } else if (!selectedLevels.includes(lvl)) {
-                          setSelectedLevels([...selectedLevels, lvl]);
+                        if (revisionLevels.includes(lvl)) {
+                          setRevisionLevels(revisionLevels.filter(l => l !== lvl));
+                        } else {
+                          setRevisionLevels([...revisionLevels, lvl]);
                         }
                       }}
                     >

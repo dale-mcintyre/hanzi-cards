@@ -10,6 +10,17 @@
 // derived map is what gets cached in localStorage — not the 9.8MB source file.
 
 import { loadSentenceCache, saveSentenceCache } from '../utils/storage';
+import hsk1Sentences from './hsk/hsk1Sentences.json';
+import hsk2Sentences from './hsk/hsk2Sentences.json';
+import hsk3Sentences from './hsk/hsk3Sentences.json';
+
+// Pre-authored sentences for HSK 1-3 words (same {sentence,pinyin,english}
+// shape as a corpus hit below) - checked before the cache/live-fetch path so
+// the most commonly studied words never need the 9.8MB corpus download.
+const STATIC_SENTENCES = {};
+for (const [word, { zh, pinyin, en }] of Object.entries({ ...hsk1Sentences, ...hsk2Sentences, ...hsk3Sentences })) {
+  STATIC_SENTENCES[word] = { sentence: zh, pinyin, english: en };
+}
 
 const TSV_URL =
   'https://raw.githubusercontent.com/krmanik/Chinese-Example-Sentences/main/Chinese%20Example%20Sentences/cmn_sen_db_2.tsv';
@@ -87,7 +98,9 @@ export async function getSentencesFor(words) {
   const missing = [];
 
   for (const w of words) {
-    if (Object.prototype.hasOwnProperty.call(cache, w)) {
+    if (Object.prototype.hasOwnProperty.call(STATIC_SENTENCES, w)) {
+      result[w] = STATIC_SENTENCES[w];
+    } else if (Object.prototype.hasOwnProperty.call(cache, w)) {
       result[w] = cache[w];
     } else {
       missing.push(w);

@@ -1,4 +1,5 @@
 const STORAGE_KEY = 'hanzi_deck_progress';
+const SENTENCE_CACHE_KEY = 'hz_sentence_cache';
 
 export function getProgress() {
   try {
@@ -11,13 +12,15 @@ export function getProgress() {
 }
 
 export function saveCardProgress(cardId, newStats) {
+  const stamped = { ...newStats, lastReviewed: Date.now() };
   try {
     const progress = getProgress();
-    progress[cardId] = newStats;
+    progress[cardId] = stamped;
     localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
   } catch (e) {
     console.error('Failed to save progress:', e);
   }
+  return stamped;
 }
 
 /**
@@ -46,4 +49,26 @@ export function getCardMasteryStats(deck) {
   });
 
   return { nailed, practicing, struggling };
+}
+
+/**
+ * Small localStorage-backed cache of { word -> {sentence, pinyin, english} | null }
+ * so sentenceSource.js only has to fetch/scan the Tatoeba corpus once per word.
+ */
+export function loadSentenceCache() {
+  try {
+    const saved = localStorage.getItem(SENTENCE_CACHE_KEY);
+    return saved ? JSON.parse(saved) : {};
+  } catch (e) {
+    console.error('Failed to load sentence cache:', e);
+    return {};
+  }
+}
+
+export function saveSentenceCache(cache) {
+  try {
+    localStorage.setItem(SENTENCE_CACHE_KEY, JSON.stringify(cache));
+  } catch (e) {
+    console.error('Failed to save sentence cache:', e);
+  }
 }

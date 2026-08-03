@@ -1,3 +1,5 @@
+import { getSentencesFor } from './sentenceSource';
+
 let cachedVocab = null;
 
 /**
@@ -20,15 +22,27 @@ export async function fetchUnifiedVocab() {
 }
 
 /**
- * Filters the vocab dataset based on selected HSK levels (e.g., ['1', '2'])
+ * Filters the vocab dataset based on selected HSK levels (e.g., ['1', '2']).
+ * An empty/missing selection means no filter - the full frequency-ranked
+ * deck (HSK words plus the non-HSK top-frequency words), used for the main
+ * "Learn" flow. A non-empty selection is a targeted revision filter.
  */
-export async function getFilteredDeck(selectedLevels = ['1']) {
+export async function getFilteredDeck(selectedLevels = []) {
   const allVocab = await fetchUnifiedVocab();
 
-  // Filter words that match the selected HSK levels
-  const filtered = allVocab.filter((item) => {
-    return selectedLevels.includes(String(item.level));
-  });
+  const filtered = selectedLevels.length > 0
+    ? allVocab.filter((item) => selectedLevels.includes(String(item.level)))
+    : allVocab;
 
-  return filtered;
+  const sentenceMap = await getSentencesFor(filtered.map((item) => item.character));
+
+  return filtered.map((item) => {
+    const s = sentenceMap[item.character];
+    return {
+      ...item,
+      sentence: s?.sentence || '',
+      sentencePinyin: s?.pinyin || '',
+      sentenceEnglish: s?.english || '',
+    };
+  });
 }
