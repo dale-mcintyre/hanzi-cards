@@ -1,69 +1,19 @@
-import hsk1Data from './hsk/hsk1.json';
-import hsk2Data from './hsk/hsk2.json';
-import hsk3Data from './hsk/hsk3.json';
-
-import hsk1Sentences from './hsk/hsk1Sentences.json';
-import hsk2Sentences from './hsk/hsk2Sentences.json';
-import hsk3Sentences from './hsk/hsk3Sentences.json';
-
-const rawDecks = {
-  '1': hsk1Data,
-  '2': hsk2Data,
-  '3': hsk3Data,
-};
-
-const sentenceBanks = {
-  ...hsk1Sentences,
-  ...hsk2Sentences,
-  ...hsk3Sentences,
-};
-
-export function getHardwiredDeck(levels = ['1', '2', '3'], sortMode = 'frequency') {
-  let combined = [];
-
-  levels.forEach((lvl) => {
-    const deck = rawDecks[lvl] || [];
-    combined = combined.concat(deck);
+export function getHardModeDeck(allDeck, savedProgress) {
+  // 1. Grab cards where repetitions > 0 and interval <= 2 (your actual struggling spots)
+  const struggling = allDeck.filter((c) => {
+    const stat = savedProgress[c.id];
+    return stat && stat.repetitions > 0 && stat.interval <= 2;
   });
 
-  // Deduplicate cards by simplified character
-  const seen = new Set();
-  const uniqueCards = [];
+  let finalPool = [...struggling];
 
-  combined.forEach((card) => {
-    const charKey = card.simplified || card.character;
-    if (!seen.has(charKey)) {
-      seen.add(charKey);
-      uniqueCards.push(card);
-    }
-  });
-
-  // Enrich cards with dedicated 1-to-1 sentences & clean properties
-  const enriched = uniqueCards.map((card) => {
-    const charKey = card.simplified || card.character;
-    const sentenceObj = sentenceBanks[charKey];
-
-    const primaryForm = card.forms ? card.forms[0] : null;
-    const pinyin = card.pinyin || primaryForm?.transcriptions?.pinyin || '';
-    const meaning = card.meaning || primaryForm?.meanings?.join(', ') || '';
-
-    return {
-      id: charKey,
-      character: charKey,
-      pinyin: pinyin,
-      meaning: meaning,
-      frequency: card.frequency || 99999, // Lower rank = higher frequency
-      sentence: sentenceObj ? sentenceObj.zh : `我们今天学习“${charKey}”。`,
-      sentencePinyin: sentenceObj ? sentenceObj.pinyin : '',
-      sentenceEnglish: sentenceObj ? sentenceObj.en : '',
-    };
-  });
-
-  // Sort by frequency (most common words first)
-  if (sortMode === 'frequency') {
-    return enriched.sort((a, b) => a.frequency - b.frequency);
+  // 2. If you don't have enough struggling cards yet, pad out with random deck cards
+  if (finalPool.length < 10) {
+    const remaining = allDeck.filter(c => !finalPool.includes(c));
+    const padded = remaining.sort(() => 0.5 - Math.random()).slice(0, 10 - finalPool.length);
+    finalPool = [...finalPool, ...padded];
   }
 
-  // Fallback to random shuffle
-  return enriched.sort(() => 0.5 - Math.random());
+  // 3. Shuffle and cap at exactly 10 cards for a focused review blitz
+  return finalPool.sort(() => 0.5 - Math.random()).slice(0, 10);
 }

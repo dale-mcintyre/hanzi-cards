@@ -6,7 +6,8 @@ import { calculateSM2 } from './utils/sm2';
 import { getProgress, saveCardProgress, getCardMasteryStats } from './utils/storage';
 import { speakText } from './utils/tts';
 import { ColorPinyin } from './utils/pinyinColor';
-import { getHardwiredDeck, getHardModeDeck } from './data/hskLoader';
+import { getFilteredDeck } from './data/vocabLoader';
+import { getHardModeDeck } from './data/hskLoader';
 
 function HighlightedSentence({ sentence, targetChar, muted = false }) {
   if (!sentence || !targetChar) return <span>{sentence}</span>;
@@ -46,7 +47,7 @@ function getMultipleChoiceOptions(currentCard, fullDeck) {
 }
 
 export default function App() {
-  const [selectedLevels, setSelectedLevels] = useState(['3']);
+  const [selectedLevels, setSelectedLevels] = useState(['1']);
   const [showSettings, setShowSettings] = useState(false);
   const [activeMasteryTab, setActiveMasteryTab] = useState('struggling');
 
@@ -64,17 +65,30 @@ export default function App() {
 
   const [isFlipped, setIsFlipped] = useState(false);
   const [streak, setStreak] = useState(1);
+  const [isLoadingDeck, setIsLoadingDeck] = useState(true);
 
+  // Load deck asynchronously from unified_vocab.json whenever selectedLevels change
   useEffect(() => {
-    const localWords = getHardwiredDeck(selectedLevels, 'frequency');
-    const savedProgress = getProgress();
+    async function loadDeck() {
+      setIsLoadingDeck(true);
+      const localWords = await getFilteredDeck(selectedLevels);
+      
+      const savedProgress = getProgress();
 
-    const merged = localWords.map((card) => ({
-      ...card,
-      stats: savedProgress[card.id] || { repetitions: 0, interval: 1, easeFactor: 2.5 },
-    }));
+      const merged = localWords.map((card, index) => {
+        const cardId = card.id || `vocab_${index}_${card.character}`;
+        return {
+          ...card,
+          id: cardId,
+          stats: savedProgress[cardId] || { repetitions: 0, interval: 1, easeFactor: 2.5 },
+        };
+      });
 
-    setRawDeck(merged);
+      setRawDeck(merged);
+      setIsLoadingDeck(false);
+    }
+
+    loadDeck();
 
     try {
       const savedCount = parseInt(localStorage.getItem('hz_streak_count') || '1', 10);
@@ -239,21 +253,27 @@ export default function App() {
           <div className="card launch-card">
             <div className="launch-card-header">
               <span className="deck-level-pill">HSK Level {selectedLevels.join(', ')}</span>
-              <span className="deck-ready-tag">{rawDeck.length} Cards Loaded</span>
+              <span className="deck-ready-tag">
+                {isLoadingDeck ? 'Loading database...' : `${rawDeck.length} Cards Loaded`}
+              </span>
             </div>
 
             <div className="launch-card-body">
               <h1 className="launch-title">Hanzi Blitz</h1>
-              <p className="launch-subtitle">Frequency-ranked study session</p>
+              <p className="launch-subtitle">Unified frequency & HSK dataset</p>
             </div>
 
             <div className="launch-card-actions">
-              <button className="primary-launch-btn" onClick={() => launchArcadeSession(10, 'all')}>
-                Start Session ⚡
+              <button 
+                className="primary-launch-btn" 
+                disabled={isLoadingDeck || rawDeck.length === 0}
+                onClick={() => launchArcadeSession(10, 'all')}
+              >
+                {isLoadingDeck ? 'Preparing Deck...' : 'Start Session ⚡'}
               </button>
 
               <button className="hard-mode-btn" onClick={launchHardModeSession}>
-                🔥 Hard Mode (10 Confusables & Weak Spots)
+                🔥 Hard Mode (Targeted Mistake Blitz)
               </button>
 
               {weakCards.length > 0 && (
@@ -394,7 +414,7 @@ export default function App() {
               <div style={{ marginTop: '12px' }}>
                 <label className="box-section-label">Active HSK Decks</label>
                 <div className="settings-level-grid">
-                  {['1', '2', '3'].map((lvl) => (
+                  {['1', '2', '3', '4', '5', '6'].map((lvl) => (
                     <button
                       key={lvl}
                       className={`level-toggle-btn ${selectedLevels.includes(lvl) ? 'active' : ''}`}

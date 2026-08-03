@@ -112,6 +112,15 @@ function SingleHanziBox({ char, mode, size }) {
 
 // Parent Wrapper (Maintains Card Container Integrity)
 export default function HanziCanvas({ character, mode = 'view' }) {
+  // Guard clause: if character hasn't loaded yet, render an empty placeholder box
+  if (!character) {
+    return (
+      <div className="card-canvas-stage" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%' }}>
+        <div style={{ color: '#64748b', fontSize: '14px' }}>Loading character...</div>
+      </div>
+    );
+  }
+
   const charString = typeof character === 'string' ? character : String(character || '');
   const charArray = Array.from(charString.trim());
 
