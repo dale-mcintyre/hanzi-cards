@@ -9,6 +9,7 @@ import { ColorPinyin } from './utils/pinyinColor';
 import { getFilteredDeck } from './data/vocabLoader';
 import { getHardModeDeck } from './data/hskLoader';
 import { buildLearnQueue } from './utils/sessionQueue';
+import { getEntitlement } from './utils/entitlement';
 
 function HighlightedSentence({ sentence, targetChar, muted = false }) {
   if (!sentence || !targetChar) return <span>{sentence}</span>;
@@ -54,6 +55,15 @@ export default function App() {
   const [isFlipped, setIsFlipped] = useState(false);
   const [streak, setStreak] = useState(1);
   const [isLoadingDeck, setIsLoadingDeck] = useState(true);
+
+  // Everything is free today - this just establishes the check-in so a
+  // paywall can be turned on later (see utils/entitlement.js) without
+  // requiring already-installed copies to update first. Not gated on
+  // anything yet; nothing reads this state below.
+  const [entitlement, setEntitlement] = useState({ paywalled: false, message: '' });
+  useEffect(() => {
+    getEntitlement().then(setEntitlement);
+  }, []);
 
   // Load deck asynchronously from unified_vocab.json whenever revisionLevels change
   useEffect(() => {
