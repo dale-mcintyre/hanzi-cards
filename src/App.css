@@ -140,6 +140,11 @@
 .card--study {
   perspective: 1600px;
   cursor: grab;
+  /* Without this, mobile browsers treat the drag as their own gesture
+     (scroll, edge-swipe-back navigation, pull-to-refresh) instead of
+     handing it to useSwipeGesture's pointer handlers - the "browser
+     thinks I'm navigating" bug. */
+  touch-action: none;
 }
 
 .card--study:active {
