@@ -4,6 +4,7 @@ import json
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
+from pypinyin import pinyin as pypinyin_pinyin, Style as PypinyinStyle
 
 # Tone-mark table for converting CC-CEDICT's numeric pinyin (e.g. "zhong1")
 # into the accented form the frontend expects (e.g. "zhōng").
@@ -127,26 +128,33 @@ def _pick_hsk_reading(word, entries):
     return entries[0]
 
 
-def spaced_pinyin_for_word(word, raw_pinyin, cedict):
+def spaced_pinyin_for_word(word, raw_pinyin):
     """Hewgill's pinyin has no spaces between syllables (e.g. 'běijīng'),
     but the frontend's tone-coloring (ColorPinyin) colors per space-separated
-    syllable. Cross-reference CC-CEDICT's own entry for the same whole word -
-    its numeric pinyin is already syllable-separated - and borrow only its
-    SPACING (not its case): CC-CEDICT capitalizes proper-noun readings
-    (surnames, ethnic groups...) and a same-sounding capitalized candidate
-    can win the match (e.g. 回 matching CC-CEDICT's "Hui2 ethnic group"
-    entry instead of "hui2 to return"), which would silently override
-    hewgill's own correct, always-lowercase pinyin with the wrong case.
-    Falls back to hewgill's own unspaced pinyin if no match - still displays
-    correctly, just without per-syllable tone coloring."""
-    candidates = cedict.get(word)
-    if not candidates:
+    syllable. pypinyin derives pinyin directly from the hanzi themselves,
+    already segmented one syllable per character (no CC-CEDICT lookup
+    needed) - and being phrase-aware, it resolves polyphonic characters in
+    context correctly too (e.g. 看 -> kàn, not kān, inside a real word).
+
+    Used only as a SPACING source, not a reading override: if pypinyin's
+    toneless reading disagrees with hewgill's own (a genuine, rare mismatch
+    rather than just a spacing difference), that's a sign something about
+    the character segmentation is off, so this falls back to hewgill's
+    original unspaced pinyin - still displays correctly, just without
+    per-syllable tone coloring for that one word."""
+    syllables = [s[0] for s in pypinyin_pinyin(word, style=PypinyinStyle.TONE)]
+    spaced = ' '.join(syllables)
+
+    strip_tones = str.maketrans(
+        'āáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ',
+        'aaaaeeeeiiiioooouuuuüüüü',
+    )
+    toneless_pypinyin = spaced.translate(strip_tones).replace(' ', '').lower()
+    toneless_hewgill = raw_pinyin.translate(strip_tones).replace(' ', '').lower()
+
+    if toneless_pypinyin != toneless_hewgill:
         return raw_pinyin
-    target = raw_pinyin.replace(' ', '').lower()
-    for _np, accented_pinyin, _defs in candidates:
-        if accented_pinyin.replace(' ', '').lower() == target:
-            return accented_pinyin.lower()
-    return raw_pinyin
+    return spaced
 
 
 def clean_hewgill_definition(raw_definition):
@@ -168,7 +176,7 @@ CJK_RE = re.compile(r'[一-鿿]')
 # These should lose out to any candidate reading that has an actual definition.
 ANNOTATION_RE = re.compile(
     r'^\(?\s*(also pr\.|see also\b|see \b|variant of\b|old variant of\b|'
-    r'archaic variant of\b|used in\b)',
+    r'archaic variant of\b|used in\b|abbr\. for\b)',
     re.IGNORECASE,
 )
 DANGLING_CONNECTOR_RE = re.compile(
@@ -313,6 +321,29 @@ MANUAL_PINYIN_OVERRIDES = {
     '趟': 'tàng', '与': 'yǔ', '脏': 'zāng',
 }
 
+# A different failure mode from MANUAL_PINYIN_OVERRIDES: these words have
+# only ONE hewgill.com reading (no homograph ambiguity), but hewgill's own
+# semicolon-joined definition doesn't lead with its most central sense -
+# e.g. 对's definition starts "couple; pair; to be opposite; ...; correct
+# (answer); ...; right", so clean_hewgill_definition's first-two-glosses
+# truncation surfaces "couple; pair" instead of the far more fundamental
+# "correct; right". Same audit-as-spotted approach as the pinyin table
+# above: fix confirmed cases here rather than guessing which of hewgill's
+# ~4995 definitions might have this issue.
+MANUAL_MEANING_OVERRIDES = {
+    '对': 'correct; right; to; towards',
+    # Found via audit_vocab()'s CC-CEDICT keyword-overlap check, then
+    # confirmed against hewgill's raw definition - all four lead with an
+    # obscure/narrow sense before the word's actually-common meaning:
+    '要': 'to want; will; must',
+    '点': "o'clock; point; a little; a bit",
+    '等': 'to wait for; class; rank',
+    '放': 'to put; to place; to release',
+    '号': 'number; day of the month',
+    '与': 'and; with; to give; to help',
+    '种': 'kind; type; seed',
+}
+
 
 def resolve_word(word, candidates):
     """Picks the best homograph reading + meaning for `word` out of its
@@ -364,6 +395,89 @@ def resolve_word(word, candidates):
     return accented_pinyin, meaning
 
 
+# CC-CEDICT tags taboo/vulgar entries fairly predictably (this is exactly
+# what let 比 -> "bi1" and 鸟 -> "diao3" slip through as the picked reading
+# before MANUAL_PINYIN_OVERRIDES caught them). A blocklist over the FINAL
+# cleaned meaning is a cheap safety net against the same class of mistake
+# recurring undetected somewhere else in ~7400 words.
+VULGAR_MARKERS = (
+    'vulgar', 'obscene', 'profanity', 'swearword', 'swear word', 'curse word',
+    'penis', 'vagina', 'genital',
+)
+
+STOPWORDS = {
+    'to', 'a', 'an', 'the', 'of', 'in', 'on', 'at', 'for', 'with', 'and', 'or',
+    'be', 'is', 'as', 'that', 'this', 'sth', 'sb', 'etc', 'also', 'used',
+}
+
+
+def keyword_set(text):
+    words = re.findall(r"[a-z']+", text.lower())
+    return {w for w in words if w not in STOPWORDS and len(w) > 2}
+
+
+def audit_vocab(rows, cedict):
+    """Scans the generated deck for likely-wrong entries instead of
+    requiring anyone to read all ~7400 by hand:
+      1. Vulgar/taboo content that slipped through as the picked reading
+         (applies to every word).
+      2. For hewgill-sourced (HSK) words: a meaning with no keyword overlap
+         with CC-CEDICT's own gloss for the same word - the signal that
+         caught 对/要/点/等/放/号/与 defaulting to an unusual sense (see
+         vocab-audit-tool memory).
+
+    IMPORTANT: check 2 is audit-only. CC-CEDICT is never read into the
+    actual `pinyin`/`meaning` written for an HSK word - hewgill.com remains
+    the sole content source for those, per the user's explicit request (see
+    hanzi-app-restore-original-source memory). This function only uses
+    CC-CEDICT to flag a mismatch for a human to look at; nothing here can
+    change what ships in unified_vocab.json.
+
+    This is a heuristic net, not a guarantee - it converts "check 7400
+    entries" into "check a much shorter flagged list," not into zero manual
+    review. Extend VULGAR_MARKERS or the mismatch heuristic if a new bug
+    class turns up that this doesn't catch."""
+    flags = []
+    for r in rows:
+        word, meaning = r['character'], r['meaning']
+        reasons = []
+
+        lower_meaning = meaning.lower()
+        hit_markers = [m for m in VULGAR_MARKERS if m in lower_meaning]
+        if hit_markers:
+            reasons.append(f"possible vulgar content ({', '.join(hit_markers)})")
+
+        if not meaning.strip():
+            reasons.append('empty meaning')
+
+        if r['level'] is not None:  # hewgill-sourced - audit-only cross-check, see docstring
+            candidates = cedict.get(word)
+            if candidates:
+                cedict_keywords = set()
+                for _np, _ap, defs in candidates:
+                    for gloss in primary_glosses(defs):
+                        cedict_keywords |= keyword_set(gloss)
+                hewgill_keywords = keyword_set(meaning)
+                if cedict_keywords and hewgill_keywords and hewgill_keywords.isdisjoint(cedict_keywords):
+                    reasons.append(f"no keyword overlap with CC-CEDICT (which has: {'; '.join(sorted(cedict_keywords))[:80]})")
+
+        if reasons:
+            flags.append((r['freq_rank'] if r['freq_rank'] is not None else 999999, word, meaning, reasons))
+
+    flags.sort(key=lambda f: f[0])
+
+    report_path = 'vocab_audit_report.txt'
+    with open(report_path, 'w', encoding='utf-8') as f:
+        for rank, word, meaning, reasons in flags:
+            rank_label = rank if rank != 999999 else '(no rank)'
+            f.write(f"[{rank_label}] {word} -> {meaning!r}\n")
+            for reason in reasons:
+                f.write(f"    - {reason}\n")
+
+    print(f"Audit: {len(flags)} of {len(rows)} words flagged for manual review -> {report_path}")
+    return flags
+
+
 def process_vocabulary():
     excel_path = 'SUBTLEX-CH-WF.xlsx'
     if not os.path.exists(excel_path):
@@ -379,8 +493,9 @@ def process_vocabulary():
     cedict = load_cedict_candidates()
 
     def build_hsk_row(word, hsk_entry, freq_rank, freq_per_million):
-        pinyin = spaced_pinyin_for_word(word, hsk_entry['pinyin'], cedict)
-        meaning = clean_hewgill_definition(hsk_entry['definition']) or hsk_entry['definition']
+        pinyin = spaced_pinyin_for_word(word, hsk_entry['pinyin'])
+        meaning = MANUAL_MEANING_OVERRIDES.get(word) or \
+            clean_hewgill_definition(hsk_entry['definition']) or hsk_entry['definition']
         return {
             'character': word,
             'pinyin': pinyin,
@@ -462,6 +577,8 @@ def process_vocabulary():
     csv_output_path = os.path.join('public', 'unified_vocab.csv')
     pd.DataFrame(rows).to_csv(csv_output_path, index=False, encoding='utf-8-sig')
     print(f"Spreadsheet version saved to {csv_output_path}")
+
+    audit_vocab(rows, cedict)
 
 
 if __name__ == '__main__':

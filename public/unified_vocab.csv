@@ -14,14 +14,14 @@
 就,jiù,at once; right away,2.0,13.0,8246.34
 会,huì,can; be possible,1.0,14.0,7927.17
 吗,ma,question tag,1.0,15.0,7428.1
-要,yào,important; vital,3.0,16.0,7114.18
+要,yào,to want; will; must,3.0,16.0,7114.18
 什么,shén me,what?; who?,1.0,17.0,7050.42
 说,shuō,to speak; to talk; to say; to explain; to comment,,18.0,6765.38
 她,tā,she,1.0,19.0,6600.39
 想,xiǎng,to think; to believe,1.0,20.0,6325.1
 一,yī,one; 1,1.0,21.0,6069.96
 很,hěn,adverb of degree; quite,1.0,22.0,5979.28
-知道,zhīdao,to know; to be aware of,2.0,23.0,5864.84
+知道,zhī dào,to know; to be aware of,2.0,23.0,5864.84
 人,rén,man; person,1.0,24.0,5810.26
 吧,ba,modal particle indicating polite suggestion; ...right?,2.0,25.0,5785.52
 那,nà,that; those,1.0,26.0,5666.37
@@ -34,7 +34,7 @@
 和,hé,and; together with,1.0,33.0,4483.86
 他们,tā men,they; them,,34.0,4187.02
 到,dào,to (a place); until (a time),2.0,35.0,4159.42
-对,duì,couple; pair,2.0,36.0,3958.83
+对,duì,correct; right; to; towards,2.0,36.0,3958.83
 也,yě,also; too,2.0,37.0,3928.9
 啊,a,"modal particle ending sentence, showing affirmation, approval, or consent",3.0,38.0,3903.92
 还,hái,still; still in progress,2.0,39.0,3884.93
@@ -47,7 +47,7 @@
 你们,nǐ men,you (plural),,46.0,3366.85
 过,guò,experienced action marker; to cross,2.0,47.0,3350.21
 没有,méi yǒu,haven't; hasn't,,48.0,3226.48
-得,de,"structural particle: used after a verb (or adjective as main verb), linking it",2.0,49.0,3135.62
+得,dé,"structural particle: used after a verb (or adjective as main verb), linking it",2.0,49.0,3135.62
 看,kàn,to see; to look at,3.0,50.0,3056.83
 真,zhēn,really; truly,2.0,51.0,3053.82
 着,zhe,"particle attached after verb to indicate action in progress, like -ing ending",2.0,52.0,2983.65
@@ -56,12 +56,12 @@
 怎么,zěn me,how?; what?,1.0,55.0,2657.98
 现在,xiàn zài,now; at present,1.0,56.0,2626.8
 可以,kě yǐ,can; may,2.0,57.0,2360.84
-点,diǎn,drop (of liquid); stain,1.0,58.0,2315.14
+点,diǎn,o'clock; point; a little; a bit,1.0,58.0,2315.14
 呢,ne,question particle for subjects already mentioned,1.0,59.0,2287.93
 如果,rú guǒ,if; in case,3.0,60.0,2277.94
 只,zhǐ,only; merely,3.0,61.0,2167.08
 别,bié,to leave; to depart,2.0,62.0,2082.63
-哦,ò,oh; ah,6.0,63.0,2068.17
+哦,ó,oh; ah,6.0,63.0,2068.17
 但,dàn,but; yet; however; still; merely; only; just,,64.0,2034.22
 被,bèi,by (indicates passive-voice sentences or clauses); quilt,3.0,65.0,1958.33
 走,zǒu,to walk; to go,2.0,66.0,1945.3
@@ -69,7 +69,7 @@
 这样,zhè yàng,this way; like this; so; this kind of; such,,68.0,1916.59
 里,lǐ,lining; interior,1.0,69.0,1886.22
 跟,gēn,heel; to follow closely,3.0,70.0,1877.36
-告诉,gào su,to tell; to inform,2.0,71.0,1824.99
+告诉,gào sù,to tell; to inform,2.0,71.0,1824.99
 因为,yīn wèi,because; owing to,2.0,72.0,1783.29
 自己,zì jǐ,self; reflexive pronoun,3.0,73.0,1728.29
 再,zài,again; once more,2.0,74.0,1684.82
@@ -80,10 +80,10 @@
 但是,dàn shì,but; however,2.0,79.0,1571.49
 多,duō,many; much,1.0,80.0,1568.12
 用,yòng,to use; to employ,3.0,81.0,1563.08
-时候,shí hou,time; length of time,1.0,82.0,1555.33
+时候,shí hòu,time; length of time,1.0,82.0,1555.33
 下,xià,down; downwards,1.0,83.0,1549.34
 已经,yǐ jīng,already,2.0,84.0,1543.29
-谢谢,xiè xie,to thank; thanks,1.0,85.0,1533.9
+谢谢,xiè xiè,to thank; thanks,1.0,85.0,1533.9
 为什么,wèi shén me,why?; for what reason?,2.0,86.0,1522.16
 觉得,jué de,to think; to feel,2.0,87.0,1521.68
 天,tiān,day; sky,,88.0,1510.14
@@ -91,10 +91,10 @@
 这么,zhè me,so much; this much,,90.0,1463.1
 它,tā,it,2.0,91.0,1461.37
 从,cóng,from; via,2.0,92.0,1410.37
-先生,xiān sheng,teacher; Mister (Mr.),1.0,93.0,1396.99
+先生,xiān shēng,teacher; Mister (Mr.),1.0,93.0,1396.99
 找,zhǎo,to try to find; to look for,2.0,94.0,1390.52
 最,zuì,most; the most,2.0,95.0,1385.06
-喜欢,xǐ huan,to like; to be fond of,1.0,96.0,1375.58
+喜欢,xǐ huān,to like; to be fond of,1.0,96.0,1375.58
 可,kě,can; may; able to; -able; to approve; to permit,,97.0,1374.9
 为,wèi,because of; for,3.0,98.0,1358.26
 大,dà,big; huge,1.0,99.0,1343.24
@@ -105,17 +105,17 @@
 次,cì,next in sequence; second,2.0,104.0,1307.83
 出,chū,to go out; to come out,2.0,105.0,1275.36
 那么,nà me,like that; in that way; to that extent; ... or so; about ...,,106.0,1245.85
-干,gān,to work; to do,4.0,107.0,1241.59
+干,gàn,to work; to do,4.0,107.0,1241.59
 那个,nà ge,that one; that thing,,108.0,1234.61
 嘿,hēi,hey,6.0,109.0,1227.4
 们,men,"plural marker for pronouns, and nouns referring to individuals",,110.0,1191.12
 话,huà,dialect; language,,111.0,1189.39
 而,ér,and; as well as,4.0,112.0,1173.92
 么,ma,interrogative final particle,,113.0,1166.14
-东西,dōng xi,thing; stuff,1.0,114.0,1136.54
+东西,dōng xī,thing; stuff,1.0,114.0,1136.54
 应该,yīng gāi,ought to; should,3.0,115.0,1127.12
 孩子,hái zi,child,2.0,116.0,1110.19
-起来,qǐ lai,beginning or continuing an action; upward movement,4.0,117.0,1109.06
+起来,qǐ lái,beginning or continuing an action; upward movement,4.0,117.0,1109.06
 所以,suǒ yǐ,therefore; as a result,2.0,118.0,1103.36
 这些,zhè xiē,these,,119.0,1095.05
 才,cái,ability; talent,3.0,120.0,1094.48
@@ -128,9 +128,9 @@
 叫,jiào,to shout; to call,1.0,127.0,1032.83
 嗯,g,a groaning sound,6.0,128.0,1032.57
 该,gāi,should; ought to,,129.0,1018.56
-等,děng,class; rank,2.0,130.0,1014.0
+等,děng,to wait for; class; rank,2.0,130.0,1014.0
 问题,wèn tí,question; problem,2.0,131.0,994.56
-一起,yìqǐ,in the same place; together,2.0,132.0,980.4
+一起,yì qǐ,in the same place; together,2.0,132.0,980.4
 拿,ná,to hold; to seize,3.0,133.0,964.66
 更,gèng,even more; furthermore,5.0,134.0,961.44
 开始,kāi shǐ,to begin; beginning,2.0,135.0,957.66
@@ -148,8 +148,8 @@
 见,jiàn,to see; to meet,,147.0,874.61
 钱,qián,coin; money,1.0,148.0,871.06
 噢,ō,oh; ah (used to indicate realization),,149.0,870.14
-一样,yíyàng,same; like,3.0,150.0,860.33
-事情,shìqíng,affair; matter,2.0,151.0,839.91
+一样,yī yàng,same; like,3.0,150.0,860.33
+事情,shì qíng,affair; matter,2.0,151.0,839.91
 就是,jiù shì,exactly; precisely; only; simply; just,,152.0,838.75
 吃,chī,to eat; to have one's meal,1.0,153.0,832.07
 所有,suǒ yǒu,all; to have,4.0,154.0,827.18
@@ -164,17 +164,17 @@
 当然,dāng rán,only natural; as it should be,3.0,163.0,784.37
 也许,yě xǔ,perhaps; maybe,4.0,164.0,777.52
 行,xíng,to walk; to go,4.0,165.0,776.0
-朋友,péng you,friend,1.0,166.0,775.55
-妈妈,mā ma,mama; mommy,1.0,167.0,766.99
+朋友,péng yǒu,friend,1.0,166.0,775.55
+妈妈,mā mā,mama; mommy,1.0,167.0,766.99
 相信,xiāng xìn,be convinced (that something is true); believe,3.0,168.0,766.07
 前,qián,front; forward,,169.0,763.51
 嗨,hāi,oh alas; hey!,6.0,170.0,755.22
 认为,rèn wéi,to believe; to think,3.0,171.0,754.0
 将,jiāng,will; shall,,172.0,743.62
-这儿,zhè r,here,1.0,173.0,739.99
+这儿,zhèr,here,1.0,173.0,739.99
 今天,jīn tiān,today; at the present,1.0,174.0,737.78
-明白,míng bai,clear; obvious,3.0,175.0,737.6
-一直,yìzhí,straight (in a straight line); continuously,3.0,176.0,731.85
+明白,míng bái,clear; obvious,3.0,175.0,737.6
+一直,yì zhí,straight (in a straight line); continuously,3.0,176.0,731.85
 看看,kàn kan,to take a look at; to examine,,177.0,724.93
 车,chē,car; vehicle,,178.0,714.65
 时,shí,o'clock; time,,179.0,699.69
@@ -188,8 +188,8 @@
 准备,zhǔn bèi,preparation; prepare,2.0,187.0,661.83
 找到,zhǎo dào,to find,,188.0,659.62
 后,hòu,empress; queen,,189.0,656.34
-爸爸,bà ba,father,1.0,190.0,653.72
-一切,yíqiè,everything; every,4.0,191.0,647.13
+爸爸,bà bà,father,1.0,190.0,653.72
+一切,yī qiè,everything; every,4.0,191.0,647.13
 抱歉,bào qiàn,sorry; We apologize!,4.0,192.0,642.78
 比,bǐ,"particle used for comparison and ""-er than""; to compare",2.0,193.0,637.06
 感觉,gǎn jué,to feel; to become aware of,4.0,194.0,635.39
@@ -198,13 +198,13 @@
 怎么样,zěn me yàng,how?; how about?,1.0,197.0,625.58
 出来,chū lái,to come out; to appear,,198.0,624.15
 不要,bù yào,don't!; must not,,199.0,616.43
-对不起,duì bu qǐ,unworthy; to let down,1.0,200.0,612.52
+对不起,duì bù qǐ,unworthy; to let down,1.0,200.0,612.52
 问,wèn,to ask,2.0,201.0,609.75
 离开,lí kāi,to depart; to leave,3.0,202.0,606.89
 一点,yī diǎn,"a bit; a little bit; a bit more, -er",,203.0,606.38
-一定,yídìng,surely; certainly,3.0,204.0,604.33
+一定,yí dìng,surely; certainly,3.0,204.0,604.33
 起,qǐ,to rise; to raise,,205.0,603.07
-还是,háishì,or; still,3.0,206.0,596.13
+还是,hái shì,or; still,3.0,206.0,596.13
 发现,fā xiàn,to find; to discover,3.0,207.0,589.45
 所,suǒ,actually; place,5.0,208.0,587.69
 住,zhù,to live; to dwell,1.0,209.0,584.32
@@ -214,7 +214,7 @@
 并,bìng,and; furthermore,,213.0,578.12
 必须,bì xū,to have to; must,3.0,214.0,575.92
 意思,yì si,idea; opinion,2.0,215.0,573.5
-放,fàng,to release; to free,3.0,216.0,569.33
+放,fàng,to put; to place; to release,3.0,216.0,569.33
 不错,bù cuò,correct; right,,217.0,564.29
 肯定,kěn dìng,to be sure; to be certain,4.0,218.0,552.4
 电话,diàn huà,telephone; phone call,,219.0,547.72
@@ -245,33 +245,33 @@
 生活,shēng huó,life; activity,4.0,244.0,474.51
 之,zhī,"possessive particle, literary equivalent of; him",4.0,245.0,471.11
 买,mǎi,to buy; to purchase,1.0,246.0,469.97
-种,zhǒng,abbr. for; race,3.0,247.0,468.48
+种,zhǒng,kind; type; seed,3.0,247.0,468.48
 医生,yī shēng,doctor,1.0,248.0,467.38
 最后,zuì hòu,final; last,4.0,249.0,453.1
 之前,zhī qián,before; prior to,,250.0,452.71
 伙计,huǒ ji,partner; fellow,,251.0,449.02
 手,shǒu,hand; to hold,,252.0,447.44
 任何,rèn hé,any; whatever,4.0,253.0,444.7
-哪儿,nǎ r,where?; wherever,1.0,255.0,443.35
+哪儿,nǎr,where?; wherever,1.0,255.0,443.35
 这种,zhè zhǒng,this kind of,,256.0,435.66
 上帝,Shàng dì,God,,257.0,435.37
 女人,nǚ rén,woman,2.0,258.0,428.9
-名字,míng zi,name (of a person or thing),1.0,259.0,427.32
-认识,rèn shi,to know; to recognize,1.0,260.0,426.39
+名字,míng zì,name (of a person or thing),1.0,259.0,427.32
+认识,rèn shí,to know; to recognize,1.0,260.0,426.39
 坐,zuò,to sit; to take a seat,1.0,261.0,423.41
 今晚,jīn wǎn,tonight,,262.0,422.64
 其他,qí tā,other; the others,3.0,263.0,422.19
 喝,hē,to drink; to shout (a command),1.0,264.0,417.45
 记得,jì de,to remember,3.0,265.0,414.29
 家伙,jiā huo,"household dish, implement or furniture; domestic animal",6.0,266.0,412.74
-与,yǔ,to give; to help,5.0,267.0,408.39
+与,yǔ,and; with; to give; to help,5.0,267.0,408.39
 或者,huò zhě,or; possibly,3.0,268.0,405.32
 写,xiě,to write,1.0,269.0,405.08
 穿,chuān,to bore through; pierce,2.0,270.0,404.99
 弄,nòng,to do; to manage,4.0,271.0,404.63
-过去,guò qu,past; former,3.0,272.0,401.98
+过去,guò qù,past; former,3.0,272.0,401.98
 哪里,nǎ lǐ,where?; somewhere,,273.0,401.56
-啦,lā,a phrase-final particle,6.0,274.0,398.52
+啦,la,a phrase-final particle,6.0,274.0,398.52
 却,què,but; yet,4.0,275.0,397.84
 算,suàn,regard as; to figure,4.0,276.0,397.57
 担心,dān xīn,anxious; worried,3.0,277.0,394.62
@@ -294,7 +294,7 @@
 长,cháng,length; long,2.0,294.0,362.87
 完全,wán quán,complete; whole,4.0,295.0,359.74
 宝贝,bǎo bèi,treasured object; treasure,5.0,296.0,356.22
-号,hào,day of a month; name of a ship,2.0,297.0,353.6
+号,hào,number; day of the month,2.0,297.0,353.6
 枪,qiāng,gun; firearm,5.0,298.0,353.24
 狗,gǒu,dog,1.0,299.0,351.99
 可是,kě shì,but; however,4.0,300.0,349.93
@@ -302,7 +302,7 @@
 小时,xiǎo shí,hour,2.0,302.0,349.04
 重要,zhòng yào,important; significant,3.0,303.0,348.08
 谈,tán,to speak; to talk,4.0,304.0,347.37
-别人,biérén,other people; others,3.0,305.0,346.18
+别人,bié rén,other people; others,3.0,305.0,346.18
 男人,nán rén,a man; a male,2.0,306.0,346.03
 头,tóu,head; hair style,,307.0,345.25
 机会,jī huì,opportunity; chance,3.0,308.0,344.92
@@ -320,7 +320,7 @@
 张,zhāng,to open up; to spread,2.0,320.0,332.26
 儿子,ér zi,son,1.0,321.0,330.88
 之后,zhī hòu,after; behind; afterwards; since then,,322.0,330.85
-漂亮,piào liang,pretty; beautiful,1.0,323.0,328.86
+漂亮,piào liàng,pretty; beautiful,1.0,323.0,328.86
 分钟,fēn zhōng,minute,1.0,324.0,328.77
 接,jiē,to receive; to answer (the phone),3.0,325.0,327.01
 场,chǎng,large place used for a specific purpose; stage,4.0,326.0,326.8
@@ -332,7 +332,7 @@
 呀,ya,particle equivalent to,4.0,332.0,318.96
 情况,qíng kuàng,circumstances; state of affairs,4.0,333.0,318.16
 变,biàn,to change; to become different,,334.0,315.38
-关系,guānxì,relation; relationship,3.0,335.0,315.0
+关系,guān xì,relation; relationship,3.0,335.0,315.0
 真是,zhēn shi,"indeed; truly; used to express disapproval, annoyance etc",,336.0,314.76
 女士,nǚ shì,lady; madam,5.0,337.0,314.31
 本,běn,roots or stems of plants; origin,1.0,338.0,313.77
@@ -341,7 +341,7 @@
 见到,jiàn dào,to see,,341.0,307.54
 根本,gēn běn,fundamental; basic,5.0,342.0,307.36
 关于,guān yú,pertaining to; concerning,3.0,343.0,306.02
-那儿,nà r,there,1.0,344.0,305.67
+那儿,nàr,there,1.0,344.0,305.67
 难,nán,difficult (to...); problem,3.0,345.0,305.67
 只要,zhǐ yào,if only; so long as,4.0,346.0,305.13
 里面,lǐ miàn,inside; interior,,347.0,303.55
@@ -363,8 +363,8 @@
 总,zǒng,general; overall; to sum up,,364.0,295.05
 确定,què dìng,definite; certain,5.0,365.0,294.78
 有人,yǒu rén,someone; people,,366.0,294.43
-清楚,qīng chu,clear; clearly understood,3.0,367.0,293.2
-晚上,wǎn shang,in the evening,2.0,368.0,285.39
+清楚,qīng chǔ,clear; clearly understood,3.0,367.0,293.2
+晚上,wǎn shàng,in the evening,2.0,368.0,285.39
 安全,ān quán,safe; secure,4.0,369.0,284.41
 怎样,zěn yàng,how; what kind,,370.0,284.05
 没什么,méi shén me,it doesn't matter; it's nothing; never mind; think nothing of it; it's my pleasure; you're welcome,,371.0,281.76
@@ -392,7 +392,7 @@
 于,yú,to go; to take,,393.0,260.15
 以后,yǐ hòu,after; later,3.0,394.0,259.28
 管,guǎn,to take care (of); to control,,395.0,259.25
-照片,zhào piàn,photo; photograph,3.0,396.0,258.95
+照片,zhào piān,photo; photograph,3.0,396.0,258.95
 每个,měi gè,each; every,,397.0,258.89
 欢迎,huān yíng,to welcome; welcome,2.0,398.0,258.57
 敢,gǎn,to dare; daring,3.0,399.0,258.27
@@ -404,10 +404,10 @@
 拜托,bài tuō,request sb to do sth; please!,6.0,405.0,252.07
 女儿,nǚ ér,daughter,1.0,406.0,251.89
 抓,zhuā,to grab; to catch,,407.0,251.29
-小姐,xiǎo jie,young lady; miss,1.0,408.0,251.08
+小姐,xiǎo jiě,young lady; miss,1.0,408.0,251.08
 动,dòng,to move; to set in movement,,409.0,250.58
 赢,yíng,to beat; to win,4.0,410.0,249.3
-消息,xiāo xi,news; information,4.0,411.0,248.79
+消息,xiāo xī,news; information,4.0,411.0,248.79
 女,nǚ,female; woman,,412.0,248.7
 忙,máng,busy; hurriedly,2.0,413.0,248.67
 或许,huò xǔ,perhaps; maybe,6.0,414.0,247.86
@@ -416,7 +416,7 @@
 无法,wú fǎ,unable to; incapable of,,417.0,245.21
 房子,fáng zi,house; building (single- or two-story),,418.0,245.12
 拉,lā,to pull; to play (string instruments),4.0,419.0,245.0
-衣服,yī fu,clothes,1.0,420.0,242.35
+衣服,yī fú,clothes,1.0,420.0,242.35
 听说,tīng shuō,to hear (sth said); one hears (that),,421.0,241.4
 救,jiù,to save; to assist,5.0,422.0,241.31
 参加,cān jiā,to participate; to take part,3.0,423.0,240.89
@@ -449,9 +449,9 @@
 接受,jiē shòu,to accept; to receive,4.0,450.0,221.9
 改变,gǎi biàn,to change; to alter,4.0,451.0,221.6
 舞,wǔ,to dance; to wield,,452.0,221.19
-看来,kàn lai,apparently; it seems that,5.0,453.0,221.07
+看来,kàn lái,apparently; it seems that,5.0,453.0,221.07
 高,gāo,high; tall,2.0,454.0,221.04
-麻烦,má fan,inconvenient; troublesome,4.0,455.0,219.87
+麻烦,má fán,inconvenient; troublesome,4.0,455.0,219.87
 出现,chū xiàn,to appear; to arise,3.0,456.0,218.26
 打算,dǎ suàn,to plan; to intend,3.0,457.0,218.06
 电影,diàn yǐng,movie; film,1.0,458.0,216.09
@@ -469,7 +469,7 @@
 甚至,shèn zhì,even; so much so that,4.0,470.0,211.65
 保护,bǎo hù,to protect; to defend,4.0,471.0,211.47
 真正,zhēn zhèng,genuine; real,4.0,472.0,211.35
-结果,jiē guǒ,to bear fruit,4.0,473.0,211.2
+结果,jié guǒ,to bear fruit,4.0,473.0,211.2
 表现,biǎo xiàn,to show; to show off,5.0,474.0,211.11
 拍,pāi,to pat; to clap,5.0,475.0,210.93
 其实,qí shí,"actually, in fact, really",3.0,476.0,210.66
@@ -485,7 +485,7 @@
 只有,zhǐ yǒu,only have ...; there is only ...; it is only (someone) who ...,,486.0,206.16
 怎么办,zěn me bàn,what's to be done,,487.0,204.82
 第,dì,prefix indicating ordinal number; grades in which successful candidates in the imperial examinations were placed,,488.0,203.96
-马,mǎ,horse; abbr. for Malaysia,3.0,489.0,202.58
+马,mǎ,horse,3.0,489.0,202.58
 讲,jiǎng,to speak; to explain,3.0,490.0,202.26
 绝对,jué duì,absolute; unconditional,5.0,491.0,202.17
 长官,zhǎng guān,senior official; senior officer,,492.0,202.11
@@ -514,13 +514,13 @@
 咱们,zán men,we or us (including both the speaker and the person(s) spoken to); I or me,4.0,515.0,194.33
 床,chuáng,"bed; couch (furniture that one can lie down on) (; bed; bottom (of rivers, oceans, gardens etc)",,516.0,193.91
 处理,chǔ lǐ,to handle; to treat,5.0,517.0,193.7
-妻子,qī zi,wife,2.0,518.0,193.58
+妻子,qī zǐ,wife,2.0,518.0,193.58
 进行,jìn xíng,to advance; to conduct,4.0,519.0,193.31
 内,nèi,inside; inner,4.0,520.0,191.85
 是否,shì fǒu,whether (or not); if,5.0,521.0,191.79
 段,duàn,paragraph; section,3.0,522.0,191.67
 令,lìng,to order; to command,,523.0,191.53
-刚刚,gāng gang,just recently; just a moment ago,4.0,524.0,191.44
+刚刚,gāng gāng,just recently; just a moment ago,4.0,524.0,191.44
 案子,àn zi,"long table; counter; case (criminal, medical etc); matter; project; job",,525.0,191.17
 行动,xíng dòng,operation; action,5.0,526.0,190.93
 第二,dì èr,second; number two,,527.0,190.15
@@ -544,9 +544,9 @@
 开心,kāi xīn,to feel happy; to rejoice,5.0,545.0,184.88
 母亲,mǔ qīn,mother,4.0,546.0,184.67
 辆,liàng,classifier for vehicles,3.0,547.0,184.52
-主意,zhǔ yi,plan; idea,4.0,548.0,183.15
+主意,zhǔ yì,plan; idea,4.0,548.0,183.15
 探,tàn,to explore; to search out,,549.0,183.03
-丈夫,zhàng fu,husband,2.0,550.0,182.28
+丈夫,zhàng fū,husband,2.0,550.0,182.28
 待,dāi,to stay; to remain,,551.0,181.93
 变成,biàn chéng,to change into; to turn into,,552.0,181.93
 倒,dào,to move backwards; converse,5.0,553.0,181.6
@@ -580,7 +580,7 @@
 危险,wēi xiǎn,danger; dangerous,4.0,581.0,170.24
 讨厌,tǎo yàn,disgusting; troublesome,4.0,582.0,169.65
 曾经,céng jīng,once; already,5.0,583.0,169.59
-眼睛,yǎn jing,eye,2.0,584.0,169.11
+眼睛,yǎn jīng,eye,2.0,584.0,169.11
 外面,wài miàn,outside (also pr. [wai4 mian5] for this sense); surface,,585.0,167.02
 处,chǔ,to reside; to live,,586.0,166.25
 国家,guó jiā,country; nation,3.0,587.0,166.22
@@ -615,11 +615,11 @@
 少,shǎo,few; little,1.0,616.0,158.73
 有趣,yǒu qù,interesting; fascinating,4.0,617.0,157.87
 提,tí,to carry; to lift,5.0,618.0,157.48
-没关系,méi guān xi,it doesn't matter,1.0,619.0,157.27
+没关系,méi guān xì,it doesn't matter,1.0,619.0,157.27
 斯,sī,phonetic; this,,620.0,156.86
 杰克,Jié kè,Jack (name),,621.0,156.17
 真的,zhēn de,really; truly; indeed; real; true; genuine,,622.0,156.05
-部分,bùfèn,part; share,4.0,623.0,155.96
+部分,bù fèn,part; share,4.0,623.0,155.96
 要求,yāo qiú,to request; to require,3.0,624.0,155.52
 糟糕,zāo gāo,too bad; how terrible,5.0,625.0,155.4
 除了,chú le,besides; apart from (... also...),3.0,626.0,153.43
@@ -627,7 +627,7 @@
 保持,bǎo chí,to keep; to maintain,5.0,628.0,153.34
 虽然,suī rán,although; even though,3.0,629.0,153.25
 办,bàn,"to take care of (a matter); to deal with (a task, procedure etc); to organize; to establish; to set up; to manage; to run (an enterprise)",,630.0,153.19
-教,jiāo,to teach,3.0,631.0,152.83
+教,jiào,to teach,3.0,631.0,152.83
 想到,xiǎng dào,to think of; to call to mind,,632.0,152.83
 理解,lǐ jiě,to comprehend; to understand,4.0,633.0,152.77
 证据,zhèng jù,evidence; proof,5.0,634.0,152.56
@@ -635,7 +635,7 @@
 脸,liǎn,face,3.0,636.0,151.82
 简单,jiǎn dān,simple; not complicated,3.0,637.0,151.7
 不同,bù tóng,different; distinct,,638.0,151.64
-夫人,fū ren,lady; madam,6.0,639.0,151.49
+夫人,fū rén,lady; madam,6.0,639.0,151.49
 父母,fù mǔ,father and mother; parents,,640.0,151.46
 重,zhòng,heavy; serious,5.0,641.0,151.4
 恩,ēn,favor; grace; kindness; used like,,642.0,151.22
@@ -651,9 +651,9 @@
 打开,dǎ kāi,to open; to show (a ticket),,652.0,148.72
 季,jì,season; the last month of a season,,653.0,148.06
 检查,jiǎn chá,inspection; to examine,3.0,654.0,148.06
-早上,zǎo shang,early morning; Good morning!,2.0,655.0,147.65
+早上,zǎo shàng,early morning; Good morning!,2.0,655.0,147.65
 玩笑,wán xiào,to joke; joke,,656.0,147.05
-任务,rèn wu,mission; assignment,4.0,657.0,146.93
+任务,rèn wù,mission; assignment,4.0,657.0,146.93
 现场,xiàn chǎng,lit. actual location; the scene (of the incident),6.0,658.0,146.57
 使,shǐ,to make; to cause,3.0,659.0,146.51
 转,zhuǎn,to turn; to change direction,,660.0,145.59
@@ -666,7 +666,7 @@
 小子,xiǎo zǐ,youngster; young fellow (term of address used by the older generation),,667.0,143.62
 电视,diàn shì,television; TV,1.0,668.0,143.56
 强,qiáng,strong; powerful,,669.0,143.5
-不好意思,bù hǎo yì si,to feel embarrassed; to be ill at ease,5.0,670.0,143.23
+不好意思,bù hǎo yì sī,to feel embarrassed; to be ill at ease,5.0,670.0,143.23
 大概,dà gài,roughly; probably,4.0,671.0,143.2
 的确,dí què,really; indeed,5.0,672.0,143.17
 特,tè,special; unique,,673.0,142.85
@@ -696,7 +696,7 @@
 黑,hēi,black; dark,2.0,697.0,136.02
 身,shēn,body; life,,698.0,134.92
 作,zuò,to do; to engage in; to write; to compose,,700.0,134.17
-后面,hòu mian,rear; back,1.0,701.0,134.14
+后面,hòu miàn,rear; back,1.0,701.0,134.14
 性,xìng,nature; character,,702.0,133.93
 带来,dài lái,to bring; to bring about; to produce,,703.0,133.9
 昨天,zuó tiān,yesterday,1.0,704.0,133.64
@@ -708,9 +708,9 @@
 来自,lái zì,to come from (a place); From: (in email header),5.0,710.0,133.01
 越,yuè,to exceed; to climb over,3.0,711.0,132.86
 大学,dà xué,university; college,,712.0,132.8
-照顾,zhào gu,to take care of; to show consideration,3.0,713.0,132.68
-太太,tài tai,married woman; Mrs.,5.0,714.0,132.12
-聪明,cōng ming,acute (of sight and hearing); clever,3.0,715.0,131.61
+照顾,zhào gù,to take care of; to show consideration,3.0,713.0,132.68
+太太,tài tài,married woman; Mrs.,5.0,714.0,132.12
+聪明,cōng míng,acute (of sight and hearing); clever,3.0,715.0,131.61
 本来,běn lái,original; originally,4.0,716.0,131.61
 加油,jiā yóu,to add oil; to top up with gas; to refuel; to accelerate; to step on the gas,,717.0,131.49
 实际上,shí jì shàng,in fact; in reality,,718.0,131.46
@@ -762,7 +762,7 @@
 另外,lìng wài,additional; in addition,4.0,764.0,122.16
 放松,fàng sōng,to loosen; to relax,5.0,765.0,121.98
 丢,diū,to lose; to put aside,4.0,766.0,121.86
-休息,xiū xi,rest; to rest,2.0,767.0,121.47
+休息,xiū xī,rest; to rest,2.0,767.0,121.47
 每天,měi tiān,every day,,768.0,121.38
 回答,huí dá,to reply; to answer,2.0,769.0,121.32
 凶手,xiōng shǒu,assailant; murderer,6.0,770.0,121.15
@@ -784,12 +784,12 @@
 错误,cuò wù,error; mistake,5.0,787.0,118.61
 子,zi,noun suffix,,788.0,118.4
 随便,suí biàn,as one wishes; as one pleases,4.0,789.0,118.37
-头发,tóu fa,hair (on the head),3.0,790.0,117.9
+头发,tóu fà,hair (on the head),3.0,790.0,117.9
 藏,cáng,to conceal; to hide away,,791.0,117.24
 关心,guān xīn,to care for sth; caring,3.0,792.0,117.03
 底,dǐ,background; bottom,4.0,793.0,117.0
 干吗,gàn má,variant of,,794.0,116.97
-兴趣,xìngqu,interest in (something),3.0,795.0,116.91
+兴趣,xìng qù,interest in (something),3.0,795.0,116.91
 情,qíng,feelings; emotion; sentiment; passion; situation; condition,,796.0,116.7
 报告,bào gào,to inform; report,5.0,797.0,116.61
 从没,cóng méi,never (in the past); never did,,798.0,116.47
@@ -814,7 +814,7 @@
 做到,zuò dào,to accomplish; to achieve,,818.0,113.78
 套,tào,cover; sheath,5.0,819.0,113.75
 哭,kū,to cry; to weep,3.0,820.0,113.66
-屁股,pì gu,buttocks; bottom,6.0,821.0,113.39
+屁股,pì gǔ,buttocks; bottom,6.0,821.0,113.39
 生日,shēng rì,birthday,2.0,822.0,113.28
 晚安,wǎn ān,Good night!; Good evening!,,823.0,113.16
 否则,fǒu zé,if not; otherwise,4.0,824.0,113.16
@@ -827,7 +827,7 @@
 年轻,nián qīng,young,3.0,831.0,112.56
 操,cāo,to grasp; to hold,,832.0,112.53
 下面,xià miàn,below; under,,833.0,112.41
-姑娘,gū niang,girl; young woman,5.0,834.0,112.23
+姑娘,gū niáng,girl; young woman,5.0,834.0,112.23
 道,dào,road; path (; way; reason; principle,,835.0,111.99
 按,àn,to press; to push,,836.0,111.84
 钥匙,yào shi,key,4.0,837.0,111.81
@@ -839,7 +839,7 @@
 信息,xìn xī,information; news,5.0,843.0,111.04
 整,zhěng,whole; complete; entire; (before a measure word) whole; (before or after number; in good order; tidy; neat,,844.0,110.53
 投票,tóu piào,to vote; vote,6.0,845.0,110.32
-哥哥,gē ge,older brother,2.0,846.0,110.29
+哥哥,gē gē,older brother,2.0,846.0,110.29
 手术,shǒu shù,surgical operation; operation,5.0,847.0,110.15
 必要,bì yào,necessary; essential,5.0,848.0,110.15
 身边,shēn biān,at one's side; on hand,,849.0,110.12
@@ -940,10 +940,10 @@
 线索,xiàn suǒ,trail; clues,6.0,947.0,97.39
 面前,miàn qián,in front of; facing,,948.0,97.3
 消失,xiāo shī,to disappear; to fade away,5.0,949.0,97.27
-妹妹,mèi mei,younger sister; fig. younger woman (esp. girl friend or rival),2.0,950.0,97.24
+妹妹,mèi mèi,younger sister; fig. younger woman (esp. girl friend or rival),2.0,950.0,97.24
 正确,zhèng què,correct; proper,4.0,951.0,97.15
-位置,wèi zhi,position; place,5.0,952.0,96.97
-答应,dā ying,to promise; to agree,5.0,953.0,96.61
+位置,wèi zhì,position; place,5.0,952.0,96.97
+答应,dā yìng,to promise; to agree,5.0,953.0,96.61
 收,shōu,to receive; to accept,4.0,954.0,96.49
 砸,zá,smash; smashed,6.0,955.0,96.34
 街,jiē,street,,956.0,95.96
@@ -954,7 +954,7 @@
 秒,miǎo,second (of time); unit of angle or arc equivalent to one sixtieth of a degree,5.0,961.0,94.61
 似乎,sì hū,apparently; to seem,5.0,962.0,94.11
 放下,fàng xià,to lay down; to put down; to let go of; to relinquish; to set aside,,963.0,94.08
-力量,lì liang,power; force,5.0,964.0,93.9
+力量,lì liàng,power; force,5.0,964.0,93.9
 命令,mìng lìng,order; command,5.0,965.0,93.81
 同时,tóng shí,at the same time; simultaneously,5.0,966.0,93.75
 提供,tí gōng,to offer; to supply,4.0,967.0,93.69
@@ -1012,13 +1012,13 @@
 多么,duō me,how (wonderful etc); what (a great idea etc),3.0,1019.0,87.79
 足够,zú gòu,enough; sufficient,,1020.0,87.79
 饿,è,to be hungry; hungry,3.0,1021.0,87.73
-学生,xué sheng,student; school child,1.0,1022.0,87.7
+学生,xué shēng,student; school child,1.0,1022.0,87.7
 红,hóng,bonus; popular,2.0,1023.0,87.4
 鸡,jī,fowl; chicken,,1024.0,87.37
 养,yǎng,to raise (animals); to bring up (children),,1025.0,87.31
 下午,xià wǔ,afternoon; p.m.,1.0,1026.0,87.28
 仍然,réng rán,still; yet,4.0,1027.0,87.1
-一旦,yídàn,in case (sth happens); if,5.0,1028.0,87.1
+一旦,yí dàn,in case (sth happens); if,5.0,1028.0,87.1
 追,zhuī,to chase; to pursue,,1029.0,86.92
 动作,dòng zuò,movement; motion,4.0,1030.0,86.92
 谢,xiè,to thank; to apologize,,1031.0,86.89
@@ -1046,7 +1046,7 @@
 人生,rén shēng,human life,5.0,1054.0,85.02
 清,qīng,clear; clean; quiet; still,,1055.0,84.9
 因此,yīn cǐ,thus; consequently,4.0,1056.0,84.84
-恶心,ěxin,nausea; to feel sick,6.0,1057.0,84.84
+恶心,ě xīn,nausea; to feel sick,6.0,1057.0,84.84
 受伤,shòu shāng,to sustain injuries; wounded (in an accident etc),5.0,1058.0,84.72
 夜,yè,night,5.0,1059.0,84.57
 婊子,biǎo zi,prostitute; whore,,1060.0,84.33
@@ -1088,9 +1088,9 @@
 失望,shī wàng,disappointed; to lose hope,4.0,1096.0,81.5
 意见,yì jiàn,idea; opinion,4.0,1097.0,81.26
 获得,huò dé,to obtain; to receive,4.0,1098.0,81.14
-要是,yào shi,if,5.0,1099.0,81.05
+要是,yào shì,if,5.0,1099.0,81.05
 近,jìn,near; close to,2.0,1100.0,80.99
-数,shǔ,to count; to enumerate,6.0,1101.0,80.69
+数,shù,to count; to enumerate,6.0,1101.0,80.69
 公寓,gōng yù,apartment building; block of flats,5.0,1102.0,80.66
 文件,wén jiàn,document; file,5.0,1103.0,80.43
 只能,zhǐ néng,can only; obliged to do sth,,1104.0,80.01
@@ -1101,7 +1101,7 @@
 不然,bù rán,not so; no,5.0,1109.0,79.32
 邀请,yāo qǐng,to invite; invitation,4.0,1110.0,79.32
 尽管,jǐn guǎn,despite; although,4.0,1111.0,79.2
-姐姐,jiě jie,older sister,2.0,1112.0,79.14
+姐姐,jiě jiě,older sister,2.0,1112.0,79.14
 浪费,làng fèi,to waste; to squander,4.0,1113.0,78.82
 多谢,duō xiè,many thanks; thanks a lot,,1114.0,78.73
 女朋友,nǚ péng you,girlfriend,,1115.0,78.73
@@ -1116,13 +1116,13 @@
 试图,shì tú,to attempt; to try,6.0,1125.0,78.04
 反应,fǎn yìng,to mirror; to reflect,4.0,1126.0,77.86
 西,xī,west,3.0,1127.0,77.68
-一边,yìbiān,one side; either side,3.0,1128.0,77.33
+一边,yī biān,one side; either side,3.0,1128.0,77.33
 听见,tīng jiàn,to hear,,1129.0,77.27
-舒服,shū fu,comfortable; feeling well,3.0,1130.0,77.21
+舒服,shū fú,comfortable; feeling well,3.0,1130.0,77.21
 失败,shī bài,to be defeated; to lose,4.0,1131.0,77.21
 通,tōng,to go through; to know well,,1132.0,77.21
 有时,yǒu shí,sometimes; now and then,,1133.0,77.12
-一般,yìbān,same; ordinary,3.0,1134.0,77.09
+一般,yì bān,same; ordinary,3.0,1134.0,77.09
 蛋,dàn,egg; oval-shaped thing,,1135.0,77.03
 介绍,jiè shào,to present; to introduce,2.0,1136.0,77.0
 意外,yì wài,unexpected; accident,5.0,1137.0,76.88
@@ -1141,10 +1141,10 @@
 证人,zhèng rén,witness,,1150.0,75.86
 美丽,měi lì,beautiful,4.0,1151.0,75.83
 压力,yā lì,pressure,4.0,1152.0,75.75
-味道,wèidào,flavor; smell,4.0,1153.0,75.54
+味道,wèi dào,flavor; smell,4.0,1153.0,75.54
 淘汰,táo tài,to wash out; elimination (by selection),6.0,1154.0,75.54
 鱼,yú,fish,2.0,1155.0,75.48
-厉害,lì hai,difficult to deal with; difficult to endure,4.0,1156.0,75.48
+厉害,lì hài,difficult to deal with; difficult to endure,4.0,1156.0,75.48
 射,shè,to shoot; to launch,,1157.0,75.42
 室,shì,room; work unit,,1158.0,75.3
 醉,zuì,intoxicated,5.0,1159.0,75.24
@@ -1163,12 +1163,12 @@
 钟,zhōng,clock; a (hanging) bell,5.0,1172.0,74.2
 子弹,zǐ dàn,bullet,6.0,1173.0,74.17
 垃圾,lā jī,trash; refuse,,1174.0,74.08
-叔叔,shū shu,father's younger brother; uncle,3.0,1175.0,74.08
+叔叔,shū shū,father's younger brother; uncle,3.0,1175.0,74.08
 男朋友,nán péng you,boyfriend,,1176.0,73.87
 疼,téng,hurts; love fondly,3.0,1177.0,73.84
 毒品,dú pǐn,drugs; narcotics,6.0,1178.0,73.72
 签,qiān,to sign one's name; to write brief comments on a document,,1179.0,73.6
-不必,búbì,need not; does not have to,5.0,1180.0,73.57
+不必,bù bì,need not; does not have to,5.0,1180.0,73.57
 反对,fǎn duì,to fight against; to oppose,4.0,1181.0,73.57
 颗,kē,"classifier for small spheres, pearls, corn grains, teeth, hearts, satellites etc",5.0,1182.0,73.39
 停下,tíng xià,to stop,,1183.0,73.3
@@ -1308,7 +1308,7 @@
 健康,jiàn kāng,health; healthy,3.0,1317.0,64.63
 客户,kè hù,client; customer,6.0,1318.0,64.63
 圈,quān,circle; ring,5.0,1319.0,64.63
-脑袋,nǎodài,head; skull,5.0,1320.0,64.54
+脑袋,nǎo dài,head; skull,5.0,1320.0,64.54
 不够,bù gòu,not enough; insufficient,,1321.0,64.48
 嘘,xū,to exhale slowly; to hiss,,1322.0,64.42
 前面,qián miàn,ahead; in front,1.0,1323.0,64.33
@@ -1326,7 +1326,7 @@
 技术,jì shù,technology; technique,4.0,1335.0,63.67
 吃饭,chī fàn,to have a meal; to eat,,1336.0,63.64
 传,chuán,to pass on; to spread,,1337.0,63.58
-困难,kùn nan,difficulty; problem,4.0,1338.0,63.55
+困难,kùn nán,difficulty; problem,4.0,1338.0,63.55
 不许,bù xǔ,not to allow; must not,,1339.0,63.49
 某种,mǒu zhǒng,some kind (of),,1340.0,63.49
 记忆,jì yì,memories; remember,5.0,1341.0,63.43
@@ -1418,13 +1418,13 @@
 于是,yú shì,thereupon; as a result,4.0,1428.0,58.13
 自我,zì wǒ,the self; oneself; self-; ego,,1429.0,58.13
 非,fēi,non-; not-,5.0,1430.0,58.07
-对付,duì fu,to handle; to deal with,6.0,1431.0,58.07
+对付,duì fù,to handle; to deal with,6.0,1431.0,58.07
 好事,hǎo shì,"good action, deed, thing or work (also sarcastic, ""a fine thing indeed""); charity",,1432.0,58.04
 唔,wú,oh (expression of agreement or surprise); not,,1433.0,58.04
 元,yuán,Chinese monetary unit; dollar,2.0,1434.0,57.98
 祈祷,qí dǎo,to pray; to say a prayer,,1435.0,57.98
 编,biān,to weave; to plait,,1436.0,57.92
-收拾,shōu shi,to put in order; to tidy up,4.0,1437.0,57.86
+收拾,shōu shí,to put in order; to tidy up,4.0,1437.0,57.86
 客人,kè rén,visitor; guest,3.0,1438.0,57.8
 状态,zhuàng tài,state of affairs; state,5.0,1439.0,57.77
 战,zhàn,to fight; fight,,1440.0,57.71
@@ -1441,12 +1441,12 @@
 爬,pá,to crawl; to climb,,1451.0,57.11
 赌,dǔ,to bet; to gamble,,1452.0,57.11
 显示,xiǎn shì,to show; to illustrate,5.0,1453.0,57.08
-队伍,duìwu,ranks; troops,6.0,1454.0,57.06
+队伍,duì wǔ,ranks; troops,6.0,1454.0,57.06
 立刻,lì kè,forthwith; immediate,5.0,1455.0,57.03
 绝不,jué bù,in no way; not in the least; absolutely not,,1456.0,57.0
 舞台,wǔ tái,stage; arena,,1457.0,56.97
-吐,tù,to vomit; to throw up,5.0,1458.0,56.97
-奶奶,nǎi nai,father's mother; paternal grandmother,3.0,1459.0,56.94
+吐,tǔ,to vomit; to throw up,5.0,1458.0,56.97
+奶奶,nǎi nǎi,father's mother; paternal grandmother,3.0,1459.0,56.94
 配,pèi,to join; to fit,,1460.0,56.91
 取消,qǔ xiāo,to cancel; cancellation,5.0,1461.0,56.88
 离婚,lí hūn,to divorce; divorced from (one's spouse),5.0,1462.0,56.85
@@ -1484,7 +1484,7 @@
 害,hài,to do harm to; to cause trouble to,,1494.0,54.94
 或是,huò shì,or; either one or the other,,1495.0,54.91
 修,xiū,to decorate; to embellish,4.0,1496.0,54.91
-在乎,zài hu,determined by; to care about,6.0,1497.0,54.85
+在乎,zài hū,determined by; to care about,6.0,1497.0,54.85
 无聊,wú liáo,nonsense; bored,4.0,1498.0,54.82
 状况,zhuàng kuàng,condition; state,5.0,1499.0,54.79
 目的,mù dì,purpose; aim,4.0,1500.0,54.7
@@ -1530,7 +1530,7 @@
 实话,shí huà,truth,5.0,1540.0,53.06
 表情,biǎo qíng,expression; to express one's feelings,5.0,1541.0,53.0
 冒险,mào xiǎn,to take risks; to take chances,5.0,1542.0,52.97
-好处,hǎo chu,benefit; advantage,4.0,1543.0,52.94
+好处,hǎo chù,benefit; advantage,4.0,1543.0,52.94
 格,gé,square; lattice; grid; frame; compartment; partition; slot (within a larger unit),,1544.0,52.94
 左,zuǒ,left; the Left (politics),,1545.0,52.85
 海,hǎi,ocean; sea,,1546.0,52.82
@@ -1604,7 +1604,7 @@
 挑,tiāo,to carry on a shoulder pole; to choose,,1614.0,50.35
 辣,là,hot (spicy); pungent,4.0,1615.0,50.35
 互相,hù xiāng,each other; mutually,4.0,1616.0,50.32
-切,qiē,to cut; to slice,5.0,1617.0,50.32
+切,qiè,to cut; to slice,5.0,1617.0,50.32
 招,zhāo,to recruit; to provoke,,1618.0,50.32
 炸,zhá,to deep fry; to blanch (a vegetable),,1619.0,50.29
 墙,qiáng,wall,4.0,1620.0,50.29
@@ -1648,14 +1648,14 @@
 仅,jǐn,barely; only,,1659.0,48.56
 不可思议,bù kě sī yì,inconceivable (idiom); unimaginable,6.0,1660.0,48.5
 结,jié,knot; sturdy,,1661.0,48.5
-爷爷,yé ye,father's father; paternal grandfather,3.0,1662.0,48.44
+爷爷,yé yé,father's father; paternal grandfather,3.0,1662.0,48.44
 会儿,huì r,a short while; a moment,,1663.0,48.44
 正式,zhèng shì,formal; official,4.0,1664.0,48.38
 厨房,chú fáng,kitchen,3.0,1665.0,48.38
 特殊,tè shū,special; particular,5.0,1666.0,48.26
 扯,chě,to pull; to tear,,1667.0,48.2
 专业,zhuān yè,specialty; specialized field,4.0,1668.0,48.14
-老实,lǎo shi,honest; sincere,5.0,1669.0,48.14
+老实,lǎo shí,honest; sincere,5.0,1669.0,48.14
 晚饭,wǎn fàn,evening meal; dinner,,1670.0,48.08
 吸引,xī yǐn,"to attract (interest, investment etc)",4.0,1671.0,48.02
 年代,nián dài,a decade of a century (e.g. the Sixties); age,5.0,1672.0,48.02
@@ -1683,7 +1683,7 @@
 奖,jiǎng,prize; award; bonus; reward; to encourage; to commend; to praise,,1694.0,47.19
 雇,gù,to employ; to hire,,1695.0,47.19
 冰,bīng,ice; to chill sth,,1696.0,47.16
-戒指,jiè zhi,ring,5.0,1697.0,47.16
+戒指,jiè zhǐ,ring,5.0,1697.0,47.16
 回头,huí tóu,to turn round; to turn one's head; later; by and by,,1698.0,47.16
 洞,dòng,cave; hole,5.0,1699.0,47.13
 祝贺,zhù hè,to congratulate; congratulations,4.0,1700.0,47.13
@@ -1718,10 +1718,10 @@
 时代,shí dài,age; era,5.0,1730.0,46.03
 接触,jiē chù,to touch; to contact,5.0,1731.0,46.03
 卡车,kǎ chē,truck,5.0,1732.0,46.0
-抢劫,qiāngjié,to rob; looting,6.0,1733.0,45.94
+抢劫,qiǎng jié,to rob; looting,6.0,1733.0,45.94
 碰到,pèng dào,to come across; to run into,,1734.0,45.94
 神父,shén fu,Catholic or Orthodox priest; Father (title of address),,1735.0,45.88
-规矩,guī ju,lit. compass and set square; fig. established standard,5.0,1736.0,45.85
+规矩,guī jǔ,lit. compass and set square; fig. established standard,5.0,1736.0,45.85
 洛,Luò,"surname Luo; old name of several rivers (in Henan, Shaanxi, Sichuan and Anhui)",,1737.0,45.73
 之中,zhī zhōng,inside; among,,1738.0,45.7
 火车,huǒ chē,train,,1739.0,45.7
@@ -1801,7 +1801,7 @@
 杀害,shā hài,to murder,,1815.0,43.07
 内心,nèi xīn,heart; innermost being; incenter,,1816.0,43.04
 暴力,bào lì,violence; force,6.0,1817.0,42.93
-脏,zāng,dirty,5.0,1818.0,42.9
+脏,zàng,dirty,5.0,1818.0,42.9
 走开,zǒu kāi,to leave; to walk away; to beat it; to move aside,,1819.0,42.87
 事故,shì gù,accident,6.0,1820.0,42.84
 艺术,yì shù,art,4.0,1821.0,42.81
@@ -1822,8 +1822,8 @@
 范围,fàn wéi,range; scope,4.0,1836.0,42.42
 称,chēng,to weigh; to state,5.0,1837.0,42.42
 骑,qí,to ride (an animal or bike); to sit astride,3.0,1838.0,42.42
-尽量,jìn liàng,as much as possible; to the greatest extent,5.0,1839.0,42.42
-太阳,tàiyáng,sun,3.0,1840.0,42.3
+尽量,jǐn liàng,as much as possible; to the greatest extent,5.0,1839.0,42.42
+太阳,tài yáng,sun,3.0,1840.0,42.3
 午餐,wǔ cān,lunch; luncheon,,1841.0,42.3
 提出,tí chū,to raise (an issue); to propose,,1842.0,42.3
 暂时,zàn shí,temporary; provisional,4.0,1843.0,42.27
@@ -1836,7 +1836,7 @@
 婴儿,yīng ér,infant; baby,6.0,1850.0,42.0
 极,jí,"extremely; pole (geography, physics)",3.0,1851.0,41.97
 兰,lán,orchid; fragrant thoroughwort,,1852.0,41.94
-笑话,xiàohuà,joke; jest,4.0,1853.0,41.94
+笑话,xiào huà,joke; jest,4.0,1853.0,41.94
 可惜,kě xī,it is a pity; what a pity,4.0,1854.0,41.94
 响,xiǎng,to make a sound; to sound,4.0,1855.0,41.88
 石头,shí tou,stone,5.0,1856.0,41.88
@@ -1850,12 +1850,12 @@
 笨,bèn,stupid; foolish,4.0,1864.0,41.7
 塔,tǎ,pagoda; tower,5.0,1865.0,41.7
 有的,yǒu de,some (who are...); some (exist),,1866.0,41.67
-道理,dàolǐ,reason; argument,5.0,1867.0,41.64
+道理,dào lǐ,reason; argument,5.0,1867.0,41.64
 船长,chuán zhǎng,captain (of a boat); skipper,,1868.0,41.61
 撒,sā,to let go; to cast,,1869.0,41.58
 歌手,gē shǒu,singer,,1870.0,41.58
 上校,shàng xiào,high ranking officer in Chinese army; colonel,,1871.0,41.58
-运气,yùn qi,luck (good or bad),5.0,1872.0,41.55
+运气,yùn qì,luck (good or bad),5.0,1872.0,41.55
 主要,zhǔ yào,main; principal,3.0,1873.0,41.52
 烟,yān,cigarette or pipe tobacco; smoke,,1874.0,41.49
 同事,tóng shì,colleague; co-worker,3.0,1875.0,41.49
@@ -1884,10 +1884,10 @@
 关注,guān zhù,to pay attention to; to follow sth closely; to follow (on social media); concern; interest; attention,,1898.0,40.81
 德国,Dé guó,Germany,,1899.0,40.78
 大部分,dà bù fen,the greater part; the majority; most; Taiwan pr. [da4bu4fen4],,1900.0,40.75
-窗户,chuāng hu,window,4.0,1901.0,40.75
+窗户,chuāng hù,window,4.0,1901.0,40.75
 奇迹,qí jì,miracle; miraculous,5.0,1902.0,40.72
 空气,kōng qì,air; atmosphere,4.0,1903.0,40.69
-护士,hù shi,nurse,4.0,1904.0,40.69
+护士,hù shì,nurse,4.0,1904.0,40.69
 分享,fēn xiǎng,"to share (esp. sth enjoyable, useful or beneficial)",,1905.0,40.6
 萨,Sà,surname Sa,,1906.0,40.6
 被捕,bèi bǔ,to be arrested; under arrest,,1907.0,40.6
@@ -1908,7 +1908,7 @@
 表达,biǎo dá,to voice (an opinion); to express,4.0,1922.0,40.21
 大约,dà yuē,approximately; about,4.0,1923.0,40.18
 东,dōng,east; host (i.e. sitting on east side of guest),3.0,1924.0,40.15
-一辈子,yíbèizi,a lifetime,5.0,1925.0,40.15
+一辈子,yī bèi zi,a lifetime,5.0,1925.0,40.15
 仅仅,jǐn jǐn,barely; only,,1926.0,40.0
 华盛顿,Huá shèng dùn,"Washington (name); George Washington (1732-1799), first US president",,1927.0,39.97
 造,zào,to make; to build,,1928.0,39.97
@@ -1994,7 +1994,7 @@
 绑,bǎng,to tie; bind or fasten together,,2015.0,37.53
 守,shǒu,to guard; to defend,,2016.0,37.5
 一一,yī yī,one by one; one after another,,2017.0,37.5
-态度,tài du,manner; bearing,4.0,2018.0,37.44
+态度,tài dù,manner; bearing,4.0,2018.0,37.44
 尴尬,gān gà,awkward; embarrassed,6.0,2019.0,37.44
 诺,nuò,to consent; to promise,,2020.0,37.41
 你好,nǐ hǎo,hello; hi,,2021.0,37.38
@@ -2028,7 +2028,7 @@
 移动,yí dòng,to move; movement,5.0,2050.0,36.55
 商店,shāng diàn,store; shop,1.0,2051.0,36.49
 妓女,jì nǚ,prostitute; hooker,,2052.0,36.49
-不断,búduàn,unceasing; uninterrupted,5.0,2053.0,36.43
+不断,bù duàn,unceasing; uninterrupted,5.0,2053.0,36.43
 能量,néng liàng,energy; capabilities,6.0,2054.0,36.43
 解,jiě,to divide; to break up,,2055.0,36.4
 熟悉,shú xī,to be familiar with; to know well,4.0,2056.0,36.4
@@ -2112,7 +2112,7 @@
 教育,jiào yù,to educate; to teach,4.0,2136.0,34.94
 谎言,huǎng yán,lie,,2137.0,34.94
 遇见,yù jiàn,to meet,,2138.0,34.94
-耳朵,ěr duo,ear,3.0,2139.0,34.91
+耳朵,ěr duǒ,ear,3.0,2139.0,34.91
 世上,shì shàng,on earth,,2140.0,34.91
 葬礼,zàng lǐ,burial; funeral,,2141.0,34.88
 某人,mǒu rén,someone; a certain person,,2142.0,34.85
@@ -2131,7 +2131,7 @@
 图,tú,diagram; picture,,2156.0,34.58
 艰难,jiān nán,difficult; hard,6.0,2157.0,34.58
 在于,zài yú,to rest with; to lie in; to be due to (a certain attribute); to be determined by; to be up to (sb),,2158.0,34.58
-教训,jiào xun,a lesson; a moral,5.0,2159.0,34.52
+教训,jiào xùn,a lesson; a moral,5.0,2159.0,34.52
 坦白,tǎn bái,honest; forthcoming,6.0,2160.0,34.49
 议员,yì yuán,member (of a legislative body); representative,,2161.0,34.49
 全国,quán guó,whole nation; nationwide,,2162.0,34.49
@@ -2162,7 +2162,7 @@
 区域,qū yù,area; region,6.0,2188.0,33.77
 坚强,jiān qiáng,staunch; strong,5.0,2189.0,33.77
 数据,shù jù,data; numbers,5.0,2190.0,33.77
-玻璃,bō li,glass; nylon,5.0,2191.0,33.77
+玻璃,bō lí,glass; nylon,5.0,2191.0,33.77
 勇气,yǒng qì,courage; valor,5.0,2192.0,33.74
 镜头,jìng tóu,camera shot (in a movie etc); scene,6.0,2193.0,33.74
 员工,yuán gōng,staff; personnel; employee,,2194.0,33.65
@@ -2173,7 +2173,7 @@
 好奇,hào qí,inquisitive; curious,5.0,2199.0,33.57
 觉,jiào,a nap; a sleep,,2200.0,33.54
 审判,shěn pàn,a trial; to try sb,6.0,2201.0,33.54
-了不起,liǎo bu qǐ,amazing; terrific,5.0,2202.0,33.54
+了不起,liǎo bù qǐ,amazing; terrific,5.0,2202.0,33.54
 基地,jī dì,base (of operations); industrial or military base,6.0,2203.0,33.48
 砍,kǎn,to chop; to cut down,5.0,2204.0,33.48
 假设,jiǎ shè,suppose that...; hypothesis,6.0,2205.0,33.48
@@ -2230,7 +2230,7 @@
 过分,guò fèn,excessive; undue,5.0,2256.0,32.43
 对象,duì xiàng,target; object,5.0,2257.0,32.4
 期,qī,period; cycle,,2258.0,32.4
-一致,yízhì,unanimous; identical (views or opinions),5.0,2260.0,32.4
+一致,yí zhì,unanimous; identical (views or opinions),5.0,2260.0,32.4
 贴,tiē,to stick; to paste,,2261.0,32.37
 转移,zhuǎn yí,to shift; to divert or distract (attention etc),6.0,2262.0,32.34
 管理,guǎn lǐ,to supervise; to manage,4.0,2263.0,32.34
@@ -2263,7 +2263,7 @@
 丹,dān,red; pellet,,2290.0,31.87
 退后,tuì hòu,to stand back; to go back (in time),,2291.0,31.87
 自豪,zì háo,pride; to be proud of sth (in a good way),5.0,2292.0,31.84
-肚子,dù zi,belly; abdomen,4.0,2293.0,31.84
+肚子,dǔ zi,belly; abdomen,4.0,2293.0,31.84
 伊,yī,"third person singular pronoun (""he"" or ""she""); second person singular pronoun (""you"")",,2294.0,31.81
 开除,kāi chú,to expel,6.0,2295.0,31.75
 不仅,bù jǐn,not only (this one); not just (...) but also,4.0,2296.0,31.75
@@ -2322,7 +2322,7 @@
 结局,jié jú,conclusion; ending,6.0,2349.0,30.88
 化,huà,to make into; to change into,,2350.0,30.85
 非法,fēi fǎ,illegal,6.0,2351.0,30.82
-合同,hé tong,contract,5.0,2352.0,30.82
+合同,hé tóng,contract,5.0,2352.0,30.82
 剪,jiǎn,scissors or similar tool; to cut as with scissors,,2353.0,30.82
 竞争,jìng zhēng,to compete; competition,4.0,2354.0,30.82
 没事儿,méi shì r,to have spare time; free from work,,2356.0,30.79
@@ -2337,11 +2337,11 @@
 早晨,zǎo chén,early morning,,2366.0,30.64
 滚开,gǔn kāi,to boil; boiling hot; get out!; go away!; fuck off!,,2367.0,30.61
 微笑,wēi xiào,smile,5.0,2368.0,30.61
-人家,rén jia,other; other people,6.0,2369.0,30.61
+人家,rén jiā,other; other people,6.0,2369.0,30.61
 电梯,diàn tī,elevator,3.0,2370.0,30.55
 辈子,bèi zi,all one's life; lifetime,,2371.0,30.52
 出口,chū kǒu,an exit; to speak,5.0,2372.0,30.52
-左边,zuǒ bian,left; the left side,2.0,2373.0,30.52
+左边,zuǒ biān,left; the left side,2.0,2373.0,30.52
 爆,bào,to explode; to burst; to stir-fry briefly; to quick-boil,,2374.0,30.52
 托,tuō,"to hold up in one's hand; to support with one's palm; sth serving as a support: a prop, a rest (e.g. arm rest)",,2375.0,30.52
 动机,dòng jī,motor; locomotive,6.0,2376.0,30.49
@@ -2359,7 +2359,7 @@
 彼得,Bǐ dé,Peter (name),,2389.0,30.35
 做爱,zuò ài,to make love,,2390.0,30.35
 同学,tóng xué,classmate,1.0,2391.0,30.35
-非洲,Fēi zhōu,Africa; abbr. for,,2392.0,30.32
+非洲,Fēi zhōu,Africa,,2392.0,30.32
 警报,jǐng bào,alarm; alert signal,,2393.0,30.29
 出局,chū jú,to be put out (in baseball); to be dismissed (in cricket); to be eliminated from a competition,,2394.0,30.26
 内部,nèi bù,"interior; inside (part, section)",,2395.0,30.23
@@ -2425,7 +2425,7 @@
 印度,Yìn dù,India,,2457.0,29.21
 交流,jiāo liú,exchange; give-and-take,4.0,2458.0,29.21
 辩护,biàn hù,to speak in defense of; to argue in favor of,6.0,2459.0,29.21
-打扮,dǎ ban,to decorate; to dress,4.0,2460.0,29.21
+打扮,dǎ bàn,to decorate; to dress,4.0,2460.0,29.21
 晕,yūn,confused; dizzy,5.0,2461.0,29.21
 黄,huáng,yellow; pornographic,3.0,2462.0,29.18
 起码,qǐ mǎ,at the minimum; at the very least,6.0,2463.0,29.18
@@ -2440,7 +2440,7 @@
 悲伤,bēi shāng,sad; sorrowful,,2472.0,29.0
 尖叫,jiān jiào,to screech; to shriek,,2473.0,29.0
 网上,wǎng shàng,online,,2474.0,29.0
-说不定,shuō bu dìng,can't say for sure; maybe,5.0,2475.0,29.0
+说不定,shuō bù dìng,can't say for sure; maybe,5.0,2475.0,29.0
 小丑,xiǎo chǒu,clown,,2476.0,28.97
 剧,jù,"theatrical work (play, opera, TV series etc); dramatic (change, increase etc)",,2477.0,28.97
 小说,xiǎo shuō,novel; fiction,4.0,2478.0,28.94
@@ -2512,7 +2512,7 @@
 适应,shì yìng,to suit; to fit,4.0,2545.0,27.6
 福尔摩斯,Fú ěr mó sī,Sherlock Holmes,,2546.0,27.6
 列,liè,to arrange; to line up,,2547.0,27.57
-应付,yìng fu,to deal with; to cope,5.0,2548.0,27.57
+应付,yìng fù,to deal with; to cope,5.0,2548.0,27.57
 物品,wù pǐn,articles; goods,,2549.0,27.57
 坏人,huài rén,bad person; villain,,2550.0,27.57
 湿,shī,moist; wet,,2551.0,27.54
@@ -2585,7 +2585,7 @@
 没法,méi fǎ,at a loss; unable to do anything about it,,2619.0,26.59
 猴子,hóu zi,monkey,4.0,2620.0,26.56
 熟,shú,ripe; mature; thoroughly cooked; done,,2621.0,26.56
-娃娃,wá wa,baby; small child,6.0,2622.0,26.56
+娃娃,wá wá,baby; small child,6.0,2622.0,26.56
 告,gào,to say; to tell; to announce; to report,,2623.0,26.56
 没事,méi shì,it's not important; it's nothing,,2624.0,26.56
 经济,jīng jì,economy; economic,4.0,2625.0,26.56
@@ -2655,7 +2655,7 @@
 依然,yī rán,still; as before,5.0,2689.0,25.93
 平静,píng jìng,tranquil; undisturbed,5.0,2690.0,25.93
 乘,chéng,to ride; to mount,5.0,2691.0,25.87
-右边,yòu bian,"right side; right, to the right",2.0,2692.0,25.87
+右边,yòu biān,"right side; right, to the right",2.0,2692.0,25.87
 内裤,nèi kù,underpants; panties,,2693.0,25.84
 不久,bù jiǔ,not long (after); before too long,,2694.0,25.84
 牢,láo,pen; fold (for livestock); prison; jail,,2695.0,25.81
@@ -2702,7 +2702,7 @@
 衬衫,chèn shān,shirt; blouse,3.0,2737.0,25.28
 金发,jīn fà,blond; blonde,,2738.0,25.25
 摧毁,cuī huǐ,to destroy; to wreck,,2739.0,25.25
-胳膊,gē bo,arm,5.0,2740.0,25.22
+胳膊,gē bó,arm,5.0,2740.0,25.22
 他人,tā rén,another person; sb else; other people,,2741.0,25.19
 俄罗斯,é luó sī,Russia,,2742.0,25.19
 哥们儿,gē men r,erhua form of,,2743.0,25.19
@@ -2786,7 +2786,7 @@
 违反,wéi fǎn,to violate (a law),5.0,2824.0,24.24
 阶段,jiē duàn,stage; section,5.0,2825.0,24.24
 否认,fǒu rèn,to declare to be untrue; to deny,5.0,2826.0,24.24
-商量,shāng liang,to consult; to talk over,4.0,2827.0,24.21
+商量,shāng liáng,to consult; to talk over,4.0,2827.0,24.21
 什么的,shén me de,and so on; and so forth; and what not,,2828.0,24.21
 出于,chū yú,due to; to stem from,,2829.0,24.18
 蒙,méng,drizzle; mist,6.0,2830.0,24.18
@@ -3048,7 +3048,7 @@
 开火,kāi huǒ,to open fire; to start shooting; to light the flame (for cooking),,3098.0,21.19
 仓库,cāng kù,depot; storehouse,6.0,3099.0,21.19
 吉他,jí tā,guitar,,3100.0,21.16
-码头,mǎtóu,dock; pier,6.0,3101.0,21.16
+码头,mǎ tóu,dock; pier,6.0,3101.0,21.16
 庭,tíng,main hall; front courtyard,,3102.0,21.13
 顺,shùn,to obey; to follow,,3103.0,21.13
 散,sǎn,scattered; loose,,3104.0,21.13
@@ -3057,10 +3057,10 @@
 山姆,Shān mǔ,Sam,,3108.0,21.08
 怀,huái,bosom; heart,,3109.0,21.05
 配合,pèi hé,matching; fitting in with,5.0,3110.0,21.05
-称呼,chēng hu,to call; to address as,5.0,3111.0,21.05
+称呼,chēng hū,to call; to address as,5.0,3111.0,21.05
 女子,nǚ zǐ,woman; female,,3112.0,21.05
 具有,jù yǒu,to have; to possess,,3113.0,21.02
-大不了,dàbùliǎo,at worst; if worst comes to worst,6.0,3115.0,21.02
+大不了,dà bù liǎo,at worst; if worst comes to worst,6.0,3115.0,21.02
 刚好,gāng hǎo,just; exactly,,3116.0,21.02
 本人,běn rén,the person himself; I (humble form used in speeches),6.0,3117.0,21.02
 补偿,bǔ cháng,compensate; make up,6.0,3118.0,20.99
@@ -3239,7 +3239,7 @@
 找回,zhǎo huí,to retrieve,,3296.0,19.55
 之下,zhī xià,under; beneath,,3297.0,19.53
 肮脏,āng zāng,dirty; filthy; despicable,,3298.0,19.53
-大夫,dài fu,doctor; minister of state (in pre-Han states),4.0,3299.0,19.5
+大夫,dàifu,doctor; minister of state (in pre-Han states),4.0,3299.0,19.5
 澡,zǎo,bath,,3300.0,19.5
 无数,wú shù,countless; numberless,5.0,3301.0,19.5
 排练,pái liàn,to rehearse; rehearsal,,3302.0,19.5
@@ -3290,7 +3290,7 @@
 气氛,qì fēn,atmosphere; mood,5.0,3347.0,19.08
 批准,pī zhǔn,to approve; to ratify,5.0,3348.0,19.08
 静,jìng,still; calm,,3349.0,19.08
-脾气,píqì,temperament; disposition,4.0,3350.0,19.05
+脾气,pí qì,temperament; disposition,4.0,3350.0,19.05
 碎片,suì piàn,chip; fragment; splinter; tatter,,3351.0,19.05
 无罪,wú zuì,innocent; guileless,,3352.0,19.05
 逃脱,táo tuō,to run away; to escape,,3353.0,19.05
@@ -3579,7 +3579,7 @@
 无能为力,wú néng wéi lì,impotent (idiom); powerless,6.0,3651.0,17.14
 生涯,shēng yá,career; life (way in which sb lives),,3652.0,17.11
 护照,hù zhào,passport,3.0,3653.0,17.11
-知识,zhī shi,intellectual; knowledge-related,4.0,3655.0,17.08
+知识,zhī shí,intellectual; knowledge-related,4.0,3655.0,17.08
 开会,kāi huì,to hold a meeting; to attend a meeting,,3656.0,17.08
 支付,zhī fù,to pay (money),,3657.0,17.08
 领袖,lǐng xiù,leader,6.0,3658.0,17.05
@@ -3626,7 +3626,7 @@
 包围,bāo wéi,to surround; to encircle,6.0,3700.0,16.84
 提示,tí shì,to prompt; to present,6.0,3701.0,16.84
 肺,fèi,lung,5.0,3702.0,16.84
-糊涂,hú tu,muddled; silly,5.0,3703.0,16.84
+糊涂,hú tú,muddled; silly,5.0,3703.0,16.84
 院,yuàn,courtyard; institution,,3704.0,16.84
 燃烧,rán shāo,combustion; flaming,5.0,3705.0,16.81
 豪华,háo huá,luxurious,5.0,3706.0,16.78
@@ -3645,7 +3645,7 @@
 桶,tǒng,bucket; can,,3720.0,16.69
 困惑,kùn huò,bewildered; perplexed,,3721.0,16.69
 武装,wǔ zhuāng,arms; equipment,6.0,3722.0,16.69
-指甲,zhǐ jia,fingernail,6.0,3723.0,16.66
+指甲,zhǐ jiǎ,fingernail,6.0,3723.0,16.66
 透露,tòu lù,to leak out; to divulge,,3724.0,16.66
 斗争,dòu zhēng,a struggle; fight,6.0,3725.0,16.66
 录像带,lù xiàng dài,videotape; video cassette,,3726.0,16.66
@@ -3790,7 +3790,7 @@
 半夜,bàn yè,midnight; in the middle of the night,,3870.0,15.89
 赌场,dǔ chǎng,casino,,3871.0,15.89
 富,fù,rich; surname Fu,4.0,3872.0,15.89
-力气,lì qi,strength,4.0,3873.0,15.86
+力气,lì qì,strength,4.0,3873.0,15.86
 立,lì,to stand; to set up,,3874.0,15.86
 掩盖,yǎn gài,to conceal; to hide behind,6.0,3875.0,15.86
 官司,guān si,lawsuit,,3876.0,15.86
@@ -3819,7 +3819,7 @@
 火箭,huǒ jiàn,rocket,6.0,3899.0,15.68
 胡扯,hú chě,to chatter; nonsense,,3900.0,15.68
 伴,bàn,partner; companion; comrade; associate; to accompany,,3903.0,15.65
-瓦,wǎ,roof tile; abbr. for,,3904.0,15.65
+瓦,wǎ,roof tile,,3904.0,15.65
 袜子,wà zi,socks; stockings,4.0,3905.0,15.65
 容,róng,to hold; to contain,,3906.0,15.65
 暂停,zàn tíng,to suspend; time-out (e.g. in sports),,3907.0,15.62
@@ -3911,7 +3911,7 @@
 测,cè,to survey; to measure,,3993.0,15.23
 领带,lǐng dài,necktie,,3994.0,15.23
 牛排,niú pái,steak,,3995.0,15.23
-情形,qíngxíng,circumstances; situation,6.0,3996.0,15.23
+情形,qíng xíng,circumstances; situation,6.0,3996.0,15.23
 差劲,chà jìn,bad; no good,,3997.0,15.23
 前途,qián tú,prospects; future outlook,5.0,3998.0,15.23
 立场,lì chǎng,position; standpoint,6.0,4000.0,15.23
@@ -3922,13 +3922,13 @@
 现代,xiàn dài,modern times; modern age,4.0,4005.0,15.2
 导弹,dǎo dàn,guided missile; cruise missile,6.0,4006.0,15.2
 无比,wú bǐ,matchless,6.0,4007.0,15.2
-一向,yī xiàng,all along; the whole time,6.0,4008.0,15.2
+一向,yí xiàng,all along; the whole time,6.0,4008.0,15.2
 成立,chéng lì,to establish; to set up,5.0,4009.0,15.2
 甜蜜,tián mì,sweet; happy,,4010.0,15.2
 野兽,yě shòu,beast; wild animal,,4011.0,15.17
 弱,ruò,weak; feeble,5.0,4012.0,15.17
 移植,yí zhí,to transplant,,4013.0,15.17
-本事,běn shi,ability; skill,6.0,4014.0,15.17
+本事,běn shì,ability; skill,6.0,4014.0,15.17
 突破,tū pò,to break through; to make a breakthrough,6.0,4015.0,15.17
 曼哈顿,Màn hā dùn,Manhattan island; Manhattan borough of New York City,,4016.0,15.17
 尾,wěi,tail; remainder,,4017.0,15.14
@@ -3940,7 +3940,7 @@
 未婚妻,wèi hūn qī,fiancée,,4023.0,15.11
 双手,shuāng shǒu,both hands,,4024.0,15.11
 挥,huī,to wave; to brandish,5.0,4025.0,15.11
-一共,yígòng,altogether,3.0,4026.0,15.11
+一共,yī gòng,altogether,3.0,4026.0,15.11
 巫师,wū shī,wizard; magician,,4027.0,15.08
 终,zhōng,end; finish,,4028.0,15.08
 碰巧,pèng qiǎo,by chance; by coincidence,,4029.0,15.08
@@ -3992,7 +3992,7 @@
 作案,zuò àn,to commit a crime,,4080.0,14.76
 牵,qiān,to pull (an animal on a tether); to lead along,5.0,4081.0,14.76
 防守,fáng shǒu,defend; protect (against),6.0,4082.0,14.76
-欺负,qī fu,to bully,6.0,4083.0,14.76
+欺负,qī fù,to bully,6.0,4083.0,14.76
 挽救,wǎn jiù,to save; to remedy,6.0,4084.0,14.73
 数据库,shù jù kù,database,,4085.0,14.73
 体会,tǐ huì,know (through learning or by experience),5.0,4086.0,14.73
@@ -4022,7 +4022,7 @@
 堵,dǔ,"to block up (a road, pipe etc); to stop up (a hole)",,4112.0,14.55
 歌词,gē cí,song lyric; lyrics,,4113.0,14.52
 钓,diào,to fish with a hook and bait,5.0,4114.0,14.52
-亲戚,qīn qi,a relative (i.e. family relation),4.0,4115.0,14.52
+亲戚,qīn qī,a relative (i.e. family relation),4.0,4115.0,14.52
 高尔夫,gāo ěr fū,golf,,4116.0,14.52
 拼命,pīn mìng,to do one's utmost; with all one's might,6.0,4117.0,14.52
 枕头,zhěn tou,pillow,5.0,4118.0,14.52
@@ -4047,7 +4047,7 @@
 死因,sǐ yīn,cause of death,,4137.0,14.43
 组成,zǔ chéng,component; part,4.0,4138.0,14.43
 施,shī,to put into effect (regulations etc); to distribute (alms etc),,4139.0,14.43
-各自,gèzi,each; respective,5.0,4140.0,14.43
+各自,gè zì,each; respective,5.0,4140.0,14.43
 武士,wǔ shì,warrior; samurai,,4141.0,14.43
 摘,zhāi,to take; to borrow,5.0,4142.0,14.43
 喜爱,xǐ ài,to like; to love,,4143.0,14.43
@@ -4105,7 +4105,7 @@
 来临,lái lín,to approach; to come closer,,4199.0,14.16
 了结,liǎo jié,to settle; to finish,,4200.0,14.16
 行业,háng yè,industry; business,5.0,4201.0,14.16
-苏联,Sū lián,"Soviet Union, 1922-1991; abbr. for Union of Soviet Socialist Republics (USSR)",,4202.0,14.16
+苏联,Sū lián,"Soviet Union, 1922-1991",,4202.0,14.16
 潜力,qián lì,potential; capacity,6.0,4203.0,14.16
 外遇,wài yù,extramarital affair,,4204.0,14.13
 沙拉,shā lā,salad,,4205.0,14.13
@@ -4113,7 +4113,7 @@
 主持人,zhǔ chí rén,host; master of ceremonies; (TV or radio) presenter; anchor; principal investigator (PI); program director,,4207.0,14.1
 举动,jǔ dòng,act; action,6.0,4208.0,14.1
 倒数,dào shǔ,to count backwards (from 10 down to 0); to count down,,4209.0,14.1
-费城,Fèi chéng,"Philadelphia, Pennsylvania; abbr. for",,4210.0,14.1
+费城,Fèi chéng,"Philadelphia, Pennsylvania",,4210.0,14.1
 鸽子,gē zi,pigeon; dove,5.0,4212.0,14.07
 戏剧,xì jù,drama; play,5.0,4213.0,14.07
 少女,shào nǚ,girl; young lady,,4214.0,14.07
@@ -4267,7 +4267,7 @@
 人数,rén shù,number of people,,4367.0,13.35
 众,zhòng,crowd; multitude; many; numerous,,4368.0,13.32
 回归,huí guī,to return to; to retreat,,4369.0,13.32
-公车,gōng chē,bus; abbr. for,,4370.0,13.32
+公车,gōng chē,bus; car belonging to an organization and used by its members (government car,,4370.0,13.32
 安全带,ān quán dài,seat belt; safety belt,,4371.0,13.32
 州长,zhōu zhǎng,governor (of a province or colony); state governor,,4372.0,13.32
 丹尼斯,Dān ní sī,Dennis (name),,4373.0,13.29
@@ -4277,7 +4277,7 @@
 收藏,shōu cáng,to hoard; to collect,6.0,4377.0,13.29
 鲁,lǔ,crass; stupid,,4378.0,13.29
 尽头,jìn tóu,end; extremity; limit,,4379.0,13.29
-泄露,xiè lù,to leak (information); to divulge,6.0,4380.0,13.27
+泄露,xièlù,to leak (information); to divulge,6.0,4380.0,13.27
 治愈,zhì yù,to cure; to restore to health; uplifting; heartwarming,,4381.0,13.27
 名片,míng piàn,card,5.0,4382.0,13.27
 勒索,lè suǒ,to blackmail; to extort,,4383.0,13.27
@@ -4395,17 +4395,17 @@
 弱点,ruò diǎn,weak point; failing,6.0,4501.0,12.82
 穷,qióng,exhausted; poor,4.0,4502.0,12.79
 恶作剧,è zuò jù,practical joke; prank,,4503.0,12.79
-下载,xià zǎi,to download,5.0,4504.0,12.79
+下载,xià zài,to download,5.0,4504.0,12.79
 蜜月,mì yuè,honeymoon,,4505.0,12.79
 投诉,tóu sù,to lodge a complaint,,4506.0,12.79
 雇员,gù yuán,employee,,4507.0,12.79
-月亮,yuè liang,moon,3.0,4508.0,12.79
+月亮,yuè liàng,moon,3.0,4508.0,12.79
 家具,jiā jù,furniture,4.0,4509.0,12.79
 凯,kǎi,triumphal music; generous with money; lavish in spending,,4510.0,12.79
 企业,qǐ yè,company; firm,5.0,4511.0,12.79
 狮子,shī zi,lion; Leo (star sign),4.0,4512.0,12.76
 凉,liáng,cool; cold,,4513.0,12.76
-拽,zhuài,to drag; to haul,6.0,4514.0,12.76
+拽,zhuāi,to drag; to haul,6.0,4514.0,12.76
 赞,zàn,to praise; to laud,,4515.0,12.76
 旅途,lǚ tú,journey; trip,,4516.0,12.76
 高潮,gāo cháo,high tide; high water,6.0,4517.0,12.76
@@ -4463,7 +4463,7 @@
 大型,dà xíng,large scale; wide scale,5.0,4570.0,12.52
 搜寻,sōu xún,to search; to look for,,4571.0,12.52
 冻,dòng,to freeze; to feel very cold,5.0,4572.0,12.52
-忍不住,rěn bu zhù,cannot help; unable to bear,5.0,4573.0,12.52
+忍不住,rěn bú zhù,cannot help; unable to bear,5.0,4573.0,12.52
 住院,zhù yuàn,to stay in hospital; to be hospitalized,,4574.0,12.52
 浴缸,yù gāng,bathtub,,4575.0,12.52
 球场,qiú chǎng,stadium; sports ground,,4576.0,12.52
@@ -4569,7 +4569,7 @@
 港,gǎng,harbor; port,,4680.0,12.13
 共事,gòng shì,to work together,,4681.0,12.13
 西雅图,Xī yǎ tú,"Seattle, city in Washington State",,4682.0,12.13
-来不及,lái bu jí,there's not enough time (to do sth); it's too late (to do sth),4.0,4683.0,12.1
+来不及,lái bù jí,there's not enough time (to do sth); it's too late (to do sth),4.0,4683.0,12.1
 狂热,kuáng rè,zealotry; fanatical,,4684.0,12.1
 赞助,zàn zhù,to support; to assist,6.0,4685.0,12.1
 土豆,tǔ dòu,potato,5.0,4687.0,12.1
@@ -4617,7 +4617,7 @@
 列车,liè chē,train,,4731.0,11.95
 看出,kàn chū,to make out; to see,,4732.0,11.92
 极其,jí qí,extremely,4.0,4733.0,11.92
-师傅,shī fu,master; qualified worker,4.0,4734.0,11.92
+师傅,shī fù,master; qualified worker,4.0,4734.0,11.92
 线路,xiàn lù,line; circuit; wire; road; track; route,,4735.0,11.92
 香肠,xiāng cháng,sausage,,4736.0,11.92
 拖车,tuō chē,to tow; towed vehicle,,4737.0,11.89
@@ -4698,15 +4698,15 @@
 尾巴,wěi ba,tail,5.0,4814.0,11.63
 串,chuàn,to string together; to mix up,6.0,4815.0,11.63
 视线,shì xiàn,line of sight,6.0,4816.0,11.63
-帐篷,zhàng peng,tent,6.0,4817.0,11.63
+帐篷,zhàng péng,tent,6.0,4817.0,11.63
 轨道,guǐ dào,orbit; railway or tram line,6.0,4818.0,11.63
 剪刀,jiǎn dāo,scissors,5.0,4819.0,11.6
 箭,jiàn,arrow,,4820.0,11.6
-点心,diǎn xin,light refreshments; pastry,5.0,4821.0,11.6
+点心,diǎn xīn,light refreshments; pastry,5.0,4821.0,11.6
 卡住,kǎ zhù,to jam; to choke,,4822.0,11.6
 氧气,yǎng qì,oxygen,6.0,4823.0,11.6
 遗传,yí chuán,heredity; inheritance,6.0,4824.0,11.6
-抽屉,chōu ti,drawer,5.0,4825.0,11.6
+抽屉,chōu tì,drawer,5.0,4825.0,11.6
 嚼,jiáo,to chew,,4826.0,11.6
 困境,kùn jìng,predicament; plight,,4827.0,11.6
 头绪,tóu xù,outline; main threads,,4828.0,11.6
@@ -4812,7 +4812,7 @@
 被害人,bèi hài rén,victim,,4930.0,11.27
 缺少,quē shǎo,lack; shortage of,4.0,4931.0,11.24
 校园,xiào yuán,campus,,4932.0,11.24
-报酬,bào chou,reward; remuneration,6.0,4933.0,11.24
+报酬,bào chóu,reward; remuneration,6.0,4933.0,11.24
 备,bèi,to prepare; to equip; fully; completely,,4934.0,11.24
 动静,dòng jìng,sound of activity or people talking; news of activity,6.0,4935.0,11.24
 教室,jiào shì,classroom,2.0,4936.0,11.24
@@ -4844,7 +4844,7 @@
 展,zhǎn,to spread out; to open up,,4966.0,11.12
 上衣,shàng yī,jacket; upper outer garment,,4967.0,11.12
 人性,rén xìng,human nature; humanity,6.0,4968.0,11.12
-铺,pū,to spread; to extend,6.0,4969.0,11.09
+铺,pù,to spread; to extend,6.0,4969.0,11.09
 粗鲁,cū lǔ,crude; coarse,6.0,4970.0,11.09
 叫醒,jiào xǐng,to awaken; to wake sb up; to rouse,,4972.0,11.09
 开场,kāi chǎng,to begin; to open,,4973.0,11.09
@@ -4860,7 +4860,7 @@
 休假,xiū jià,to go on vacation; to have a holiday; to take leave,,4984.0,11.06
 逊,xùn,to abdicate; modest,,4985.0,11.06
 撤离,chè lí,to withdraw from; to evacuate,,4986.0,11.03
-不要紧,búyàojǐn,unimportant; not serious,5.0,4987.0,11.03
+不要紧,bú yào jǐn,unimportant; not serious,5.0,4987.0,11.03
 朝鲜,Cháo xiǎn,North Korea; Korea as geographic term,,4988.0,11.03
 额,é,forehead; horizontal tablet or inscribed board,,4989.0,11.03
 手腕,shǒu wàn,wrist; trickery,,4991.0,11.03
@@ -4877,10 +4877,10 @@
 赔偿,péi cháng,to compensate,5.0,5012.0,10.94
 潜水,qián shuǐ,to dive; to go under water,6.0,5013.0,10.94
 光荣,guāng róng,honor and glory,5.0,5023.0,10.91
-逻辑,luó ji,logic (loanword),5.0,5026.0,10.88
-挨,ái,to suffer from; to endure,6.0,5027.0,10.88
+逻辑,luó jí,logic (loanword),5.0,5026.0,10.88
+挨,āi,to suffer from; to endure,6.0,5027.0,10.88
 违背,wéi bèi,to violate; to be contrary to,6.0,5029.0,10.88
-正经,zhèngjing,decent; honorable,6.0,5033.0,10.85
+正经,zhèng jīng,decent; honorable,6.0,5033.0,10.85
 遗产,yí chǎn,heritage; legacy,6.0,5034.0,10.85
 物理,wù lǐ,physics; physical,5.0,5036.0,10.85
 圈套,quān tào,trap; snare,6.0,5038.0,10.85
@@ -4890,7 +4890,7 @@
 云,yún,to say,3.0,5043.0,10.82
 惊奇,jīng qí,to be amazed; to be surprised,6.0,5047.0,10.79
 输入,shū rù,to import; to input,5.0,5048.0,10.79
-管子,guǎn zǐ,tube; pipe,5.0,5052.0,10.79
+管子,guǎn zi,tube; pipe,5.0,5052.0,10.79
 人格,rén gé,personality; integrity,6.0,5054.0,10.79
 拦,lán,cut off; hinder,5.0,5056.0,10.79
 珍贵,zhēn guì,precious,6.0,5067.0,10.76
@@ -4914,7 +4914,7 @@
 革命,gé mìng,revolution; revolutionary (politics),5.0,5117.0,10.58
 岩石,yán shí,rock,6.0,5119.0,10.58
 嫌疑,xián yí,suspicion; suspected (of),6.0,5120.0,10.55
-迷惑,mí huo,to puzzle; to confuse,6.0,5121.0,10.55
+迷惑,mí huò,to puzzle; to confuse,6.0,5121.0,10.55
 学位,xué wèi,"academic degree, e.g.: BSc",6.0,5124.0,10.55
 干涉,gān shè,to interfere; to meddle,6.0,5125.0,10.55
 交叉,jiāo chā,to cross; to intersect,6.0,5134.0,10.52
@@ -4931,7 +4931,7 @@
 设施,shè shī,facilities; installation,5.0,5190.0,10.31
 奋斗,fèn dòu,to strive; to struggle,5.0,5191.0,10.31
 抵达,dǐ dá,arrive; reach (a destination),6.0,5193.0,10.31
-一流,yī liú,top quality; front ranking,6.0,5200.0,10.31
+一流,yì liú,top quality; front ranking,6.0,5200.0,10.31
 珍惜,zhēn xī,treasure; value,5.0,5201.0,10.31
 成果,chéng guǒ,result; achievement,5.0,5202.0,10.31
 培养,péi yǎng,to train; culture,5.0,5203.0,10.31
@@ -4964,7 +4964,7 @@
 税,shuì,taxes; duties,5.0,5290.0,10.08
 传达,chuán dá,to pass on; to convey,6.0,5292.0,10.08
 镇定,zhèn dìng,calm; unperturbed,6.0,5294.0,10.05
-打招呼,dǎ zhāo hu,to greet sb by word or action; to give prior notice,5.0,5296.0,10.05
+打招呼,dǎ zhāo hū,to greet sb by word or action; to give prior notice,5.0,5296.0,10.05
 捏,niē,to pinch (with one's fingers); to knead,6.0,5297.0,10.05
 清晰,qīng xī,clear; distinct,6.0,5302.0,10.05
 宿舍,sù shè,dormitory; dorm room,5.0,5307.0,10.02
@@ -5003,7 +5003,7 @@
 煎,jiān,to pan fry; to sauté,5.0,5411.0,9.78
 捣乱,dǎo luàn,to disturb; to look for trouble,6.0,5415.0,9.78
 雷达,léi dá,radar (loanword),6.0,5417.0,9.78
-哄,hōng,roar of laughter (onomatopoeia); hubbub,6.0,5418.0,9.78
+哄,hǒng,roar of laughter (onomatopoeia); hubbub,6.0,5418.0,9.78
 福利,fú lì,welfare; well-being,6.0,5422.0,9.75
 牵扯,qiān chě,to involve; to implicate,6.0,5432.0,9.72
 循环,xún huán,to cycle; to circulate,6.0,5437.0,9.72
@@ -5041,7 +5041,7 @@
 警惕,jǐng tì,to be on the alert; vigilant,6.0,5524.0,9.51
 神话,shén huà,fairy tale; mythology,5.0,5525.0,9.51
 桃,táo,peach,5.0,5527.0,9.51
-耽误,dān wu,delay; hold-up,5.0,5536.0,9.48
+耽误,dān wù,delay; hold-up,5.0,5536.0,9.48
 精确,jīng què,accurate; precise,6.0,5537.0,9.48
 问候,wèn hòu,to give one's respects; to send a greeting,5.0,5541.0,9.45
 待遇,dài yù,treatment; pay,5.0,5545.0,9.45
@@ -5062,7 +5062,7 @@
 玩弄,wán nòng,to play with; to engage in,6.0,5592.0,9.33
 新郎,xīn láng,bridegroom; groom,6.0,5596.0,9.33
 数目,shù mù,amount; number,6.0,5604.0,9.3
-吩咐,fēnfù,to tell; to instruct,6.0,5615.0,9.3
+吩咐,fēn fù,to tell; to instruct,6.0,5615.0,9.3
 童话,tóng huà,children's fairy tales,6.0,5617.0,9.3
 保管,bǎo guǎn,to assure; to guarantee,6.0,5631.0,9.24
 高尚,gāo shàng,nobly; lofty,6.0,5640.0,9.24
@@ -5076,7 +5076,7 @@
 季节,jì jié,time; season,3.0,5659.0,9.18
 战略,zhànlvè,strategy,6.0,5660.0,9.18
 统一,tǒng yī,to unify; to unite,5.0,5667.0,9.15
-模糊,mó hu,vague; indistinct,5.0,5670.0,9.15
+模糊,mó hú,vague; indistinct,5.0,5670.0,9.15
 封闭,fēng bì,to seal; to close,6.0,5678.0,9.12
 首要,shǒu yào,the most important; of chief importance,6.0,5680.0,9.12
 脉搏,mài bó,a pulse (both medical and figurative),6.0,5684.0,9.12
@@ -5142,7 +5142,7 @@
 途径,tú jìng,way; channel,6.0,5898.0,8.59
 时髦,shí máo,in vogue; fashionable,5.0,5907.0,8.56
 加油站,jiā yóu zhàn,gas station,4.0,5920.0,8.56
-唠叨,láo dao,to prattle; to chatter,6.0,5921.0,8.56
+唠叨,láo dāo,to prattle; to chatter,6.0,5921.0,8.56
 技能,jì néng,technical ability; skill,6.0,5924.0,8.53
 挣钱,zhèng qián,to make money,5.0,5926.0,8.53
 目光,mù guāng,sight; vision,6.0,5947.0,8.5
@@ -5164,7 +5164,7 @@
 生理,shēng lǐ,physiology,6.0,5993.0,8.44
 空白,kòng bái,blank space,6.0,5994.0,8.41
 打猎,dǎ liè,to go hunting,6.0,5999.0,8.41
-怪不得,guài bu de,lit. you can't blame it!; no wonder!,5.0,6003.0,8.41
+怪不得,guài bù dé,lit. you can't blame it!; no wonder!,5.0,6003.0,8.41
 捞,lāo,to fish up; to dredge up,6.0,6006.0,8.41
 融化,róng huà,to melt; to thaw,5.0,6011.0,8.41
 跨,kuà,to step across; to stride over,6.0,6015.0,8.38
@@ -5178,11 +5178,11 @@
 改善,gǎi shàn,to make better; to improve,5.0,6054.0,8.29
 精心,jīng xīn,with utmost care; fine,6.0,6061.0,8.29
 总共,zǒng gòng,altogether; in sum,5.0,6073.0,8.26
-固执,gùzhi,persistent; stubborn,6.0,6077.0,8.23
+固执,gù zhí,persistent; stubborn,6.0,6077.0,8.23
 文学,wén xué,literature,5.0,6078.0,8.23
 冷酷,lěng kù,grim; unfeeling,6.0,6081.0,8.23
 床单,chuáng dān,sheet,6.0,6084.0,8.23
-打听,dǎ ting,to ask about; to inquire about,5.0,6098.0,8.17
+打听,dǎ tīng,to ask about; to inquire about,5.0,6098.0,8.17
 劳驾,láo jià,excuse me,5.0,6118.0,8.14
 平均,píng jūn,average,5.0,6119.0,8.14
 勉强,miǎn qiǎng,to do with difficulty; to force sb to do sth,6.0,6122.0,8.14
@@ -5207,7 +5207,7 @@
 英勇,yīng yǒng,bravery; gallant,6.0,6187.0,8.02
 番,fān,to take turns; order in series,6.0,6191.0,8.02
 粒,lì,grain; granule,5.0,6194.0,8.02
-势力,shì li,power; influence,6.0,6196.0,7.99
+势力,shì lì,power; influence,6.0,6196.0,7.99
 认可,rèn kě,to approve; approval,6.0,6197.0,7.99
 扩大,kuò dà,to expand; to enlarge,4.0,6204.0,7.99
 相对,xiāng duì,relatively; opposite,5.0,6212.0,7.99
@@ -5257,7 +5257,7 @@
 商品,shāng pǐn,good; commodity,5.0,6361.0,7.72
 反复,fǎn fù,repeatedly; over and over,5.0,6362.0,7.72
 片段,piàn duàn,fragment (of speech etc); extract (from book etc),6.0,6373.0,7.72
-大伙儿,dà huǒ r,everybody; everyone,6.0,6374.0,7.72
+大伙儿,dàhuǒr,everybody; everyone,6.0,6374.0,7.72
 洞穴,dòng xué,cave; cavern,6.0,6385.0,7.69
 出差,chū chāi,to go on an official or business trip,4.0,6386.0,7.69
 请客,qǐng kè,give a dinner party; entertain guests,4.0,6402.0,7.66
@@ -5270,9 +5270,9 @@
 辣椒,là jiāo,hot pepper; chili,5.0,6436.0,7.6
 粉色,fěn sè,white; light pink,6.0,6437.0,7.6
 近来,jìn lái,recently; lately,6.0,6442.0,7.57
-比方,bǐ fang,analogy; instance,6.0,6456.0,7.57
+比方,bǐ fāng,analogy; instance,6.0,6456.0,7.57
 屈服,qū fú,to surrender; to yield,6.0,6460.0,7.54
-地道,dì dao,authentic; genuine,5.0,6462.0,7.54
+地道,dì dào,authentic; genuine,5.0,6462.0,7.54
 传真,chuán zhēn,fax; facsimile,4.0,6471.0,7.54
 强调,qiáng diào,to emphasize (a statement); to stress,5.0,6473.0,7.51
 膜,mó,membrane; film,6.0,6477.0,7.51
@@ -5292,12 +5292,12 @@
 昂贵,áng guì,expensive; costly,6.0,6516.0,7.45
 彩票,cǎi piào,the lottery; lottery ticket,6.0,6521.0,7.45
 照相机,zhào xiàng jī,camera,3.0,6522.0,7.45
-豆腐,dòu fu,tofu; bean curd,5.0,6524.0,7.42
+豆腐,dòu fǔ,tofu; bean curd,5.0,6524.0,7.42
 回收,huí shōu,to recycle; to reclaim,6.0,6525.0,7.42
 沉重,chén zhòng,heavy; hard,6.0,6530.0,7.42
 化验,huà yàn,laboratory test; chemical experiment,6.0,6533.0,7.42
 家属,jiā shǔ,family member; dependent,6.0,6539.0,7.42
-舅舅,jiù jiu,mother's brother; maternal uncle (informal),5.0,6548.0,7.39
+舅舅,jiù jiù,mother's brother; maternal uncle (informal),5.0,6548.0,7.39
 僵硬,jiāng yìng,stark; stiff,6.0,6554.0,7.39
 演习,yǎn xí,exercise; practice,6.0,6555.0,7.39
 束缚,shù fù,to bind; to restrict,6.0,6557.0,7.39
@@ -5353,7 +5353,7 @@
 安置,ān zhì,find a place for; help settle down,6.0,6723.0,7.09
 增长,zēng zhǎng,to grow; to increase,4.0,6725.0,7.09
 信赖,xìn lài,to trust; to have confidence in,6.0,6729.0,7.09
-葡萄,pú tao,grape,3.0,6733.0,7.09
+葡萄,pú táo,grape,3.0,6733.0,7.09
 原告,yuán gào,complainant; plaintiff,6.0,6734.0,7.09
 行政,xíng zhèng,administration; administrative,6.0,6737.0,7.09
 往往,wǎng wǎng,often; frequently,4.0,6745.0,7.06
@@ -5372,7 +5372,7 @@
 罢工,bà gōng,a strike; to go on strike,6.0,6814.0,6.98
 悄悄,qiāo qiāo,quietly; secretly,5.0,6818.0,6.98
 智商,zhì shāng,IQ (intelligence quotient),6.0,6820.0,6.98
-眉毛,méi mao,eyebrow,5.0,6824.0,6.98
+眉毛,méi máo,eyebrow,5.0,6824.0,6.98
 迈,mài,take a step,6.0,6825.0,6.95
 兜,dōu,pocket; bag,6.0,6843.0,6.95
 贸易,mào yì,trade,5.0,6848.0,6.92
@@ -5409,7 +5409,7 @@
 构成,gòu chéng,to constitute; to form,5.0,7001.0,6.71
 支撑,zhī chēng,to prop up; to support,6.0,7002.0,6.71
 航行,háng xíng,to sail; to fly,6.0,7007.0,6.71
-姑姑,gū gu,paternal aunt,5.0,7011.0,6.68
+姑姑,gū gū,paternal aunt,5.0,7011.0,6.68
 消化,xiāo huà,digest; digestion,5.0,7013.0,6.68
 围巾,wéi jīn,scarf; shawl,5.0,7018.0,6.68
 淋,lín,to drain; to drench,6.0,7021.0,6.68
@@ -5429,13 +5429,13 @@
 恼火,nǎo huǒ,to get angry; irritated,6.0,7086.0,6.59
 规律,guī lǜ,rule (e.g. of science); law of behavior,5.0,7087.0,6.59
 密切,mì qiè,close; familiar,5.0,7095.0,6.56
-不得了,bù dé liǎo,desperately serious; disastrous,5.0,7098.0,6.56
+不得了,bùdéliǎo,desperately serious; disastrous,5.0,7098.0,6.56
 探望,tàn wàng,to visit,6.0,7103.0,6.56
 临床,lín chuáng,clinical,6.0,7105.0,6.56
 外界,wài jiè,the outside world; external,6.0,7111.0,6.53
 性别,xìng bié,gender; sex,4.0,7112.0,6.53
 外交,wài jiāo,diplomacy; diplomatic,5.0,7129.0,6.5
-颇,pō,very; considerably,6.0,7131.0,6.5
+颇,pǒ,very; considerably,6.0,7131.0,6.5
 事态,shì tài,situation; existing state of affairs,6.0,7141.0,6.5
 准则,zhǔn zé,norm; standard,6.0,7143.0,6.5
 覆盖,fù gài,to cover,6.0,7153.0,6.47
@@ -5450,7 +5450,7 @@
 鼓舞,gǔ wǔ,heartening (news); boost (morale),5.0,7186.0,6.44
 浇,jiāo,to pour liquid; to irrigate (using waterwheel),5.0,7189.0,6.44
 边界,biān jiè,boundary; border,6.0,7200.0,6.41
-挑剔,tiāo ti,picky; fussy,6.0,7207.0,6.41
+挑剔,tiāo tī,picky; fussy,6.0,7207.0,6.41
 规模,guī mó,scale; scope,5.0,7212.0,6.41
 召开,zhào kāi,to convene (a conference or meeting); to convoke,5.0,7215.0,6.38
 以免,yǐ miǎn,in order to avoid; so as not to,6.0,7216.0,6.38
@@ -5518,7 +5518,7 @@
 口气,kǒu qì,tone of voice; the way one speaks,6.0,7450.0,6.05
 公关,gōng guān,public relations,6.0,7453.0,6.05
 熊猫,xióng māo,panda,3.0,7456.0,6.05
-散发,sàn fā,distribute; emit,6.0,7457.0,6.05
+散发,sàn fà,distribute; emit,6.0,7457.0,6.05
 水泥,shuǐ ní,cement,6.0,7461.0,6.05
 景色,jǐng sè,scenery; scene,5.0,7463.0,6.05
 任命,rèn mìng,to appoint and nominate,6.0,7465.0,6.02
@@ -5536,8 +5536,8 @@
 等级,děng jí,degree; rate,6.0,7506.0,5.99
 大使馆,dà shǐ guǎn,embassy,4.0,7509.0,5.99
 总结,zǒng jié,to sum up; to conclude,4.0,7518.0,5.96
-结实,jiē shi,rugged; sturdy,5.0,7522.0,5.96
-喇叭,lǎ ba,"horn (automobile, alarm siren, musical etc) which produces a sound; loudspeaker",6.0,7526.0,5.96
+结实,jiē shí,rugged; sturdy,5.0,7522.0,5.96
+喇叭,lǎ bā,"horn (automobile, alarm siren, musical etc) which produces a sound; loudspeaker",6.0,7526.0,5.96
 都市,dū shì,city; metropolis,6.0,7527.0,5.96
 痛快,tòng kuài,overjoyed; delighted,5.0,7540.0,5.96
 莫名其妙,mò míng qí miào,unfathomable mystery (idiom); subtle and ineffable,6.0,7548.0,5.93
@@ -5555,7 +5555,7 @@
 书面,shū miàn,in writing; written (guarantee etc),6.0,7617.0,5.84
 反常,fǎn cháng,unusual; abnormal,6.0,7626.0,5.84
 原先,yuán xiān,former; original,6.0,7627.0,5.84
-热闹,rè nao,bustling with noise and excitement; lively,4.0,7634.0,5.84
+热闹,rè nào,bustling with noise and excitement; lively,4.0,7634.0,5.84
 遥控,yáo kòng,remote control,6.0,7640.0,5.81
 壶,hú,pot; classifier for bottled liquid,5.0,7643.0,5.81
 围绕,wéi rào,to revolve around; to center on (an issue),5.0,7672.0,5.78
@@ -5577,7 +5577,7 @@
 利息,lì xī,interest (on a loan),5.0,7720.0,5.69
 营业,yíng yè,to do business; to trade,5.0,7733.0,5.69
 终究,zhōng jiū,in the end; after all is said and done,6.0,7734.0,5.69
-咳嗽,ké sou,to cough,4.0,7744.0,5.66
+咳嗽,ké sòu,to cough,4.0,7744.0,5.66
 内在,nèi zài,intrinsic; innate,6.0,7758.0,5.63
 延续,yán xù,to continue; to go on,6.0,7766.0,5.63
 视力,shì lì,vision; eyesight,6.0,7769.0,5.63
@@ -5585,7 +5585,7 @@
 忍耐,rěn nài,to show restraint; to repress (anger etc),6.0,7782.0,5.6
 题目,tí mù,subject; title,5.0,7784.0,5.6
 样品,yàng pǐn,sample; specimen,6.0,7792.0,5.6
-棉花,mián hua,cotton,5.0,7793.0,5.6
+棉花,mián huā,cotton,5.0,7793.0,5.6
 实行,shí xíng,to implement; to carry out,5.0,7796.0,5.6
 铜,tóng,copper (chemistry),5.0,7797.0,5.6
 岸,àn,bank; shore,5.0,7827.0,5.57
@@ -5693,7 +5693,7 @@
 频繁,pín fán,frequently; often,6.0,8437.0,4.95
 热心,rè xīn,enthusiasm; zeal,5.0,8438.0,4.95
 支配,zhī pèi,to dominate; to allocate,6.0,8442.0,4.95
-活泼,huó po,lively; vivacious,4.0,8443.0,4.95
+活泼,huó pō,lively; vivacious,4.0,8443.0,4.95
 时常,shí cháng,often; frequently,6.0,8447.0,4.92
 劳动,láo dòng,work; toil,5.0,8459.0,4.92
 证书,zhèng shū,credentials; certificate,6.0,8461.0,4.92
@@ -5710,7 +5710,7 @@
 称赞,chēng zàn,to praise; to acclaim,5.0,8533.0,4.86
 参考,cān kǎo,consultation; reference,5.0,8540.0,4.86
 条约,tiáo yuē,treaty; pact,6.0,8543.0,4.86
-一贯,yī guàn,consistent; constant,6.0,8545.0,4.86
+一贯,yí guàn,consistent; constant,6.0,8545.0,4.86
 股份,gǔ fèn,a share (in a company); stock,6.0,8552.0,4.83
 邮局,yóu jú,post office,5.0,8559.0,4.83
 丰满,fēng mǎn,plentiful; rich,6.0,8560.0,4.83
@@ -5731,11 +5731,11 @@
 坡,pō,slope,6.0,8644.0,4.74
 潮流,cháo liú,tide; current,6.0,8649.0,4.74
 不择手段,bù zé shǒu duàn,by fair means or foul; by hook or by crook,6.0,8650.0,4.74
-包袱,bāo fu,cloth-wrapper; a bundle wrapped in cloth,6.0,8652.0,4.74
+包袱,bāo fú,cloth-wrapper; a bundle wrapped in cloth,6.0,8652.0,4.74
 扛,gāng,to raise aloft with both hands,6.0,8655.0,4.74
 徘徊,pái huái,to dither; to hesitate,6.0,8670.0,4.74
 侧面,cè miàn,lateral side; side,6.0,8674.0,4.74
-周到,zhōudao,thoughtful; considerate,5.0,8683.0,4.71
+周到,zhōu dào,thoughtful; considerate,5.0,8683.0,4.71
 臂,bì,arm,6.0,8685.0,4.71
 备忘录,bèi wàng lù,memorandum; aide-memoire,6.0,8687.0,4.71
 改革,gǎi gé,to reform,5.0,8692.0,4.71
@@ -5762,7 +5762,7 @@
 当前,dāng qián,current; today's,6.0,8798.0,4.62
 高档,gāo dàng,superior quality; high grade,5.0,8811.0,4.62
 消毒,xiāo dú,to disinfect; to sterilize,6.0,8818.0,4.59
-快活,kuài huo,happy; cheerful,6.0,8830.0,4.59
+快活,kuài huó,happy; cheerful,6.0,8830.0,4.59
 收益,shōu yì,earnings; profit,6.0,8833.0,4.59
 况且,kuàng qiě,moreover; besides,6.0,8838.0,4.59
 明信片,míng xìn piàn,postcard,5.0,8843.0,4.56
@@ -5792,7 +5792,7 @@
 扭转,niǔ zhuǎn,to reverse; to turn around (an undesirable situation),6.0,8966.0,4.47
 洪水,hóng shuǐ,deluge; flood,6.0,8969.0,4.47
 诽谤,fěi bàng,slander; libel,6.0,8972.0,4.47
-别扭,biè niu,awkward; difficult,6.0,8980.0,4.47
+别扭,biè niǔ,awkward; difficult,6.0,8980.0,4.47
 专利,zhuān lì,patent,6.0,8990.0,4.47
 声誉,shēng yù,reputation; fame,6.0,8998.0,4.47
 发达,fā dá,developed (country etc); flourishing,5.0,9009.0,4.44
@@ -5803,7 +5803,7 @@
 喜悦,xǐ yuè,happy; joyous,6.0,9039.0,4.44
 个别,gè bié,individual; specific,5.0,9043.0,4.44
 紫,zǐ,purple; violet,5.0,9045.0,4.41
-机灵,jī ling,clever; quick-witted,6.0,9058.0,4.41
+机灵,jī líng,clever; quick-witted,6.0,9058.0,4.41
 预报,yù bào,forecast,5.0,9069.0,4.41
 地理,dì lǐ,geography,5.0,9081.0,4.38
 盼望,pàn wàng,to hope for; look forward to,5.0,9083.0,4.38
@@ -5823,13 +5823,13 @@
 请假,qǐng jià,ask for time off,4.0,9168.0,4.32
 生育,shēng yù,to bear; to give birth,6.0,9178.0,4.32
 发育,fā yù,to develop; growth,6.0,9179.0,4.32
-一如既往,yī rú jì wǎng,just as in the past (idiom); as before,6.0,9182.0,4.29
+一如既往,yì rú jì wǎng,just as in the past (idiom); as before,6.0,9182.0,4.29
 性质,xìng zhì,nature; characteristic,5.0,9190.0,4.29
 浏览,liú lǎn,to skim over; to browse,5.0,9191.0,4.29
 风度,fēng dù,elegance (for men); elegant demeanor,6.0,9198.0,4.29
 分解,fēn jiě,to resolve; to decompose,6.0,9199.0,4.29
 疲倦,pí juàn,to tire; tired,6.0,9200.0,4.29
-动画片,dònghuàpiān,cartoon; animation,5.0,9203.0,4.29
+动画片,dòng huà piàn,cartoon; animation,5.0,9203.0,4.29
 辜负,gū fù,to fail to live up (to expectations); unworthy (of trust),6.0,9208.0,4.29
 歹徒,dǎi tú,evil-doer; malefactor,6.0,9216.0,4.29
 故乡,gù xiāng,home; homeland,6.0,9222.0,4.26
@@ -5869,7 +5869,7 @@
 冻结,dòng jié,"to freeze (loan, wage, price etc)",6.0,9371.0,4.17
 揉,róu,to knead; to massage,6.0,9377.0,4.17
 三角,sān jiǎo,triangle,6.0,9380.0,4.17
-裁缝,cái feng,tailor; dressmaker,6.0,9384.0,4.14
+裁缝,cái féng,tailor; dressmaker,6.0,9384.0,4.14
 淹没,yān mò,to submerge; to drown,6.0,9393.0,4.14
 坦率,tǎn shuài,frank (discussion); blunt,5.0,9394.0,4.14
 生动,shēng dòng,vivid; lively,5.0,9396.0,4.14
@@ -5882,14 +5882,14 @@
 操场,cāo chǎng,playground; sports field,5.0,9429.0,4.14
 光辉,guāng huī,radiance; glory,6.0,9431.0,4.14
 钢铁,gāng tiě,steel,5.0,9437.0,4.11
-伺候,cìhòu,to serve; to act as a valet,6.0,9440.0,4.11
+伺候,cì hòu,to serve; to act as a valet,6.0,9440.0,4.11
 用途,yòng tú,use; application,5.0,9442.0,4.11
 中文,zhōng wén,Chinese; Chinese written language,4.0,9443.0,4.11
 要点,yào diǎn,main point; essential,6.0,9444.0,4.11
 触犯,chù fàn,offend,6.0,9446.0,4.11
 风光,fēng guāng,scene; view,6.0,9455.0,4.11
 疲劳,pí láo,fatigue; wearily,5.0,9457.0,4.11
-打官司,dǎ guān si,to file a lawsuit; to sue,6.0,9458.0,4.11
+打官司,dǎ guān sī,to file a lawsuit; to sue,6.0,9458.0,4.11
 屑,xiè,crumbs; filings,6.0,9459.0,4.11
 整齐,zhěng qí,orderly; neat,4.0,9465.0,4.11
 失眠,shī mián,insomnia,5.0,9469.0,4.11
@@ -5933,7 +5933,7 @@
 研究生,yán jiū shēng,graduate student; postgraduate student,4.0,9714.0,3.93
 工夫,gōng fu,time; skill,6.0,9726.0,3.93
 决策,jué cè,strategic decision; decision-making,6.0,9727.0,3.93
-疏忽,shū hu,to neglect; to overlook,6.0,9736.0,3.93
+疏忽,shū hū,to neglect; to overlook,6.0,9736.0,3.93
 键盘,jiàn pán,keyboard,5.0,9741.0,3.93
 叉子,chā zi,fork,5.0,9750.0,3.91
 施展,shī zhǎn,to use fully; to put to use,6.0,9764.0,3.91
@@ -5966,10 +5966,10 @@
 表扬,biǎo yáng,to praise; to commend,4.0,9913.0,3.82
 颁发,bān fā,issue; promulgate,6.0,9914.0,3.82
 单元,dān yuán,unit; entrance number,5.0,9916.0,3.82
-妥当,tuǒ dang,appropriate; proper,6.0,9925.0,3.79
+妥当,tuǒ dàng,appropriate; proper,6.0,9925.0,3.79
 打针,dǎ zhēn,to give or have an injection,4.0,9935.0,3.79
 起草,qǐ cǎo,draft (a bill); draw up (plans),6.0,9938.0,3.79
-苗条,miáotiáo,"slim, slender, graceful",5.0,9940.0,3.79
+苗条,miáo tiáo,"slim, slender, graceful",5.0,9940.0,3.79
 智能,zhì néng,intelligent; able,6.0,9941.0,3.79
 向往,xiàng wǎng,to yearn for; to look forward to,6.0,9945.0,3.79
 起源,qǐ yuán,origin; to originate,6.0,9953.0,3.79
@@ -6052,7 +6052,7 @@
 微不足道,wēi bù zú dào,negligible; insignificant,6.0,10410.0,3.52
 推广,tuī guǎng,to extend; to spread,5.0,10417.0,3.52
 排列,pái liè,array; arrangement,4.0,10420.0,3.52
-粮食,liáng shi,foodstuff; cereals,5.0,10421.0,3.52
+粮食,liáng shí,foodstuff; cereals,5.0,10421.0,3.52
 追究,zhuī jiū,investigate; look into,6.0,10431.0,3.49
 空闲,kòng xián,idle; free time,5.0,10432.0,3.49
 国防,guó fáng,national defense,6.0,10441.0,3.49
@@ -6060,7 +6060,7 @@
 选拔,xuǎn bá,to select the best,6.0,10459.0,3.49
 叙述,xù shù,to relate (a story or information); to tell or talk about,5.0,10468.0,3.46
 配偶,pèi ǒu,consort; mate,6.0,10476.0,3.46
-联想,lián xiǎng,to associate with something in thinking; abbr. for,6.0,10479.0,3.46
+联想,lián xiǎng,to associate with something in thinking,6.0,10479.0,3.46
 小气,xiǎo qì,stingy; petty,5.0,10481.0,3.46
 抵制,dǐ zhì,to resit; to boycott,6.0,10483.0,3.46
 前景,qián jǐng,foreground; vista,6.0,10488.0,3.46
@@ -6073,7 +6073,7 @@
 计较,jì jiào,to haggle; to bicker,6.0,10536.0,3.43
 器材,qì cái,equipment; material,6.0,10545.0,3.43
 寂静,jì jìng,quiet,6.0,10547.0,3.43
-恨不得,hènbudé,wishing one could do sth; to hate to be unable,6.0,10549.0,3.43
+恨不得,hèn bù dé,wishing one could do sth; to hate to be unable,6.0,10549.0,3.43
 废除,fèi chú,to abolish; to abrogate,6.0,10555.0,3.43
 闪烁,shǎn shuò,flicker; twinkling,6.0,10562.0,3.43
 敏捷,mǐn jié,nimble; quick,6.0,10564.0,3.43
@@ -6089,7 +6089,7 @@
 加工,jiā gōng,to process; processing,6.0,10700.0,3.34
 分泌,fēn mì,secrete,6.0,10706.0,3.34
 改正,gǎi zhèng,to correct; to amend,5.0,10720.0,3.34
-行李箱,xíng li xiāng,suitcase,3.0,10721.0,3.34
+行李箱,xíng lǐ xiāng,suitcase,3.0,10721.0,3.34
 振奋,zhèn fèn,to stir oneself up; to raise one's spirits,6.0,10735.0,3.34
 人事,rén shì,human affairs; ways of the world,5.0,10739.0,3.34
 胡乱,hú luàn,careless; reckless,6.0,10740.0,3.34
@@ -6107,7 +6107,7 @@
 遗失,yí shī,to lose; lost,6.0,10823.0,3.28
 混淆,hùn xiáo,to obscure; to confuse,6.0,10824.0,3.28
 机动,jī dòng,locomotive; motorized,6.0,10828.0,3.28
-冤枉,yuān wang,hatred; injustice,6.0,10832.0,3.28
+冤枉,yuān wǎng,hatred; injustice,6.0,10832.0,3.28
 事迹,shì jì,deed; past achievement,6.0,10834.0,3.28
 承办,chéng bàn,to undertake; to accept a contract,6.0,10839.0,3.28
 摇晃,yáo huàng,to rock; to shake,6.0,10844.0,3.28
@@ -6126,7 +6126,7 @@
 枯燥,kū zào,dry and dull; uninteresting,6.0,10965.0,3.22
 惦记,diàn jì,remember with concern; worry about,6.0,10973.0,3.22
 盛,chéng,to hold; contain,6.0,10989.0,3.19
-记性,jì xing,memory; recall,6.0,10993.0,3.19
+记性,jì xìng,memory; recall,6.0,10993.0,3.19
 正规,zhèng guī,regular; according to standards,6.0,10995.0,3.19
 品种,pǐn zhǒng,breed; variety,5.0,11019.0,3.19
 衰老,shuāi lǎo,to age; to deteriorate with age,6.0,11024.0,3.19
@@ -6136,7 +6136,7 @@
 转达,zhuǎn dá,to pass on; to convey,6.0,11049.0,3.16
 平面,píng miàn,plane (flat surface); print media,6.0,11068.0,3.16
 调皮,tiáo pí,naughty; mischievous,5.0,11072.0,3.16
-光滑,guānghua,glossy; sleek,5.0,11084.0,3.16
+光滑,guāng huá,glossy; sleek,5.0,11084.0,3.16
 讲座,jiǎng zuò,a course of lectures,5.0,11086.0,3.16
 斜,xié,inclined; slanting,5.0,11087.0,3.16
 嚷,rǎng,blurt out; to shout,5.0,11089.0,3.16
@@ -6148,7 +6148,7 @@
 心态,xīn tài,attitude (of the heart); state of one's psyche,6.0,11109.0,3.13
 冷淡,lěng dàn,cold; indifferent,6.0,11121.0,3.13
 贬低,biǎn dī,to belittle; to disparage,6.0,11133.0,3.13
-凉快,liáng kuai,nice and cold; pleasantly cool,4.0,11134.0,3.13
+凉快,liáng kuài,nice and cold; pleasantly cool,4.0,11134.0,3.13
 熟练,shú liàn,practiced; proficient,5.0,11135.0,3.13
 探讨,tàn tǎo,to investigate; to probe,6.0,11136.0,3.13
 支柱,zhī zhù,mainstay; pillar,6.0,11143.0,3.13
@@ -6161,7 +6161,7 @@
 岳父,yuè fù,"wife's father, father-in-law",6.0,11210.0,3.1
 胡须,hú xū,beard,5.0,11219.0,3.1
 商标,shāng biāo,trademark; logo,6.0,11234.0,3.07
-宽敞,kuān chang,spacious; wide,6.0,11251.0,3.07
+宽敞,kuān chǎng,spacious; wide,6.0,11251.0,3.07
 无动于衷,wú dòng yú zhōng,aloof; indifferent,6.0,11257.0,3.07
 体谅,tǐ liàng,to empathize; to allow (for something),6.0,11259.0,3.07
 民间,mín jiān,among the people; popular,6.0,11271.0,3.07
@@ -6177,7 +6177,7 @@
 乙,yǐ,second of 1 heavenly stems; second in order,5.0,11335.0,3.04
 定期,dìng qī,regularly; at regular intervals,6.0,11343.0,3.04
 导游,dǎo yóu,tour guide; to conduct a tour,4.0,11347.0,3.04
-凑合,còu he,to bring together; to make do in a bad situation,6.0,11350.0,3.04
+凑合,còu hé,to bring together; to make do in a bad situation,6.0,11350.0,3.04
 熨,yù,reconciled; smooth,6.0,11352.0,3.04
 过渡,guò dù,to cross over (by ferry); transition,6.0,11361.0,3.04
 自主,zì zhǔ,to act for oneself; autonomous,6.0,11365.0,3.01
@@ -6201,7 +6201,7 @@
 修建,xiū jiàn,to build; to construct,6.0,11532.0,2.95
 肖像,xiào xiàng,portrait,6.0,11540.0,2.95
 照耀,zhào yào,shine; illuminate,6.0,11554.0,2.95
-舍不得,shě bu de,to hate to do sth; to hate to part with,5.0,11568.0,2.95
+舍不得,shě bù dé,to hate to do sth; to hate to part with,5.0,11568.0,2.95
 储蓄,chǔ xù,to deposit money; to save,6.0,11570.0,2.95
 可口,kě kǒu,tasty; to taste good,6.0,11589.0,2.92
 趋势,qū shì,trend; tendency,5.0,11596.0,2.92
@@ -6268,7 +6268,7 @@
 蹬,dēng,to tread on; to step on,6.0,12144.0,2.71
 呼吁,hū yù,to call on (sb to do sth); to appeal (to),6.0,12145.0,2.71
 卓越,zhuó yuè,distinction; excellence,6.0,12150.0,2.71
-含糊,hán hu,obscurity; vague,6.0,12157.0,2.71
+含糊,hán hú,obscurity; vague,6.0,12157.0,2.71
 辛勤,xīn qín,hardworking; industrious,6.0,12162.0,2.71
 周期,zhōu qī,period; cycle,6.0,12172.0,2.68
 领悟,lǐng wù,to understand; to comprehend,6.0,12175.0,2.68
@@ -6382,7 +6382,7 @@
 夹子,jiā zi,clip; clamp,5.0,13049.0,2.38
 削弱,xuē ruò,to weaken,6.0,13060.0,2.38
 晾,liàng,to dry in the air,6.0,13063.0,2.38
-一度,yī dù,for a time; at one time,6.0,13067.0,2.38
+一度,yí dù,for a time; at one time,6.0,13067.0,2.38
 得力,dé lì,able; capable,6.0,13084.0,2.38
 人为,rén wéi,artificial; man-made,6.0,13086.0,2.38
 可观,kě guān,considerable,6.0,13091.0,2.35
@@ -6394,13 +6394,13 @@
 请柬,qǐng jiǎn,invitation card; written invitation,6.0,13149.0,2.35
 结晶,jié jīng,crystallization; crystalline,6.0,13156.0,2.35
 告辞,gào cí,to take leave,6.0,13160.0,2.35
-讲究,jiǎng jiu,to pay particular attention to; exquisite,5.0,13174.0,2.35
+讲究,jiǎng jiū,to pay particular attention to; exquisite,5.0,13174.0,2.35
 悔恨,huǐ hèn,remorse; repentance,6.0,13176.0,2.35
 用功,yòng gōng,diligent; industrious (in one's studies),6.0,13178.0,2.35
 指南针,zhǐ nán zhēn,compass,6.0,13185.0,2.33
 诚挚,chéng zhì,sincere; cordial,6.0,13190.0,2.33
 陶瓷,táo cí,pottery and porcelain; ceramics,6.0,13191.0,2.33
-不耐烦,búnàifán,impatience; impatient,5.0,13195.0,2.33
+不耐烦,bù nài fán,impatience; impatient,5.0,13195.0,2.33
 局部,jú bù,part; local,6.0,13208.0,2.33
 缩短,suō duǎn,to curtail; to cut down,5.0,13219.0,2.33
 未免,wèi miǎn,unavoidable; a bit too much,6.0,13224.0,2.33
@@ -6440,9 +6440,9 @@
 牲畜,shēng chù,domesticated animals; livestock,6.0,13561.0,2.24
 学历,xué lì,educational background; academic qualifications,6.0,13568.0,2.24
 歪曲,wāi qū,to distort; to misrepresent,6.0,13575.0,2.24
-巴不得,bābùdé,to be eager for; to long for,6.0,13605.0,2.21
+巴不得,bā bù dé,to be eager for; to long for,6.0,13605.0,2.21
 岛屿,dǎo yǔ,islands,6.0,13607.0,2.21
-时差,shí chā,time difference; time lag,6.0,13610.0,2.21
+时差,shí chà,time difference; time lag,6.0,13610.0,2.21
 沉思,chén sī,contemplate; contemplation,6.0,13636.0,2.21
 半途而废,bàn tú ér fèi,to give up halfway (idiom); leave sth unfinished,6.0,13642.0,2.21
 物资,wù zī,goods and materials,6.0,13653.0,2.21
@@ -6520,7 +6520,7 @@
 停顿,tíng dùn,pause,6.0,14388.0,2.03
 日益,rì yì,day by day; more and more,6.0,14417.0,2.0
 贪污,tān wū,corruption,6.0,14420.0,2.0
-福气,fú qi,good fortune; to enjoy good fortune,6.0,14421.0,2.0
+福气,fú qì,good fortune; to enjoy good fortune,6.0,14421.0,2.0
 缠绕,chán rào,twisting; to twine,6.0,14459.0,2.0
 索赔,suǒ péi,to ask for compensation; to claim damages,6.0,14474.0,2.0
 更正,gēng zhèng,to correct; to make a correction,6.0,14491.0,2.0
@@ -6556,7 +6556,7 @@
 灰心,huī xīn,lose heart; be discouraged,5.0,14896.0,1.91
 畏,wèi,to fear,6.0,14924.0,1.88
 饭馆,fàn guǎn,restaurant,1.0,14942.0,1.88
-唾沫,tuò mo,spittle; saliva,6.0,14943.0,1.88
+唾沫,tuò mò,spittle; saliva,6.0,14943.0,1.88
 吝啬,lìn sè,stingy; mean,6.0,14985.0,1.88
 作文,zuò wén,to write an essay; composition (student essay),5.0,15017.0,1.88
 悠久,yōu jiǔ,established; long,5.0,15022.0,1.88
@@ -6628,7 +6628,7 @@
 滔滔不绝,tāo tāo bù jué,unceasing torrent (idiom); talking non-stop,6.0,15856.0,1.7
 曲折,qū zhé,complicated; winding,6.0,15857.0,1.7
 迟疑,chí yí,to hesitate,6.0,15861.0,1.7
-委屈,wěiqū,to feel wronged; to nurse a grievance,5.0,15876.0,1.7
+委屈,wěi qū,to feel wronged; to nurse a grievance,5.0,15876.0,1.7
 试卷,shì juàn,examination paper; test paper,5.0,15897.0,1.7
 甘心,gān xīn,to be willing to; to resign oneself to,6.0,15931.0,1.67
 深沉,shēn chén,deep; extreme,6.0,16000.0,1.67
@@ -6659,10 +6659,10 @@
 炎热,yán rè,blistering hot; sizzling hot (weather),6.0,16273.0,1.61
 表彰,biǎo zhāng,cite (in dispatches); commend,6.0,16276.0,1.61
 焦急,jiāo jí,anxiety; anxious,6.0,16300.0,1.61
-打量,dǎ liang,to size sb up; to take measure of,6.0,16314.0,1.61
+打量,dǎ liàng,to size sb up; to take measure of,6.0,16314.0,1.61
 退步,tuì bù,degenerate; regress,5.0,16316.0,1.61
 奥秘,ào mì,profound; deep,6.0,16321.0,1.61
-应酬,yìng chou,social niceties; social interaction,6.0,16351.0,1.61
+应酬,yìng chóu,social niceties; social interaction,6.0,16351.0,1.61
 响亮,xiǎng liàng,loud and clear; resounding,6.0,16358.0,1.61
 转折,zhuǎn zhé,shift in the trend of events; plot shift in a book,6.0,16360.0,1.61
 牵制,qiān zhì,to control; to curb,6.0,16364.0,1.61
@@ -6701,11 +6701,11 @@
 往返,wǎng fǎn,to go back and forth; to go to and fro,5.0,16938.0,1.49
 好客,hào kè,hospitality; to treat guests well,6.0,16950.0,1.49
 优异,yōu yì,exceptional; outstandingly good,6.0,16953.0,1.49
-出息,chū xi,promise; prospects,6.0,16961.0,1.49
+出息,chū xī,promise; prospects,6.0,16961.0,1.49
 专题,zhuān tí,special topic,6.0,17051.0,1.49
 急剧,jí jù,rapid; sudden,6.0,17056.0,1.49
 投掷,tóu zhì,to throw sth a long distance; to hurl,6.0,17083.0,1.49
-摸索,mō suo,to feel about; to grope about,6.0,17106.0,1.46
+摸索,mō suǒ,to feel about; to grope about,6.0,17106.0,1.46
 着凉,zháo liáng,catch cold,5.0,17115.0,1.46
 固体,gù tǐ,solid,5.0,17161.0,1.46
 转让,zhuǎn ràng,"transfer (technology, goods etc); conveyancing (property)",6.0,17167.0,1.46
@@ -6757,7 +6757,7 @@
 荒凉,huāng liáng,desolate,6.0,17813.0,1.37
 清澈,qīng chè,clear; limpid,6.0,17824.0,1.37
 筐,kuāng,basket,6.0,17828.0,1.37
-看不起,kàn bu qǐ,to look down upon; to despise,5.0,17841.0,1.37
+看不起,kàn bù qǐ,to look down upon; to despise,5.0,17841.0,1.37
 致使,zhì shǐ,to cause; to result in,6.0,17862.0,1.37
 格式,gé shì,form; specification,6.0,17880.0,1.37
 投机,tóu jī,to speculate (on financial markets); opportunistic,6.0,17885.0,1.37
@@ -6769,7 +6769,7 @@
 广大,guǎng dà,vast or extensive; large-scale,5.0,18004.0,1.34
 化石,huà shí,fossil,6.0,18015.0,1.34
 照应,zhào yìng,to correlate with; to correspond to,6.0,18032.0,1.34
-爽快,shuǎngkuài,refreshed; rejuvenated,6.0,18042.0,1.34
+爽快,shuǎng kuài,refreshed; rejuvenated,6.0,18042.0,1.34
 丰收,fēng shōu,bumper harvest,6.0,18044.0,1.34
 反倒,fǎn dào,but on the contrary; but expectedly,6.0,18053.0,1.34
 参照,cān zhào,to consult a reference; to refer to (another document),6.0,18083.0,1.34
@@ -6816,11 +6816,11 @@
 会晤,huì wù,to meet; meeting,6.0,18716.0,1.25
 惹祸,rě huò,stirring up trouble; to invite disaster,6.0,18719.0,1.25
 无偿,wú cháng,free; no charge,6.0,18720.0,1.25
-媳妇,xí fu,daughter-in-law; wife (of a younger man),6.0,18721.0,1.25
+媳妇,xí fù,daughter-in-law; wife (of a younger man),6.0,18721.0,1.25
 滞留,zhì liú,to detain; retention,6.0,18729.0,1.25
 接连,jiē lián,on end; in a row,6.0,18744.0,1.25
 充沛,chōng pèi,abundant; plentiful,6.0,18747.0,1.25
-高考,gāo kǎo,college entrance exam; abbr. for,6.0,18750.0,1.25
+高考,gāo kǎo,college entrance exam,6.0,18750.0,1.25
 参谋,cān móu,staff officer; give advice,6.0,18766.0,1.25
 品行,pǐn xíng,behavior; moral conduct,6.0,18773.0,1.25
 畅通,chàng tōng,unimpeded; free-flowing,6.0,18810.0,1.22
@@ -6830,7 +6830,7 @@
 堆积,duī jī,to pile up; to heap,6.0,18891.0,1.22
 盛行,shèng xíng,to be in vogue; to be prevalent,6.0,18905.0,1.22
 海拔,hǎi bá,height above sea level; elevation,6.0,18916.0,1.22
-斯文,sīwen,refined; educate,6.0,18936.0,1.22
+斯文,sī wén,refined; educate,6.0,18936.0,1.22
 枯竭,kū jié,used up; dried up,6.0,18972.0,1.22
 生疏,shēng shū,unfamiliar; strange,6.0,19010.0,1.22
 民用,mín yòng,civilian use,6.0,19015.0,1.22
@@ -6855,12 +6855,12 @@
 对照,duì zhào,to contrast; to compare,6.0,19308.0,1.16
 文献,wén xiàn,document,6.0,19325.0,1.16
 崇敬,chóng jìng,to revere; high esteem,6.0,19333.0,1.16
-和气,hé qi,friendly; polite,6.0,19356.0,1.16
+和气,hé qì,friendly; polite,6.0,19356.0,1.16
 处分,chǔ fèn,to discipline sb; to punish,6.0,19361.0,1.16
 媒介,méi jiè,media; medium,6.0,19425.0,1.16
 港湾,gǎng wān,natural harbor; bay serving as harbor,6.0,19477.0,1.16
-马虎,mǎ hu,careless; sloppy,4.0,19492.0,1.16
-不见得,bújiànde,not necessarily; not likely,5.0,19503.0,1.16
+马虎,mǎ hǔ,careless; sloppy,4.0,19492.0,1.16
+不见得,bú jiàn de,not necessarily; not likely,5.0,19503.0,1.16
 暂且,zàn qiě,for now; for the time being,6.0,19532.0,1.13
 科目,kē mù,subject,6.0,19548.0,1.13
 点缀,diǎn zhuì,to decorate; an ornament,6.0,19549.0,1.13
@@ -6869,7 +6869,7 @@
 赞叹,zàn tàn,to sigh or gasp in admiration; high praise,6.0,19655.0,1.13
 专科,zhuān kē,specialized subject; branch (of medicine),6.0,19662.0,1.13
 歌颂,gē sòng,sing the praises of; extol,6.0,19682.0,1.13
-嘱咐,zhǔfù,to tell; to exhort,5.0,19714.0,1.13
+嘱咐,zhǔ fù,to tell; to exhort,5.0,19714.0,1.13
 杂交,zá jiāo,a hybrid,6.0,19759.0,1.13
 耸,sǒng,to excite; to raise up,6.0,19771.0,1.13
 有条不紊,yǒu tiáo bù wěn,regular and thorough (idiom); methodically arranged,6.0,19838.0,1.1
@@ -6890,10 +6890,10 @@
 制订,zhì dìng,to work out; to formulate,6.0,20287.0,1.07
 新颖,xīn yǐng,lit. new bud; fig. new and original,6.0,20288.0,1.07
 停泊,tíng bó,anchorage; mooring (of a ship),6.0,20301.0,1.07
-兴高采烈,xīnggāocǎiliè,happy and excited (idiom); in high spirits,6.0,20312.0,1.07
+兴高采烈,xìng gāo cǎi liè,happy and excited (idiom); in high spirits,6.0,20312.0,1.07
 周折,zhōu zhé,complication; twists and turns,6.0,20363.0,1.04
 依次,yī cì,in order; in succession,6.0,20365.0,1.04
-踏实,tā shi,practical; down-to-earth,6.0,20367.0,1.04
+踏实,tà shí,practical; down-to-earth,6.0,20367.0,1.04
 立足,lì zú,to stand; to have a footing,6.0,20421.0,1.04
 朴素,pǔ sù,plain and simple; unadorned,5.0,20429.0,1.04
 杠杆,gàng gǎn,lever; pry bar,6.0,20533.0,1.04
@@ -6902,7 +6902,7 @@
 靠拢,kào lǒng,to draw close to,6.0,20591.0,1.04
 淡水,dàn shuǐ,potable water (water with low salt content); fresh water,6.0,20600.0,1.04
 丛,cóng,cluster; collection,6.0,20616.0,1.04
-框架,kuàng jià,frame; framework,6.0,20646.0,1.01
+框架,kuāng jià,frame; framework,6.0,20646.0,1.01
 确立,què lì,to establish; to institute,6.0,20658.0,1.01
 盛情,shèng qíng,great kindness; magnificent hospitality,6.0,20676.0,1.01
 进而,jìn ér,and then (what follows next),6.0,20683.0,1.01
@@ -6964,7 +6964,7 @@
 追悼,zhuī dào,mourning; memorial (service etc),6.0,22103.0,0.89
 寒暄,hán xuān,exchanging conventional greetings; to talk about the weather,6.0,22129.0,0.89
 立方,lì fāng,cube,5.0,22159.0,0.89
-播种,bō zhòng,to sow seeds; sowing,6.0,22233.0,0.89
+播种,bō zhǒng,to sow seeds; sowing,6.0,22233.0,0.89
 千方百计,qiān fāng bǎi jì,"lit. thousand ways, a hundred plans (idiom); by every possible means",6.0,22344.0,0.89
 钻研,zuān yán,to study meticulously; to delve into,6.0,22356.0,0.89
 胸怀,xiōng huái,one's bosom (the seat of emotions); breast,6.0,22430.0,0.86
@@ -6979,7 +6979,7 @@
 无穷无尽,wú qióng wú jìn,vast and limitless (idiom); endless span of time,6.0,22631.0,0.86
 镶嵌,xiāng qiàn,to inlay; to embed,6.0,22672.0,0.86
 占线,zhàn xiàn,busy (telephone),5.0,22690.0,0.86
-巴结,bā jie,to fawn on; to curry favor with,6.0,22774.0,0.86
+巴结,bā jié,to fawn on; to curry favor with,6.0,22774.0,0.86
 刊物,kān wù,publication,6.0,22825.0,0.83
 着重,zhuó zhòng,put emphasis on; to stress,6.0,22845.0,0.83
 督促,dū cù,to urge sb to complete a task,6.0,22868.0,0.83
@@ -6993,7 +6993,7 @@
 鞭炮,biān pào,firecrackers; a string of small firecrackers,5.0,23141.0,0.83
 盖章,gài zhāng,to affix a seal (to sth),6.0,23169.0,0.83
 栽培,zāi péi,to grow; to cultivate,6.0,23188.0,0.8
-颈椎,jǐng zhuī,cervical vertebra; the seven cervical vertebrae in the neck of humans and most mammals,6.0,23195.0,0.8
+颈椎,jǐngzhuī,cervical vertebra; the seven cervical vertebrae in the neck of humans and most mammals,6.0,23195.0,0.8
 章程,zhāng chéng,rules; regulations,6.0,23218.0,0.8
 昼夜,zhòu yè,day and night; period of 24 hours,6.0,23250.0,0.8
 迎面,yíng miàn,directly; head-on (collision),6.0,23271.0,0.8
@@ -7042,14 +7042,14 @@
 出洋相,chū yáng xiàng,to make a fool of oneself,6.0,24782.0,0.72
 壮丽,zhuàng lì,magnificence; magnificent,6.0,24788.0,0.72
 借鉴,jiè jiàn,to use other people's experience; to borrow from a source,6.0,24862.0,0.72
-扇子,shānzi,fan,5.0,24893.0,0.72
+扇子,shàn zi,fan,5.0,24893.0,0.72
 学说,xué shuō,theory; doctrine,6.0,24919.0,0.72
 慈祥,cí xiáng,kindly; benevolent (often of older person),6.0,24923.0,0.72
 经商,jīng shāng,to trade; to carry out commercial activities,6.0,24932.0,0.72
 纵横,zòng héng,lit. warp and weft in weaving; vertically and horizontal,6.0,24933.0,0.69
 历来,lì lái,always; throughout (a period of time),6.0,24964.0,0.69
 截至,jié zhì,up to (a time); by (a time),6.0,25030.0,0.69
-分寸,fēn cun,propriety; appropriate behavior,6.0,25061.0,0.69
+分寸,fēn cùn,propriety; appropriate behavior,6.0,25061.0,0.69
 团员,tuán yuán,member; group member,6.0,25198.0,0.69
 夹杂,jiā zá,to mix together (disparate substances); to mingle,6.0,25211.0,0.69
 反之,fǎn zhī,on the other hand...; conversely...,6.0,25221.0,0.69
@@ -7093,16 +7093,16 @@
 贬义,biǎn yì,derogatory sense; negative connotation,6.0,26343.0,0.63
 挑拨,tiǎo bō,to incite disharmony; to instigate,6.0,26354.0,0.63
 亏损,kuī sǔn,deficit; loss,6.0,26447.0,0.63
-扎实,zhā shi,strong; solid,6.0,26452.0,0.63
+扎实,zhā shí,strong; solid,6.0,26452.0,0.63
 落成,luò chéng,to complete a construction project,6.0,26460.0,0.63
 斟酌,zhēn zhuó,to consider; to deliberate,6.0,26501.0,0.63
 次品,cì pǐn,substandard products; defective,6.0,26511.0,0.6
 地势,dì shì,terrain; topography relief,6.0,26570.0,0.6
 中旬,zhōng xún,middle third of a month,5.0,26582.0,0.6
-干活儿,gàn huó r,to work; manual labor,5.0,26584.0,0.6
+干活儿,gànhuór,to work; manual labor,5.0,26584.0,0.6
 力争,lì zhēng,to work hard for; to do all one can,6.0,26598.0,0.6
 并存,bìng cún,to exist at the same time; to coexist,6.0,26601.0,0.6
-书记,shū ji,secretary; clerk,6.0,26667.0,0.6
+书记,shū jì,secretary; clerk,6.0,26667.0,0.6
 为首,wéi shǒu,head; be headed by,6.0,26761.0,0.6
 涂抹,tú mǒ,to paint; to smear,6.0,26773.0,0.6
 自满,zì mǎn,complacent; self-satisfied,6.0,26779.0,0.6
@@ -7362,7 +7362,7 @@
 泰斗,tài dǒu,leading scholar of his time; magnate,6.0,54986.0,0.09
 各抒己见,gè shū jǐ jiàn,everyone gives their own view,6.0,55084.0,0.09
 畜牧,xù mù,to raise animals,6.0,55202.0,0.09
-馅儿,xiàn r,"stuffing; filling, e.g. in",6.0,55333.0,0.09
+馅儿,xiànr,"stuffing; filling, e.g. in",6.0,55333.0,0.09
 勉励,miǎn lì,to encourage,6.0,55663.0,0.09
 相辅相成,xiāng fǔ xiāng chéng,to complement one another (idiom),6.0,56152.0,0.09
 理直气壮,lǐ zhí qì zhuàng,in the right and self-confident (idiom); bold and confident with justice on one's side,6.0,56315.0,0.09
@@ -7387,7 +7387,7 @@
 端午节,duān wǔ jié,The Dragon Boat Festival (the 5th day of the 5th lunar month),6.0,69562.0,0.03
 对联,duì lián,rhyming couplet; pair of lines of verse written vertically down the sides of a doorway,6.0,70695.0,0.03
 碧玉,bì yù,jasper,6.0,76681.0,0.03
-糖葫芦,táng hú lu,sugar coated Chinese hawthorn fruit on a stick; tanghulu,6.0,78415.0,0.03
+糖葫芦,táng hú lú,sugar coated Chinese hawthorn fruit on a stick; tanghulu,6.0,78415.0,0.03
 连忙,lián máng,promptly; at once,5.0,82327.0,0.03
 饱经沧桑,bǎo jīng cāng sāng,having lived through many changes,6.0,84847.0,0.03
 华侨,huá qiáo,overseas Chinese,6.0,85404.0,0.03
@@ -7395,21 +7395,21 @@
 重阳节,chóng yáng jié,Double Ninth or Yang Festival; 9th day of 9th lunar month,6.0,88224.0,0.03
 京剧,jīng jù,Beijing opera,4.0,89507.0,0.03
 武侠,wǔ xiá,"martial arts chivalry (Chinese literary, theatrical and cinema genre); knight-errant",6.0,96758.0,0.03
-不客气,bù kè qi,you're welcome; impolite,1.0,,
-打篮球,dǎlánqiú,play basketball,2.0,,
+不客气,bú kè qì,you're welcome; impolite,1.0,,
+打篮球,dǎ lán qiú,play basketball,2.0,,
 公共汽车,gōng gòng qì chē,bus,2.0,,
-踢足球,tīzúqiú,play soccer(football),2.0,,
-电子邮件,diàn zǐ yóu jiàn,electronic mail; email,3.0,,
+踢足球,tī zú qiú,play soccer(football),2.0,,
+电子邮件,diàn zi yóu jiàn,electronic mail; email,3.0,,
 翻译,fān yì,to translate; to interpret,4.0,,
 放暑假,fàng shǔ jià,take summer vacation,4.0,,
 …分之…,fēnzhī,used for fractions and percentages,4.0,,
-弹钢琴,tángāngqín,play the piano,4.0,,
+弹钢琴,tán gāng qín,play the piano,4.0,,
 做生意,zuò shēng yì,to do business,4.0,,
 导演,dǎo yǎn,direct; director (film etc),5.0,,
 短信,duǎn xìn,text message; SMS,5.0,,
 系领带,jìlǐngdài,tie one's necktie,5.0,,
-使劲儿,shǐ jìn r,to exert all one's strength,5.0,,
-一路平安,yílùpíngān,to have a pleasant journey; Bon voyage!,5.0,,
+使劲儿,shǐjìnr,to exert all one's strength,5.0,,
+一路平安,yí lù píng ān,to have a pleasant journey; Bon voyage!,5.0,,
 油炸,yóu zhá,to deep fry,5.0,,
 拔苗助长,bá miáo zhù zhǎng,to spoil things through excessive enthusiasm (idiom),6.0,,
 波涛汹涌,bō tāo xiōng yǒng,tumultuous situations,6.0,,
@@ -7417,21 +7417,21 @@
 繁体字,fán tǐ zì,traditional Chinese character,6.0,,
 俯仰,fǔ yǎng,looking up and down; actions,6.0,,
 简体字,jiǎn tǐ zì,"simplified Chinese character, as opposed to traditional Chinese character",6.0,,
-啰唆,luō suo,to grumble,6.0,,
-墨水儿,mò shuǐ r,ink,6.0,,
-纳闷儿,nà mèn r,puzzled; bewildered,6.0,,
+啰唆,luō suō,to grumble,6.0,,
+墨水儿,mòshuǐr,ink,6.0,,
+纳闷儿,nàmènr,puzzled; bewildered,6.0,,
 纽扣儿,niǔkòur,button,6.0,,
 岂有此理,qǐ yǒu cǐ lǐ,how can this be so? (idiom); preposterous,6.0,,
 师范,shī fàn,teacher-training; pedagogical,6.0,,
 涮火锅,shuàn huǒ guō,"to instant-boil (mutton, beef, vegetables, etc.)",6.0,,
 素食主义,sù shí zhǔ yì,vegetarianism,6.0,,
 算了,suàn le,let it be; let it pass,6.0,,
-摊儿,tān r,street vendor's stall or stand,6.0,,
+摊儿,tānr,street vendor's stall or stand,6.0,,
 统筹兼顾,tǒng chóu jiān gù,an overall plan taking into account all factors,6.0,,
-玩意儿,wán yì r,toy; plaything,6.0,,
-心眼儿,xīn yǎn r,one's thoughts; mind,6.0,,
+玩意儿,wányìr,toy; plaything,6.0,,
+心眼儿,xīnyǎnr,one's thoughts; mind,6.0,,
 压制,yā zhì,to suppress; to inhibit,6.0,,
 烟花爆竹,yān huā bào zhú,fireworks and crackers,6.0,,
 元宵节,yuán xiāo jié,"Lantern festival, the final event of the Spring festival",6.0,,
 招投标,zhāo tóu biāo,bidding; tender,6.0,,
-致力于,zhìlìyú,to devote to; to dedicate to,6.0,,
+致力于,zhì lì yú,to devote to; to dedicate to,6.0,,
