@@ -43,7 +43,7 @@ export default function App() {
   const [showSettings, setShowSettings] = useState(false);
   const [showAccount, setShowAccount] = useState(false);
   const [showMistakeReport, setShowMistakeReport] = useState(false);
-  const [activeMasteryTab, setActiveMasteryTab] = useState('struggling');
+  const [activeMasteryTab, setActiveMasteryTab] = useState('new');
 
   const { user, syncVersion } = useAuth();
 
@@ -108,7 +108,12 @@ export default function App() {
   }, [revisionLevels, syncVersion]);
 
   const weakCards = useMemo(() => rawDeck.filter((c) => c.stats.repetitions > 0 && c.stats.interval <= 2), [rawDeck]);
-  
+
+  // Every card the user has graded at least once, regardless of how it's
+  // currently doing on the SM-2 curve - a free-form review pool distinct
+  // from "weak" (struggling specifically) or the mastery matrix tabs.
+  const seenCards = useMemo(() => rawDeck.filter((c) => c.stats.repetitions > 0), [rawDeck]);
+
   const mastery = useMemo(() => {
     return getCardMasteryStats(rawDeck);
   }, [rawDeck]);
@@ -117,6 +122,10 @@ export default function App() {
     let queue;
     if (mode === 'weak' && weakCards.length > 0) {
       queue = [...weakCards].sort(() => 0.5 - Math.random()).slice(0, count);
+    } else if (mode === 'seen') {
+      // "At their own leisure" - review every seen card in one sitting,
+      // not a fixed-size sample like the other modes.
+      queue = [...seenCards].sort(() => 0.5 - Math.random());
     } else {
       // Due-for-review cards first (most overdue first), then never-studied
       // cards introduced in frequency order - not a flat random shuffle.
@@ -296,6 +305,12 @@ export default function App() {
                   🎯 Review {weakCards.length} Weak Cards
                 </button>
               )}
+
+              {seenCards.length > 0 && (
+                <button className="secondary-launch-btn" onClick={() => launchArcadeSession(seenCards.length, 'seen')}>
+                  📖 Review All {seenCards.length} Seen Cards
+                </button>
+              )}
             </div>
           </div>
         )}
@@ -455,26 +470,26 @@ export default function App() {
                 <label className="box-section-label">Character Mastery Matrix</label>
                 
                 <div style={{ display: 'flex', gap: '6px', margin: '8px 0' }}>
-                  <button 
-                    className={`level-toggle-btn ${activeMasteryTab === 'struggling' ? 'active' : ''}`}
-                    onClick={() => setActiveMasteryTab('struggling')}
+                  <button
+                    className={`level-toggle-btn ${activeMasteryTab === 'new' ? 'active' : ''}`}
+                    onClick={() => setActiveMasteryTab('new')}
                     style={{ fontSize: '12px', padding: '8px' }}
                   >
-                    ⚠️ Struggling ({mastery.struggling.length})
+                    🆕 New ({mastery.new.length})
                   </button>
-                  <button 
-                    className={`level-toggle-btn ${activeMasteryTab === 'practicing' ? 'active' : ''}`}
-                    onClick={() => setActiveMasteryTab('practicing')}
+                  <button
+                    className={`level-toggle-btn ${activeMasteryTab === 'learning' ? 'active' : ''}`}
+                    onClick={() => setActiveMasteryTab('learning')}
                     style={{ fontSize: '12px', padding: '8px' }}
                   >
-                    ⚖️ Practicing ({mastery.practicing.length})
+                    📖 Learning ({mastery.learning.length})
                   </button>
-                  <button 
-                    className={`level-toggle-btn ${activeMasteryTab === 'nailed' ? 'active' : ''}`}
-                    onClick={() => setActiveMasteryTab('nailed')}
+                  <button
+                    className={`level-toggle-btn ${activeMasteryTab === 'mastered' ? 'active' : ''}`}
+                    onClick={() => setActiveMasteryTab('mastered')}
                     style={{ fontSize: '12px', padding: '8px' }}
                   >
-                    🔥 Nailed ({mastery.nailed.length})
+                    🏆 Mastered ({mastery.mastered.length})
                   </button>
                 </div>
 

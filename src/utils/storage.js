@@ -64,31 +64,34 @@ export function hydrateLocalFromRemote(mergedProgress) {
 }
 
 /**
- * Categorizes the deck into mastery groups based on SM-2 interval stats
+ * Categorizes the deck into mastery groups based on SM-2 interval stats:
+ * new: never studied (no stats, or reset back to repetitions === 0).
+ * learning: studied at least once but the SM-2 interval hasn't reached
+ *   21 days yet.
+ * mastered: interval has reached 21+ days - SM-2's interval grows
+ *   multiplicatively on repeated Easy grades, so this reflects sustained
+ *   recall, not a single lucky grade.
  */
 export function getCardMasteryStats(deck) {
   const progress = getProgress();
-  
-  const nailed = [];
-  const practicing = [];
-  const struggling = [];
+
+  const newCards = [];
+  const learning = [];
+  const mastered = [];
 
   deck.forEach((card) => {
     const stat = progress[card.id];
-    
-    // If never reviewed or interval is 1 or less with low reps
-    if (!stat || (stat.repetitions === 0 && stat.interval <= 1)) {
-      struggling.push(card); // Unseen or reset counts as needing practice/struggling initially
-    } else if (stat.interval > 10) {
-      nailed.push(card);
-    } else if (stat.interval > 1 && stat.interval <= 10) {
-      practicing.push(card);
+
+    if (!stat || stat.repetitions === 0) {
+      newCards.push(card);
+    } else if (stat.interval >= 21) {
+      mastered.push(card);
     } else {
-      struggling.push(card);
+      learning.push(card);
     }
   });
 
-  return { nailed, practicing, struggling };
+  return { new: newCards, learning, mastered };
 }
 
 /**
