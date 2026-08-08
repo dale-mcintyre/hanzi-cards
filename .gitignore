@@ -3,3 +3,6 @@ dist/
 .DS_Store
 __pycache__/
 vocab_audit_report.txt
+.env
+.env.local
+.env.*.local

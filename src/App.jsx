@@ -10,6 +10,9 @@ import { getFilteredDeck } from './data/vocabLoader';
 import { getHardModeDeck } from './data/hskLoader';
 import { buildLearnQueue } from './utils/sessionQueue';
 import { getEntitlement } from './utils/entitlement';
+import { useAuth } from './context/AuthContext';
+import AccountDrawer from './components/AccountDrawer';
+import MistakeReportDrawer from './components/MistakeReportDrawer';
 
 function HighlightedSentence({ sentence, targetChar, muted = false }) {
   if (!sentence || !targetChar) return <span>{sentence}</span>;
@@ -38,7 +41,11 @@ export default function App() {
   // for targeted revision.
   const [revisionLevels, setRevisionLevels] = useState([]);
   const [showSettings, setShowSettings] = useState(false);
+  const [showAccount, setShowAccount] = useState(false);
+  const [showMistakeReport, setShowMistakeReport] = useState(false);
   const [activeMasteryTab, setActiveMasteryTab] = useState('struggling');
+
+  const { user, syncVersion } = useAuth();
 
   const [appState, setAppState] = useState('launch');
   const [countdownNum, setCountdownNum] = useState(3);
@@ -94,7 +101,11 @@ export default function App() {
     } catch (e) {
       setStreak(1);
     }
-  }, [revisionLevels]);
+    // syncVersion isn't read above - it's a signal, not data. It bumps once
+    // after AuthContext hydrates localStorage from a signed-in account's
+    // remote progress, so this effect re-runs and rawDeck picks up the
+    // merged stats (sign-in doesn't otherwise change revisionLevels).
+  }, [revisionLevels, syncVersion]);
 
   const weakCards = useMemo(() => rawDeck.filter((c) => c.stats.repetitions > 0 && c.stats.interval <= 2), [rawDeck]);
   
@@ -225,6 +236,9 @@ export default function App() {
           )}
         </div>
         <div className="nav-right">
+          <button className="account-trigger-btn" onClick={() => setShowAccount(true)} aria-label="Account">
+            {user ? '👤' : '👤 Sign in'}
+          </button>
           <button className="settings-trigger-btn" onClick={() => setShowSettings(true)} aria-label="Settings">
             ⚙️ {revisionLevels.length > 0 ? `HSK ${revisionLevels.join(',')}` : 'Settings'}
           </button>
@@ -344,9 +358,18 @@ export default function App() {
                       <p className="meaning-primary">{primaryMeaning}</p>
                       {secondaryMeanings && <p className="meaning-secondary">{secondaryMeanings}</p>}
                     </div>
-                    <button className="audio-icon-btn" onClick={() => speakText(card.character)} aria-label="Play pronunciation">
-                      🔊
-                    </button>
+                    <div className="back-header-actions">
+                      <button className="audio-icon-btn" onClick={() => speakText(card.character)} aria-label="Play pronunciation">
+                        🔊
+                      </button>
+                      <button
+                        className="report-mistake-btn"
+                        onClick={(e) => { e.stopPropagation(); setShowMistakeReport(true); }}
+                        aria-label="Report an issue with this card"
+                      >
+                        🚩
+                      </button>
+                    </div>
                   </div>
 
                   <div className="card-meta-row">
@@ -473,6 +496,16 @@ export default function App() {
 
             </div>
           </div>
+        )}
+
+        {showAccount && <AccountDrawer onClose={() => setShowAccount(false)} />}
+
+        {showMistakeReport && card && (
+          <MistakeReportDrawer
+            card={card}
+            onClose={() => setShowMistakeReport(false)}
+            onRequestSignIn={() => { setShowMistakeReport(false); setShowAccount(true); }}
+          />
         )}
 
       </div>

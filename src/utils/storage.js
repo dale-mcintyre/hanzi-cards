@@ -1,5 +1,17 @@
+import { pushCardProgress } from './syncClient';
+import { enqueue as enqueueSync } from './syncQueue';
+
 const STORAGE_KEY = 'hanzi_deck_progress';
 const SENTENCE_CACHE_KEY = 'hz_sentence_cache';
+
+// Set by AuthContext on every auth state change (sign in/out). Kept as a
+// plain module-level value rather than storage.js importing React context,
+// so this file stays framework-agnostic like the rest of its exports.
+let currentSyncUserId = null;
+
+export function setCurrentSyncUser(userId) {
+  currentSyncUserId = userId || null;
+}
 
 export function getProgress() {
   try {
@@ -20,7 +32,35 @@ export function saveCardProgress(cardId, newStats) {
   } catch (e) {
     console.error('Failed to save progress:', e);
   }
+
+  // Fail-open: the localStorage write above already happened and this
+  // function already has its return value ready - a slow or failed
+  // network push must never delay grading or lose the grade event, so
+  // this runs unawaited and queues for retry on failure instead of
+  // throwing. See syncQueue.js and PLAN.md's "Fail-open philosophy".
+  if (currentSyncUserId) {
+    pushCardProgress(currentSyncUserId, cardId, stamped).then((result) => {
+      if (!result.ok) enqueueSync(cardId, stamped);
+    });
+  }
+
   return stamped;
+}
+
+/**
+ * Replaces the whole local progress object with syncClient's
+ * mergeLocalAndRemoteProgress() result - used once after sign-in (fresh
+ * device: populates local state from remote; existing device: reconciles
+ * both sides). A full replace is correct here, not a merge-on-top, because
+ * `merged` is already the complete reconciled union of every card either
+ * side has touched.
+ */
+export function hydrateLocalFromRemote(mergedProgress) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(mergedProgress));
+  } catch (e) {
+    console.error('Failed to hydrate local progress from remote:', e);
+  }
 }
 
 /**
