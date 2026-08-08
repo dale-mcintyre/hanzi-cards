@@ -16,7 +16,7 @@ Words), XP/combo session loop, mastery dashboard, multiple-choice + hard-mode
 confusable cards, unified vocab dataset rebuilt from scratch with an
 LLM-audited definition pipeline (`build-vocab.py`).
 
-## Phase 3 — Accounts + cross-device sync (in progress)
+## Phase 3 — Accounts + cross-device sync (shipped)
 - **Report-a-mistake flag**: lets a learner flag a vocab entry (wrong pinyin/
   definition/reading) directly from the card. Reports are tied to the signed-in
   user and stored in Supabase so they're reviewable later, instead of vanishing
