@@ -1,4 +1,4 @@
-# Hanzi Cards
+# Learn Hanzi
 
 Minimalist Chinese character flashcards for HSK 3 learners — dark, high-contrast,
 zero clutter.

@@ -11,6 +11,7 @@ import { getHardModeDeck } from './data/hskLoader';
 import { buildLearnQueue } from './utils/sessionQueue';
 import { getEntitlement } from './utils/entitlement';
 import { useAuth } from './context/AuthContext';
+import MarketingLanding from './components/MarketingLanding';
 import AccountDrawer from './components/AccountDrawer';
 import MistakeReportDrawer from './components/MistakeReportDrawer';
 
@@ -45,7 +46,14 @@ export default function App() {
   const [showMistakeReport, setShowMistakeReport] = useState(false);
   const [activeMasteryTab, setActiveMasteryTab] = useState('new');
 
-  const { user, syncVersion } = useAuth();
+  const { user, isAuthReady, syncVersion } = useAuth();
+
+  // Defaults to the dashboard (false) during the brief pre-isAuthReady gap
+  // rather than flashing marketing copy at a logged-in user - the dashboard
+  // is a strict subset of the marketing view (same header, same primary
+  // CTA, just no persuasive copy), so the worst case for a logged-out
+  // visitor is a sub-frame of the leaner view before this flips true.
+  const showMarketing = isAuthReady && !user;
 
   const [appState, setAppState] = useState('launch');
   const [countdownNum, setCountdownNum] = useState(3);
@@ -270,49 +278,60 @@ export default function App() {
           ))}
         </div>
 
-        {/* 1. LAUNCH SCREEN */}
+        {/* 1. LAUNCH SCREEN - marketing pitch for logged-out visitors,
+               action-first dashboard for everyone else */}
         {appState === 'launch' && (
-          <div className="card launch-card">
-            <div className="launch-card-header">
-              <span className="deck-level-pill">
-                {revisionLevels.length > 0 ? `Revising HSK ${revisionLevels.join(', ')}` : 'All Levels'}
-              </span>
-              <span className="deck-ready-tag">
-                {isLoadingDeck ? 'Loading database...' : `${rawDeck.length} Cards Loaded`}
-              </span>
-            </div>
+          showMarketing ? (
+            <MarketingLanding
+              revisionLevels={revisionLevels}
+              isLoadingDeck={isLoadingDeck}
+              cardCount={rawDeck.length}
+              onStart={() => launchArcadeSession(20, 'all')}
+              onSignIn={() => setShowAccount(true)}
+            />
+          ) : (
+            <div className="card launch-card">
+              <div className="launch-card-header">
+                <span className="deck-level-pill">
+                  {revisionLevels.length > 0 ? `Revising HSK ${revisionLevels.join(', ')}` : 'All Levels'}
+                </span>
+                <span className="deck-ready-tag">
+                  {isLoadingDeck ? 'Loading database...' : `${rawDeck.length} Cards Loaded`}
+                </span>
+              </div>
 
-            <div className="launch-card-body">
-              <h1 className="launch-title">Hanzi Blitz</h1>
-              <p className="launch-subtitle">Unified frequency & HSK dataset</p>
-            </div>
+              <div className="launch-card-body">
+                <h1 className="launch-title">Learn Hanzi</h1>
+                <p className="launch-subtitle">Unified frequency & HSK dataset</p>
+              </div>
 
-            <div className="launch-card-actions">
-              <button
-                className="primary-launch-btn"
-                disabled={isLoadingDeck || rawDeck.length === 0}
-                onClick={() => launchArcadeSession(20, 'all')}
-              >
-                {isLoadingDeck ? 'Preparing Deck...' : 'Learn ⚡'}
-              </button>
-
-              <button className="hard-mode-btn" onClick={launchHardModeSession}>
-                🔥 Hard Mode (Targeted Mistake Blitz)
-              </button>
-
-              {weakCards.length > 0 && (
-                <button className="secondary-launch-btn" onClick={() => launchArcadeSession(20, 'weak')}>
-                  🎯 Review {weakCards.length} Weak Cards
+              <div className="launch-card-actions">
+                <button
+                  className="primary-launch-btn"
+                  disabled={isLoadingDeck || rawDeck.length === 0}
+                  onClick={() => launchArcadeSession(20, 'all')}
+                >
+                  {isLoadingDeck ? 'Preparing Deck...' : 'Learn ⚡'}
                 </button>
-              )}
 
-              {seenCards.length > 0 && (
-                <button className="secondary-launch-btn" onClick={() => launchArcadeSession(seenCards.length, 'seen')}>
-                  📖 Review All {seenCards.length} Seen Cards
+                <button className="hard-mode-btn" onClick={launchHardModeSession}>
+                  🔥 Hard Mode (Targeted Mistake Blitz)
                 </button>
-              )}
+
+                {weakCards.length > 0 && (
+                  <button className="secondary-launch-btn" onClick={() => launchArcadeSession(20, 'weak')}>
+                    🎯 Review {weakCards.length} Weak Cards
+                  </button>
+                )}
+
+                {seenCards.length > 0 && (
+                  <button className="secondary-launch-btn" onClick={() => launchArcadeSession(seenCards.length, 'seen')}>
+                    📖 Review All {seenCards.length} Seen Cards
+                  </button>
+                )}
+              </div>
             </div>
-          </div>
+          )
         )}
 
         {/* 2. COUNTDOWN */}

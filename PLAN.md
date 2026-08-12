@@ -1,4 +1,4 @@
-# Hanzi Cards — Roadmap
+# Learn Hanzi — Roadmap
 
 Informal phase tracking, reconstructed from commit history + ongoing work. Not
 exhaustive — a summary of what shipped in each phase, for context in future
@@ -29,6 +29,15 @@ LLM-audited definition pipeline (`build-vocab.py`).
   a device that already has data.
 - Backend: Supabase (managed Postgres + Auth + row-level security), chosen for
   the free tier and minimal setup versus a hand-rolled backend.
+
+## Phase 4 — Rebrand + auth-split landing (in progress)
+- Renamed "Hanzi Cards"/"Hanzi Blitz" to **Learn Hanzi** throughout (title,
+  package name, docs, in-app header).
+- Split the entry screen by auth state: logged-out visitors see a value-prop
+  marketing page (`src/components/MarketingLanding.jsx`) explaining the
+  frequency-data + HSK-milestones pitch, with a direct "Start Learning" CTA
+  that still launches a real session with no sign-up required; logged-in
+  visitors go straight to the existing action-first dashboard unchanged.
 
 ## Later / unscheduled
 - OAuth providers (Google, Apple) beyond email/password, if requested.

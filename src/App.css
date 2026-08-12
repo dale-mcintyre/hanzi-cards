@@ -517,6 +517,66 @@
   color: var(--ink);
 }
 
+/* ==================== Marketing landing (logged-out) ==================== */
+.marketing-card-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+  overflow-y: auto;
+}
+
+.marketing-subtitle {
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--ink-dim);
+  margin: 0;
+  max-width: 280px;
+}
+
+.marketing-feature-list {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: left;
+  width: 100%;
+}
+
+.marketing-feature-item {
+  font-size: 12.5px;
+  line-height: 1.4;
+  color: var(--ink-dim);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 8px 12px;
+}
+
+.marketing-card-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.marketing-signin-link {
+  background: none;
+  border: none;
+  color: var(--ink-faint);
+  font-size: 12.5px;
+  font-weight: 600;
+  text-align: center;
+  padding: 4px;
+}
+
+.marketing-signin-link:hover {
+  color: var(--ink-dim);
+  text-decoration: underline;
+}
+
 /* ==================== Countdown screen ==================== */
 .countdown-card {
   align-items: center;
