@@ -11,13 +11,15 @@ export default function AboutDrawer({ onClose }) {
         <div className="about-section">
           <h4>The Philosophy</h4>
           <p>
-            Most textbooks teach characters in a fixed HSK order, but that order has
-            nothing to do with how often a character actually shows up in real Chinese.
-            Learn Hanzi ranks its deck against the SUBTLEX-CH frequency corpus, drawn
-            from real subtitle and media usage, so the characters you review first are
-            the ones you'll actually run into. HSK levels are still here as milestones
-            you can filter by, but frequency, not textbook order, decides what you see
-            next.
+            Learn Hanzi was designed and built by Dale McIntyre, a Mandarin learner who
+            has tackled multiple languages and found reading to be his primary
+            bottleneck. Most textbooks teach characters in a fixed HSK order, but that
+            order has nothing to do with how often a character actually shows up in real
+            Chinese. Learn Hanzi ranks its deck against the SUBTLEX-CH frequency corpus,
+            drawn from real subtitle and media usage, so the characters you review first
+            are the ones you will actually run into. HSK levels are still here as
+            milestones you can filter by; however, frequency, not textbook order,
+            decides what you see next.
           </p>
         </div>
 
@@ -25,26 +27,22 @@ export default function AboutDrawer({ onClose }) {
           <h4>How It Works</h4>
           <p>
             Every card you grade feeds an SM-2 spaced repetition loop: cards you find
-            easy get pushed further out, cards you struggle with come back sooner, so
-            your review time goes toward what you're actually forgetting. Writing mode
-            has you trace each character stroke by stroke against real stroke-order
-            data, not just recognize it. And the dual-ring tiles in Settings show two
-            numbers at a glance per tier: the outer ring is how much you've seen, the
-            inner ring is how much you've mastered.
+            easy get pushed further out, while cards you struggle with come back sooner,
+            ensuring your review time goes toward what you are actually forgetting. The
+            interface is designed for fast, frictionless flashcard flipping and
+            character recall. Furthermore, the dual-ring tiles in Settings show two
+            numbers at a glance per tier: the outer ring tracks how much you have seen,
+            and the inner ring tracks how much you have mastered.
           </p>
         </div>
 
         <div className="about-section">
           <h4>Tech Stack &amp; Credits</h4>
           <p>
-            Built with React and Vite on the front end, character stroke rendering from
-            HanziWriter, and Supabase for accounts and cross-device sync.
+            Designed and built by Dale McIntyre. Built with React and Vite on the front
+            end, character rendering powered by HanziWriter, and Supabase for accounts
+            and cross-device sync.
           </p>
-        </div>
-
-        <div className="about-footer">
-          Learn Hanzi is an independently built tool for serious learners. Thanks for
-          studying with it.
         </div>
       </div>
     </div>
