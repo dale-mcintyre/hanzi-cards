@@ -53,7 +53,7 @@ export default function MistakeReportDrawer({ card, onClose, onRequestSignIn }) 
         )}
 
         {user && submitted && (
-          <p style={{ marginTop: '12px' }}>Reported — thanks!</p>
+          <p style={{ marginTop: '12px' }}>Reported. Thanks!</p>
         )}
 
         {user && !submitted && (

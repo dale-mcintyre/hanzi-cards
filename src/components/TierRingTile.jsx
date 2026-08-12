@@ -35,8 +35,8 @@ export default function TierRingTile({ tierKey, label, total, seen, mastered, ac
       className={`tier-ring-tile ${active ? 'active' : ''}`}
       onClick={onClick}
       aria-pressed={active}
-      aria-label={`${label}: ${seenPct}% seen, ${masteredPct}% mastered. ${active ? 'Included' : 'Excluded'} in active study filter — tap to toggle.`}
-      title={`${label} — ${seen}/${total} seen (${seenPct}%), ${mastered}/${total} mastered (${masteredPct}%)`}
+      aria-label={`${label}: ${seenPct}% seen, ${masteredPct}% mastered. ${active ? 'Included' : 'Excluded'} in active study filter. Tap to toggle.`}
+      title={`${label}: ${seen}/${total} seen (${seenPct}%), ${mastered}/${total} mastered (${masteredPct}%)`}
     >
       <svg width={size} height={size} viewBox={`0 0 ${VIEWBOX} ${VIEWBOX}`} className="tier-ring-svg">
         <circle cx={CENTER} cy={CENTER} r={R_OUTER} fill="none" stroke="var(--surface-line)" strokeWidth={SW_OUTER} />

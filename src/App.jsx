@@ -19,7 +19,9 @@ import TierRingTile from './components/TierRingTile';
 const ALL_HSK_LEVELS = ['1', '2', '3', '4', '5', '6'];
 
 // Cards graded (across the whole visit, any session type) before an
-// anonymous user sees the one-time sign-up nudge on the completion screen.
+// anonymous user sees the one-time dismissible sign-up nudge mid-session -
+// and, from that point on, before any session's completion screen gates on
+// sign-in instead of offering a "Continue" escape.
 const SOFT_WALL_THRESHOLD = 5;
 
 function HighlightedSentence({ sentence, targetChar, muted = false }) {
@@ -84,12 +86,16 @@ export default function App() {
   const [floatingPopups, setFloatingPopups] = useState([]);
 
   // Visit-level (not per-session-queue) grade count for the anonymous
-  // sign-up nudge - accumulates across however many mini-sessions happen
-  // in this visit, resets only on a full page reload. hasShownSoftWall
-  // guarantees the nudge fires at most once per visit.
+  // sign-up flow - accumulates across however many mini-sessions happen in
+  // this visit, resets only on a full page reload. hasCrossedSoftWall
+  // flips true (permanently, for the rest of the visit) the moment it's
+  // reached: that same grade shows a one-time dismissible overlay without
+  // interrupting the current session, and from then on every session's
+  // completion screen gates on sign-in instead of offering a plain
+  // "Continue" escape (see the completed-screen JSX below).
   const [visitGradeCount, setVisitGradeCount] = useState(0);
-  const [hasShownSoftWall, setHasShownSoftWall] = useState(false);
-  const [showSoftWallPrompt, setShowSoftWallPrompt] = useState(false);
+  const [hasCrossedSoftWall, setHasCrossedSoftWall] = useState(false);
+  const [showSoftWallOverlay, setShowSoftWallOverlay] = useState(false);
 
   const [rawDeck, setRawDeck] = useState([]);
   const [sessionQueue, setSessionQueue] = useState([]);
@@ -342,21 +348,29 @@ export default function App() {
     // look "never studied" until the next full deck reload.
     setRawDeck((prev) => prev.map((c) => (c.id === card.id ? { ...c, stats: stamped } : c)));
 
-    // Computed as a local value, not read back from state this same tick -
-    // setVisitGradeCount's update wouldn't be visible yet if we read
-    // visitGradeCount directly below.
+    // Computed as local values, not read back from state this same tick -
+    // the setters below wouldn't be visible yet if we read the state
+    // directly further down.
     const newVisitGradeCount = !user ? visitGradeCount + 1 : visitGradeCount;
     if (!user) setVisitGradeCount(newVisitGradeCount);
 
+    const justCrossedSoftWall = !user && !hasCrossedSoftWall && newVisitGradeCount >= SOFT_WALL_THRESHOLD;
+    if (justCrossedSoftWall) setHasCrossedSoftWall(true);
+
     if (currentIndex + 1 >= sessionQueue.length) {
-      if (!user && !hasShownSoftWall && newVisitGradeCount >= SOFT_WALL_THRESHOLD) {
-        setShowSoftWallPrompt(true);
-        setHasShownSoftWall(true); // once per visit, regardless of future sessions
-      }
+      // No separate action needed for gating here - the completed screen
+      // derives its gated/ungated variant from (!user && hasCrossedSoftWall)
+      // at render time, and hasCrossedSoftWall was just set above if this
+      // very card is the one that crossed the threshold - so even a first
+      // session that crosses 5 on its last card correctly renders gated.
       setAppState('completed');
     } else {
       setIsFlipped(false);
       setCurrentIndex((prev) => prev + 1);
+      // Dismissible, non-interrupting: currentIndex has already advanced
+      // above, so the card behind this overlay is already the next one -
+      // dismissing just reveals it, no re-showing the card just graded.
+      if (justCrossedSoftWall) setShowSoftWallOverlay(true);
     }
   };
 
@@ -373,6 +387,13 @@ export default function App() {
 
   const primaryMeaning = meaningList[0]?.trim();
   const secondaryMeanings = meaningList.slice(1).join('; ').trim();
+
+  // Once an anonymous user has crossed SOFT_WALL_THRESHOLD for this visit,
+  // every subsequent session-completion screen gates on sign-in - no
+  // "Continue" escape - instead of the normal one. See handleNextCard for
+  // where hasCrossedSoftWall flips true and the accompanying dismissible
+  // mid-session overlay (that one never blocks the current session).
+  const isSoftWallGated = !user && hasCrossedSoftWall;
 
   return (
     <div className="app-container">
@@ -582,24 +603,21 @@ export default function App() {
                 </div>
               </div>
 
-              {showSoftWallPrompt && !user && (
-                <div className="soft-wall-prompt">
+              {isSoftWallGated ? (
+                <div className="soft-wall-gate">
                   <p className="soft-wall-message">
-                    Great progress! You've reviewed {visitGradeCount} cards. Sign in to save
-                    your results, sync across your devices, and keep your learning streak.
+                    Great work! You've reviewed {visitGradeCount} cards this visit. Create a
+                    free account to save your results and keep your streak going.
                   </p>
                   <button className="primary-launch-btn" onClick={() => setShowAccount(true)}>
                     Sign In / Create Account
                   </button>
                 </div>
+              ) : (
+                <button className="primary-launch-btn" onClick={() => setAppState('launch')}>
+                  Continue ⚡
+                </button>
               )}
-
-              <button
-                className={showSoftWallPrompt && !user ? 'secondary-launch-btn' : 'primary-launch-btn'}
-                onClick={() => { setShowSoftWallPrompt(false); setAppState('launch'); }}
-              >
-                {showSoftWallPrompt && !user ? 'Continue Studying' : 'Continue ⚡'}
-              </button>
             </div>
           </div>
         )}
@@ -612,7 +630,7 @@ export default function App() {
               <h3>Settings & Character Mastery</h3>
 
               <div style={{ marginTop: '12px' }}>
-                <label className="box-section-label">Study Tiers — tap to include/exclude</label>
+                <label className="box-section-label">Study Tiers: tap to include/exclude</label>
                 <p style={{ fontSize: '12px', color: 'var(--ink-faint)', margin: '4px 0 0' }}>
                   {revisionLevels.length === 0 && includeNonHsk
                     ? 'Learning from every tier. Tap a tile to focus on specific ones.'
@@ -678,6 +696,37 @@ export default function App() {
             onClose={() => setShowMistakeReport(false)}
             onRequestSignIn={() => { setShowMistakeReport(false); setShowAccount(true); }}
           />
+        )}
+
+        {/* Dismissible mid-session nudge - does NOT end or interrupt the
+            session; currentIndex has already advanced by the time this
+            shows, so dismissing (including clicking the backdrop) just
+            reveals the next card exactly as if this hadn't appeared. */}
+        {showSoftWallOverlay && (
+          <div className="drawer-overlay" onClick={() => setShowSoftWallOverlay(false)}>
+            <div className="drawer-sheet" onClick={(e) => e.stopPropagation()}>
+              <div className="drawer-handle" />
+              <h3>Nice progress! 🎉</h3>
+              <p className="soft-wall-message" style={{ marginTop: '10px' }}>
+                You've reviewed {visitGradeCount} cards. Sign in to save your results, sync
+                across your devices, and keep your learning streak.
+              </p>
+              <button
+                className="primary-launch-btn"
+                style={{ marginTop: '16px' }}
+                onClick={() => { setShowSoftWallOverlay(false); setShowAccount(true); }}
+              >
+                Sign In / Create Account
+              </button>
+              <button
+                className="auth-toggle-link"
+                style={{ marginTop: '8px' }}
+                onClick={() => setShowSoftWallOverlay(false)}
+              >
+                Continue Studying
+              </button>
+            </div>
+          </div>
         )}
 
       </div>

@@ -574,6 +574,13 @@
   gap: 10px;
 }
 
+.marketing-trial-note {
+  font-size: 11.5px;
+  color: var(--ink-faint);
+  text-align: center;
+  margin: 0;
+}
+
 .marketing-signin-link {
   background: none;
   border: none;
@@ -673,7 +680,7 @@
   color: var(--ink);
 }
 
-.soft-wall-prompt {
+.soft-wall-gate {
   display: flex;
   flex-direction: column;
   align-items: center;
