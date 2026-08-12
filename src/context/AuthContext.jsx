@@ -18,6 +18,54 @@ export function AuthProvider({ children }) {
   // pick up the freshly-merged progress.
   const [syncVersion, setSyncVersion] = useState(0);
 
+  // One-time re-keying of this account's remote card_progress rows from
+  // the old position-based ID (vocab_<index>_<char>) to the stable
+  // character-based one storage.js's local migration already moved to.
+  // MUST complete before runMigration below - otherwise
+  // mergeLocalAndRemoteProgress would compare fresh local character-keys
+  // against still-old-format remote keys, see no overlap, and
+  // hydrateLocalFromRemote would write the stale keys straight back into
+  // localStorage, undoing the local migration. See the call sites below.
+  const runCardIdMigration = useCallback(async (user) => {
+    const migratedFlag = `hz_card_id_migrated_account_${user.id}`;
+    try {
+      if (localStorage.getItem(migratedFlag) === 'true') return;
+    } catch (e) {
+      // fall through and attempt anyway rather than getting stuck
+    }
+
+    const remoteResult = await pullAllProgress(user.id);
+    if (!remoteResult.ok) return; // fail-open: retry on next sign-in
+
+    const oldCardIdPattern = /^vocab_\d+_(.+)$/;
+    const rewrites = [];
+    for (const [cardId, stats] of Object.entries(remoteResult.data)) {
+      const match = cardId.match(oldCardIdPattern);
+      if (match) rewrites.push({ newCardId: match[1], stats });
+    }
+
+    if (rewrites.length > 0) {
+      await Promise.all(
+        rewrites.map(({ newCardId, stats }) => {
+          // An old-format row may collide with an already character-keyed
+          // row for the same word (pushed post-migration from another
+          // device) - newer lastReviewed wins, same rule mergeLocalAndRemoteProgress uses.
+          const existing = remoteResult.data[newCardId];
+          const winner = existing && (existing.lastReviewed || 0) > (stats.lastReviewed || 0) ? existing : stats;
+          return pushCardProgress(user.id, newCardId, winner);
+        })
+      );
+      // No client-side delete policy on card_progress - the old
+      // vocab_N_char rows are left behind as harmless orphans.
+    }
+
+    try {
+      localStorage.setItem(migratedFlag, 'true');
+    } catch (e) {
+      // Non-fatal: worst case this (harmlessly) re-runs next sign-in.
+    }
+  }, []);
+
   // One-time reconciliation between this device's local progress and the
   // signed-in account's remote progress. Idempotent and safe to call more
   // than once (guarded by a per-account localStorage flag) - see PLAN.md's
@@ -86,9 +134,12 @@ export function AuthProvider({ children }) {
       setCurrentSyncUser(initialSession?.user?.id || null);
       setIsAuthReady(true);
       if (initialSession?.user) {
-        runMigration(initialSession.user);
-        runSettingsSync(initialSession.user);
-        flushSyncQueue(pushFnFor(initialSession.user.id));
+        const user = initialSession.user;
+        runCardIdMigration(user).then(() => {
+          runMigration(user);
+          runSettingsSync(user);
+        });
+        flushSyncQueue(pushFnFor(user.id));
       }
     });
 
@@ -96,9 +147,12 @@ export function AuthProvider({ children }) {
       setSession(newSession);
       setCurrentSyncUser(newSession?.user?.id || null);
       if (event === 'SIGNED_IN' && newSession?.user) {
-        runMigration(newSession.user);
-        runSettingsSync(newSession.user);
-        flushSyncQueue(pushFnFor(newSession.user.id));
+        const user = newSession.user;
+        runCardIdMigration(user).then(() => {
+          runMigration(user);
+          runSettingsSync(user);
+        });
+        flushSyncQueue(pushFnFor(user.id));
       }
     });
 
@@ -106,7 +160,7 @@ export function AuthProvider({ children }) {
       unsubscribed = true;
       subscription.unsubscribe();
     };
-  }, [runMigration, runSettingsSync]);
+  }, [runCardIdMigration, runMigration, runSettingsSync]);
 
   // Retry queued pushes whenever the device comes back online.
   useEffect(() => {

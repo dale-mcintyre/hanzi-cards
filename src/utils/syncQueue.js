@@ -8,7 +8,7 @@
  * cardId so a card graded multiple times while offline only ever queues its
  * latest stats, not a growing backlog of stale entries for the same card.
  */
-const QUEUE_KEY = 'hz_sync_queue';
+export const QUEUE_KEY = 'hz_sync_queue';
 
 function loadQueue() {
   try {

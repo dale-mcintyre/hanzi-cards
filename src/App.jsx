@@ -3,10 +3,10 @@ import './App.css';
 import HanziCanvas from './components/HanziCanvas';
 import useSwipeGesture from './hooks/useSwipeGesture';
 import { calculateSM2 } from './utils/sm2';
-import { getProgress, saveCardProgress, getCardMasteryStats, getPrefs, savePrefs } from './utils/storage';
+import { getProgress, saveCardProgress, getCardMasteryStats, getPrefs, savePrefs, getTierStats } from './utils/storage';
 import { speakText } from './utils/tts';
 import { ColorPinyin } from './utils/pinyinColor';
-import { getFilteredDeck } from './data/vocabLoader';
+import { getFilteredDeck, fetchUnifiedVocab } from './data/vocabLoader';
 import { getHardModeDeck } from './data/hskLoader';
 import { buildLearnQueue } from './utils/sessionQueue';
 import { getEntitlement } from './utils/entitlement';
@@ -14,6 +14,9 @@ import { useAuth } from './context/AuthContext';
 import MarketingLanding from './components/MarketingLanding';
 import AccountDrawer from './components/AccountDrawer';
 import MistakeReportDrawer from './components/MistakeReportDrawer';
+import TierRingTile from './components/TierRingTile';
+
+const ALL_HSK_LEVELS = ['1', '2', '3', '4', '5', '6'];
 
 function HighlightedSentence({ sentence, targetChar, muted = false }) {
   if (!sentence || !targetChar) return <span>{sentence}</span>;
@@ -101,8 +104,8 @@ export default function App() {
 
       const savedProgress = getProgress();
 
-      const merged = localWords.map((card, index) => {
-        const cardId = card.id || `vocab_${index}_${card.character}`;
+      const merged = localWords.map((card) => {
+        const cardId = card.id || card.character;
         return {
           ...card,
           id: cardId,
@@ -151,6 +154,87 @@ export default function App() {
   const mastery = useMemo(() => {
     return getCardMasteryStats(rawDeck);
   }, [rawDeck]);
+
+  // Independent of the current HSK/non-HSK filter - rawDeck only contains
+  // whatever tiers are currently selected, but the tier tiles need stats
+  // for every tier including ones not currently active. fetchUnifiedVocab
+  // caches internally, so this only ever does real work once per session.
+  const [fullVocab, setFullVocab] = useState([]);
+  useEffect(() => {
+    fetchUnifiedVocab().then(setFullVocab);
+  }, []);
+
+  const tierStats = useMemo(
+    () => getTierStats(fullVocab, getProgress()),
+    // rawDeck/syncVersion are cheap "something changed" triggers, not the
+    // data source - getProgress() is re-read fresh each time, matching how
+    // getCardMasteryStats already re-reads progress rather than trusting a
+    // stale closure.
+    [fullVocab, rawDeck, syncVersion]
+  );
+
+  const toggleLevel = (lvl) => {
+    // An empty revisionLevels means "every level active" (see
+    // getFilteredDeck), so tapping one tile from that state should read as
+    // "turn off just this one" - populate every OTHER level explicitly,
+    // rather than naively adding lvl to an empty array (which would jump
+    // to "only this level", turning every other tier off too).
+    let next;
+    if (revisionLevels.length === 0) {
+      next = ALL_HSK_LEVELS.filter((l) => l !== lvl);
+    } else if (revisionLevels.includes(lvl)) {
+      next = revisionLevels.filter((l) => l !== lvl);
+    } else {
+      next = [...revisionLevels, lvl];
+    }
+    // Re-selecting every level by hand collapses back to [] ("no filter") -
+    // functionally identical, but keeps state canonical so the nav pill's
+    // "All Levels" label (which checks length === 0) stays accurate.
+    if (next.length === ALL_HSK_LEVELS.length) next = [];
+
+    setRevisionLevels(next);
+    savePrefs({ revisionLevels: next, includeNonHsk });
+  };
+
+  const toggleNonHsk = () => {
+    const next = !includeNonHsk;
+    setIncludeNonHsk(next);
+    savePrefs({ revisionLevels, includeNonHsk: next });
+  };
+
+  function renderTierTiles(size) {
+    return (
+      <>
+        {ALL_HSK_LEVELS.map((lvl) => (
+          <TierRingTile
+            key={lvl}
+            tierKey={lvl}
+            label={`HSK ${lvl}`}
+            total={tierStats[lvl].total}
+            seen={tierStats[lvl].seen}
+            mastered={tierStats[lvl].mastered}
+            // An empty revisionLevels means "no filter - every level
+            // included" (see loadDeck/getFilteredDeck), not "nothing
+            // selected" - so every HSK tile should read as active then,
+            // not just whichever's literally in the array.
+            active={revisionLevels.length === 0 || revisionLevels.includes(lvl)}
+            size={size}
+            onClick={() => toggleLevel(lvl)}
+          />
+        ))}
+        <TierRingTile
+          tierKey="non-hsk"
+          label="Non-HSK"
+          total={tierStats['non-hsk'].total}
+          seen={tierStats['non-hsk'].seen}
+          mastered={tierStats['non-hsk'].mastered}
+          active={includeNonHsk}
+          size={size}
+          onClick={toggleNonHsk}
+        />
+      </>
+    );
+  }
 
   const launchArcadeSession = (count = 20, mode = 'all') => {
     let queue;
@@ -316,47 +400,53 @@ export default function App() {
               onSignIn={() => setShowAccount(true)}
             />
           ) : (
-            <div className="card launch-card">
-              <div className="launch-card-header">
-                <span className="deck-level-pill">
-                  {revisionLevels.length > 0 ? `Revising HSK ${revisionLevels.join(', ')}` : 'All Levels'}
-                </span>
-                <span className="deck-ready-tag">
-                  {isLoadingDeck ? 'Loading database...' : `${rawDeck.length} Cards Loaded`}
-                </span>
-              </div>
+            <>
+              <div className="card launch-card">
+                <div className="launch-card-header">
+                  <span className="deck-level-pill">
+                    {revisionLevels.length > 0 ? `Revising HSK ${revisionLevels.join(', ')}` : 'All Levels'}
+                  </span>
+                  <span className="deck-ready-tag">
+                    {isLoadingDeck ? 'Loading database...' : `${rawDeck.length} Cards Loaded`}
+                  </span>
+                </div>
 
-              <div className="launch-card-body">
-                <h1 className="launch-title">Learn Hanzi</h1>
-                <p className="launch-subtitle">Unified frequency & HSK dataset</p>
-              </div>
+                <div className="launch-card-body">
+                  <h1 className="launch-title">Learn Hanzi</h1>
+                  <p className="launch-subtitle">Unified frequency & HSK dataset</p>
+                </div>
 
-              <div className="launch-card-actions">
-                <button
-                  className="primary-launch-btn"
-                  disabled={isLoadingDeck || rawDeck.length === 0}
-                  onClick={() => launchArcadeSession(20, 'all')}
-                >
-                  {isLoadingDeck ? 'Preparing Deck...' : 'Learn ⚡'}
-                </button>
-
-                <button className="hard-mode-btn" onClick={launchHardModeSession}>
-                  🔥 Hard Mode (Targeted Mistake Blitz)
-                </button>
-
-                {weakCards.length > 0 && (
-                  <button className="secondary-launch-btn" onClick={() => launchArcadeSession(20, 'weak')}>
-                    🎯 Review {weakCards.length} Weak Cards
+                <div className="launch-card-actions">
+                  <button
+                    className="primary-launch-btn"
+                    disabled={isLoadingDeck || rawDeck.length === 0}
+                    onClick={() => launchArcadeSession(20, 'all')}
+                  >
+                    {isLoadingDeck ? 'Preparing Deck...' : 'Learn ⚡'}
                   </button>
-                )}
 
-                {seenCards.length > 0 && (
-                  <button className="secondary-launch-btn" onClick={() => launchArcadeSession(seenCards.length, 'seen')}>
-                    📖 Review All {seenCards.length} Seen Cards
+                  <button className="hard-mode-btn" onClick={launchHardModeSession}>
+                    🔥 Hard Mode (Targeted Mistake Blitz)
                   </button>
-                )}
+
+                  {weakCards.length > 0 && (
+                    <button className="secondary-launch-btn" onClick={() => launchArcadeSession(20, 'weak')}>
+                      🎯 Review {weakCards.length} Weak Cards
+                    </button>
+                  )}
+
+                  {seenCards.length > 0 && (
+                    <button className="secondary-launch-btn" onClick={() => launchArcadeSession(seenCards.length, 'seen')}>
+                      📖 Review All {seenCards.length} Seen Cards
+                    </button>
+                  )}
+                </div>
               </div>
-            </div>
+
+              <div className="dashboard-tier-strip">
+                <div className="tier-ring-strip-scroll">{renderTierTiles(48)}</div>
+              </div>
+            </>
           )
         )}
 
@@ -484,52 +574,13 @@ export default function App() {
               <h3>Settings & Character Mastery</h3>
 
               <div style={{ marginTop: '12px' }}>
-                <label className="box-section-label">Revision: Filter by HSK Level</label>
+                <label className="box-section-label">Study Tiers — tap to include/exclude</label>
                 <p style={{ fontSize: '12px', color: 'var(--ink-faint)', margin: '4px 0 0' }}>
-                  {revisionLevels.length === 0
-                    ? 'Learning from all levels. Select levels below to revise a specific one.'
-                    : `Only reviewing HSK ${revisionLevels.join(', ')}. Deselect all to go back to learning from every level.`}
+                  {revisionLevels.length === 0 && includeNonHsk
+                    ? 'Learning from every tier. Tap a tile to focus on specific ones.'
+                    : 'Only reviewing the highlighted tiers below. Tap to add more, or clear all HSK tiles to include every level again.'}
                 </p>
-                <div className="settings-level-grid">
-                  {['1', '2', '3', '4', '5', '6'].map((lvl) => (
-                    <button
-                      key={lvl}
-                      className={`level-toggle-btn ${revisionLevels.includes(lvl) ? 'active' : ''}`}
-                      onClick={() => {
-                        const next = revisionLevels.includes(lvl)
-                          ? revisionLevels.filter(l => l !== lvl)
-                          : [...revisionLevels, lvl];
-                        setRevisionLevels(next);
-                        savePrefs({ revisionLevels: next, includeNonHsk });
-                      }}
-                    >
-                      HSK {lvl}
-                    </button>
-                  ))}
-                </div>
-
-                <div className="settings-toggle-row">
-                  <div>
-                    <p className="settings-toggle-label">Include non-HSK words</p>
-                    <p className="settings-toggle-sublabel">
-                      {includeNonHsk
-                        ? 'Also studying ~2,400 extra high-frequency words outside the HSK list.'
-                        : 'Only official HSK vocabulary — non-HSK frequency words excluded.'}
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    role="switch"
-                    aria-checked={includeNonHsk}
-                    aria-label="Include non-HSK words"
-                    className={`toggle-switch ${includeNonHsk ? 'active' : ''}`}
-                    onClick={() => {
-                      const next = !includeNonHsk;
-                      setIncludeNonHsk(next);
-                      savePrefs({ revisionLevels, includeNonHsk: next });
-                    }}
-                  />
-                </div>
+                <div className="tier-ring-grid">{renderTierTiles(72)}</div>
               </div>
 
               <div className="card-internal-divider" />

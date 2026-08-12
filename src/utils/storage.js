@@ -1,10 +1,79 @@
 import { pushCardProgress, pushSettings } from './syncClient';
-import { enqueue as enqueueSync } from './syncQueue';
+import { enqueue as enqueueSync, QUEUE_KEY as SYNC_QUEUE_KEY } from './syncQueue';
 
 const STORAGE_KEY = 'hanzi_deck_progress';
 const SENTENCE_CACHE_KEY = 'hz_sentence_cache';
 const PREFS_KEY = 'hz_study_prefs';
 const DEFAULT_PREFS = { revisionLevels: [], includeNonHsk: true };
+
+// SM-2 interval (days) at which a card counts as "mastered" - shared by
+// getCardMasteryStats and getTierStats below so the two never drift onto
+// different thresholds for the same underlying question.
+const MASTERED_INTERVAL_DAYS = 21;
+
+// --- One-time card-ID migration (vocab_<index>_<char> -> <char>) ---------
+// The old ID embedded a word's position within whatever HSK/non-HSK filter
+// was active when its deck loaded, so the same word got different progress
+// keys across filter changes. `character` is verified unique across all
+// 7,429 rows of unified_vocab.json, so remapping straight onto it is a
+// safe, lossless 1:1 rekey. Runs once per browser, at module load time
+// (see the bare call at the bottom of this block) - that guarantees it
+// completes before React renders and before AuthContext's mount effect
+// fires, with no orchestration needed elsewhere.
+const LOCAL_MIGRATION_FLAG = 'hz_card_id_migrated_v1';
+const OLD_CARD_ID_PATTERN = /^vocab_\d+_(.+)$/;
+
+function rekeyByPattern(obj, getTimestamp) {
+  const rekeyed = {};
+  let changed = false;
+  for (const [id, value] of Object.entries(obj)) {
+    const match = id.match(OLD_CARD_ID_PATTERN);
+    const newId = match ? match[1] : id;
+    if (match) changed = true;
+
+    // Two old-format keys can collide onto the same character (the word
+    // appeared at different index positions in different filter sessions) -
+    // keep whichever has the newer lastReviewed, same rule
+    // mergeLocalAndRemoteProgress already uses for local/remote collisions.
+    const existing = rekeyed[newId];
+    if (!existing || getTimestamp(value) > getTimestamp(existing)) {
+      rekeyed[newId] = value;
+    }
+  }
+  return { rekeyed, changed };
+}
+
+function migrateLocalCardIds() {
+  try {
+    if (localStorage.getItem(LOCAL_MIGRATION_FLAG) === 'true') return;
+  } catch (e) {
+    return; // localStorage unavailable - nothing to migrate, nothing to flag
+  }
+
+  try {
+    const savedProgress = localStorage.getItem(STORAGE_KEY);
+    if (savedProgress) {
+      const { rekeyed, changed } = rekeyByPattern(JSON.parse(savedProgress), (s) => s.lastReviewed || 0);
+      if (changed) localStorage.setItem(STORAGE_KEY, JSON.stringify(rekeyed));
+    }
+
+    // Also rekey any not-yet-flushed offline sync-queue entries, so a
+    // stale pre-migration queue item doesn't push an old-format row to
+    // Supabase after this ships (see syncQueue.js's { [cardId]: { stats, attempts } } shape).
+    const savedQueue = localStorage.getItem(SYNC_QUEUE_KEY);
+    if (savedQueue) {
+      const { rekeyed, changed } = rekeyByPattern(JSON.parse(savedQueue), (q) => q.stats?.lastReviewed || 0);
+      if (changed) localStorage.setItem(SYNC_QUEUE_KEY, JSON.stringify(rekeyed));
+    }
+
+    localStorage.setItem(LOCAL_MIGRATION_FLAG, 'true');
+  } catch (e) {
+    console.error('Failed to migrate local card IDs:', e);
+    // Leave the flag unset - retried on next load instead of getting stuck.
+  }
+}
+
+migrateLocalCardIds();
 
 // Set by AuthContext on every auth state change (sign in/out). Kept as a
 // plain module-level value rather than storage.js importing React context,
@@ -133,7 +202,7 @@ export function getCardMasteryStats(deck) {
 
     if (!stat || stat.repetitions === 0) {
       newCards.push(card);
-    } else if (stat.interval >= 21) {
+    } else if (stat.interval >= MASTERED_INTERVAL_DAYS) {
       mastered.push(card);
     } else {
       learning.push(card);
@@ -141,6 +210,35 @@ export function getCardMasteryStats(deck) {
   });
 
   return { new: newCards, learning, mastered };
+}
+
+/**
+ * Per-tier (HSK 1-6 + 'non-hsk') seen/mastered breakdown, independent of
+ * whatever HSK/non-HSK filter is currently active - takes the FULL,
+ * unfiltered vocab list (see data/vocabLoader.js's fetchUnifiedVocab) so a
+ * tier that's currently deselected still reports accurate stats. Uses the
+ * same MASTERED_INTERVAL_DAYS threshold as getCardMasteryStats above - one
+ * classification rule, two different aggregations, so they can't drift.
+ */
+export function getTierStats(fullVocab, progress) {
+  const tiers = {};
+  for (const key of ['1', '2', '3', '4', '5', '6', 'non-hsk']) {
+    tiers[key] = { total: 0, seen: 0, mastered: 0 };
+  }
+
+  fullVocab.forEach((word) => {
+    const key = word.level === null || word.level === undefined ? 'non-hsk' : String(word.level);
+    const tier = tiers[key];
+    if (!tier) return; // defensive: unexpected level value, skip rather than throw
+    tier.total += 1;
+
+    const stat = progress[word.character];
+    if (!stat || stat.repetitions === 0) return;
+    tier.seen += 1;
+    if (stat.interval >= MASTERED_INTERVAL_DAYS) tier.mastered += 1;
+  });
+
+  return tiers;
 }
 
 /**
