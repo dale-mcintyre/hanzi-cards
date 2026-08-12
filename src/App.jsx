@@ -18,6 +18,10 @@ import TierRingTile from './components/TierRingTile';
 
 const ALL_HSK_LEVELS = ['1', '2', '3', '4', '5', '6'];
 
+// Cards graded (across the whole visit, any session type) before an
+// anonymous user sees the one-time sign-up nudge on the completion screen.
+const SOFT_WALL_THRESHOLD = 5;
+
 function HighlightedSentence({ sentence, targetChar, muted = false }) {
   if (!sentence || !targetChar) return <span>{sentence}</span>;
   const parts = sentence.split(targetChar);
@@ -78,6 +82,14 @@ export default function App() {
   const [combo, setCombo] = useState(0);
   const [maxCombo, setMaxCombo] = useState(0);
   const [floatingPopups, setFloatingPopups] = useState([]);
+
+  // Visit-level (not per-session-queue) grade count for the anonymous
+  // sign-up nudge - accumulates across however many mini-sessions happen
+  // in this visit, resets only on a full page reload. hasShownSoftWall
+  // guarantees the nudge fires at most once per visit.
+  const [visitGradeCount, setVisitGradeCount] = useState(0);
+  const [hasShownSoftWall, setHasShownSoftWall] = useState(false);
+  const [showSoftWallPrompt, setShowSoftWallPrompt] = useState(false);
 
   const [rawDeck, setRawDeck] = useState([]);
   const [sessionQueue, setSessionQueue] = useState([]);
@@ -330,7 +342,17 @@ export default function App() {
     // look "never studied" until the next full deck reload.
     setRawDeck((prev) => prev.map((c) => (c.id === card.id ? { ...c, stats: stamped } : c)));
 
+    // Computed as a local value, not read back from state this same tick -
+    // setVisitGradeCount's update wouldn't be visible yet if we read
+    // visitGradeCount directly below.
+    const newVisitGradeCount = !user ? visitGradeCount + 1 : visitGradeCount;
+    if (!user) setVisitGradeCount(newVisitGradeCount);
+
     if (currentIndex + 1 >= sessionQueue.length) {
+      if (!user && !hasShownSoftWall && newVisitGradeCount >= SOFT_WALL_THRESHOLD) {
+        setShowSoftWallPrompt(true);
+        setHasShownSoftWall(true); // once per visit, regardless of future sessions
+      }
       setAppState('completed');
     } else {
       setIsFlipped(false);
@@ -559,8 +581,24 @@ export default function App() {
                   <span className="stat-value">🔥 {maxCombo}x</span>
                 </div>
               </div>
-              <button className="primary-launch-btn" onClick={() => setAppState('launch')}>
-                Continue ⚡
+
+              {showSoftWallPrompt && !user && (
+                <div className="soft-wall-prompt">
+                  <p className="soft-wall-message">
+                    Great progress! You've reviewed {visitGradeCount} cards. Sign in to save
+                    your results, sync across your devices, and keep your learning streak.
+                  </p>
+                  <button className="primary-launch-btn" onClick={() => setShowAccount(true)}>
+                    Sign In / Create Account
+                  </button>
+                </div>
+              )}
+
+              <button
+                className={showSoftWallPrompt && !user ? 'secondary-launch-btn' : 'primary-launch-btn'}
+                onClick={() => { setShowSoftWallPrompt(false); setAppState('launch'); }}
+              >
+                {showSoftWallPrompt && !user ? 'Continue Studying' : 'Continue ⚡'}
               </button>
             </div>
           </div>

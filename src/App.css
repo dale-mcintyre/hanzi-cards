@@ -673,6 +673,25 @@
   color: var(--ink);
 }
 
+.soft-wall-prompt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 16px;
+  border-radius: 16px;
+  background: rgba(56, 189, 248, 0.06);
+  border: 1px solid rgba(56, 189, 248, 0.2);
+}
+
+.soft-wall-message {
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--ink-dim);
+  margin: 0;
+}
+
 /* ==================== Settings drawer ==================== */
 .drawer-overlay {
   position: fixed;
