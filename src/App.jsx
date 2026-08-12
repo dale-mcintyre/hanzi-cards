@@ -15,6 +15,7 @@ import MarketingLanding from './components/MarketingLanding';
 import AccountDrawer from './components/AccountDrawer';
 import MistakeReportDrawer from './components/MistakeReportDrawer';
 import BetaFeedbackDrawer from './components/BetaFeedbackDrawer';
+import AboutDrawer from './components/AboutDrawer';
 import TierRingTile from './components/TierRingTile';
 
 const ALL_HSK_LEVELS = ['1', '2', '3', '4', '5', '6'];
@@ -57,6 +58,7 @@ export default function App() {
   const [showAccount, setShowAccount] = useState(false);
   const [showMistakeReport, setShowMistakeReport] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
+  const [showAbout, setShowAbout] = useState(false);
   const [activeMasteryTab, setActiveMasteryTab] = useState('new');
 
   const { user, isAuthReady, syncVersion } = useAuth();
@@ -407,6 +409,9 @@ export default function App() {
       {/* Top Navbar */}
       <nav className="top-nav-bar">
         <div className="nav-left">
+          <button className="about-trigger-btn" onClick={() => setShowAbout(true)} aria-label="About Learn Hanzi">
+            ℹ️
+          </button>
           <span className="streak-badge">🔥 {streak}d</span>
           {appState === 'studying' && (
             <span className="xp-pill">⚡ {score} XP</span>
@@ -691,6 +696,17 @@ export default function App() {
                 </div>
               </div>
 
+              <div className="card-internal-divider" />
+
+              <button
+                type="button"
+                className="auth-toggle-link"
+                style={{ margin: '4px auto 0' }}
+                onClick={() => { setShowSettings(false); setShowAbout(true); }}
+              >
+                ℹ️ About Learn Hanzi
+              </button>
+
             </div>
           </div>
         )}
@@ -698,6 +714,8 @@ export default function App() {
         {showAccount && <AccountDrawer onClose={() => setShowAccount(false)} />}
 
         {showFeedback && <BetaFeedbackDrawer onClose={() => setShowFeedback(false)} />}
+
+        {showAbout && <AboutDrawer onClose={() => setShowAbout(false)} />}
 
         {showMistakeReport && card && (
           <MistakeReportDrawer
