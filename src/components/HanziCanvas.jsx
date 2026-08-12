@@ -13,30 +13,42 @@ function SingleHanziBox({ char, mode, size }) {
     containerRef.current.innerHTML = '';
     setWriterLoaded(false);
 
-    try {
-      const writer = HanziWriter.create(containerRef.current, char, {
-        width: size,
-        height: size,
-        padding: Math.max(6, Math.floor(size * 0.08)),
-        strokeColor: '#f8fafc',
-        radicalColor: '#38bdf8',
-        outlineColor: '#334155',
-        showOutline: true,
-        showCharacter: true,
-        delayBetweenStrokes: 50,
-        strokeAnimationSpeed: 1.25,
-        onLoadCharDataSuccess: () => setWriterLoaded(true),
-        onLoadCharDataError: () => setWriterLoaded(false),
-      });
+    // HanziWriter.create() synchronously builds a nontrivial number of SVG
+    // elements from stroke path data - on the same tick as the swipe/tap
+    // that just changed `char`, that competes with the browser processing
+    // the very next pointer event, which is what made rapid swiping feel
+    // laggy. Deferring it one frame gets it off that critical path (the
+    // other half of this fix is useSwipeGesture.js's rAF-throttled drag
+    // updates).
+    const rafId = requestAnimationFrame(() => {
+      if (!containerRef.current) return;
+      try {
+        const writer = HanziWriter.create(containerRef.current, char, {
+          width: size,
+          height: size,
+          padding: Math.max(6, Math.floor(size * 0.08)),
+          strokeColor: '#f8fafc',
+          radicalColor: '#38bdf8',
+          outlineColor: '#334155',
+          showOutline: true,
+          showCharacter: true,
+          delayBetweenStrokes: 50,
+          strokeAnimationSpeed: 1.25,
+          onLoadCharDataSuccess: () => setWriterLoaded(true),
+          onLoadCharDataError: () => setWriterLoaded(false),
+        });
 
-      writerRef.current = writer;
+        writerRef.current = writer;
 
-      if (mode === 'animate') {
-        writer.animateCharacter();
+        if (mode === 'animate') {
+          writer.animateCharacter();
+        }
+      } catch (e) {
+        console.warn('HanziWriter fallback:', e);
       }
-    } catch (e) {
-      console.warn('HanziWriter fallback:', e);
-    }
+    });
+
+    return () => cancelAnimationFrame(rafId);
   }, [char, mode, size]);
 
   return (

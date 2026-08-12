@@ -175,10 +175,22 @@
   box-sizing: border-box;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
+  -moz-backface-visibility: hidden;
+  /* Firefox (esp. macOS) ghosts/ blends the hidden back face into the
+     visible one mid-rotation unless each face paints its own opaque
+     background instead of relying on .card's background showing through -
+     same gradient as .card so this is visually identical everywhere else.
+     translateZ(0) forces its own compositing layer, which is the other
+     half of the standard fix for this Firefox-specific artifact. */
+  background: linear-gradient(165deg, var(--surface-raised), var(--surface));
+  transform: translateZ(0);
 }
 
 .back-face {
-  transform: rotateY(180deg);
+  /* Combined with .card-face's translateZ(0), not overriding it - a bare
+     `rotateY(180deg)` here would replace that compositing hint entirely
+     since it's the same CSS property. */
+  transform: rotateY(180deg) translateZ(0);
 }
 
 /* ==================== Front face ==================== */
