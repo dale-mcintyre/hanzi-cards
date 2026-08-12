@@ -14,6 +14,7 @@ import { useAuth } from './context/AuthContext';
 import MarketingLanding from './components/MarketingLanding';
 import AccountDrawer from './components/AccountDrawer';
 import MistakeReportDrawer from './components/MistakeReportDrawer';
+import BetaFeedbackDrawer from './components/BetaFeedbackDrawer';
 import TierRingTile from './components/TierRingTile';
 
 const ALL_HSK_LEVELS = ['1', '2', '3', '4', '5', '6'];
@@ -55,6 +56,7 @@ export default function App() {
   const [showSettings, setShowSettings] = useState(false);
   const [showAccount, setShowAccount] = useState(false);
   const [showMistakeReport, setShowMistakeReport] = useState(false);
+  const [showFeedback, setShowFeedback] = useState(false);
   const [activeMasteryTab, setActiveMasteryTab] = useState('new');
 
   const { user, isAuthReady, syncVersion } = useAuth();
@@ -397,6 +399,11 @@ export default function App() {
 
   return (
     <div className="app-container">
+      <button type="button" className="beta-banner" onClick={() => setShowFeedback(true)}>
+        <span className="beta-banner-tag">BETA TESTING.</span>
+        <span className="beta-banner-cta">Click here to provide feedback.</span>
+      </button>
+
       {/* Top Navbar */}
       <nav className="top-nav-bar">
         <div className="nav-left">
@@ -689,6 +696,8 @@ export default function App() {
         )}
 
         {showAccount && <AccountDrawer onClose={() => setShowAccount(false)} />}
+
+        {showFeedback && <BetaFeedbackDrawer onClose={() => setShowFeedback(false)} />}
 
         {showMistakeReport && card && (
           <MistakeReportDrawer

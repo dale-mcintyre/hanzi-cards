@@ -173,3 +173,22 @@ export async function reportMistake(userId, { cardId, character, reason, note })
     return { ok: false, error };
   }
 }
+
+/** Inserts one beta-feedback submission, from signed-in or anonymous
+ * visitors alike (userId may be null). Insert-only from the client by RLS
+ * design, mirroring reportMistake - reviewed directly in the Supabase
+ * dashboard, no corresponding read function. */
+export async function submitFeedback({ userId, email, message }) {
+  if (!supabase) return unavailable();
+  try {
+    const { error } = await supabase.from('beta_feedback').insert({
+      user_id: userId || null,
+      email: email || null,
+      message,
+    });
+    if (error) return { ok: false, error };
+    return { ok: true };
+  } catch (error) {
+    return { ok: false, error };
+  }
+}
