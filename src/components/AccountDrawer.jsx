@@ -48,7 +48,7 @@ export default function AccountDrawer({ onClose }) {
               {queueSize() > 0 ? `⏳ ${queueSize()} card${queueSize() === 1 ? '' : 's'} pending sync` : '✓ Synced'}
             </p>
             <button className="auth-submit-btn" onClick={() => { signOut(); onClose(); }}>
-              Sign out
+              Log Out
             </button>
           </div>
         )}

@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { supabase } from '../lib/supabaseClient';
-import { getProgress, hydrateLocalFromRemote, setCurrentSyncUser } from '../utils/storage';
-import { pullAllProgress, mergeLocalAndRemoteProgress, pushCardProgress } from '../utils/syncClient';
+import { getProgress, hydrateLocalFromRemote, setCurrentSyncUser, getPrefs, hydratePrefsFromRemote } from '../utils/storage';
+import { pullAllProgress, mergeLocalAndRemoteProgress, pushCardProgress, pullSettings, pushSettings } from '../utils/syncClient';
 import { flush as flushSyncQueue } from '../utils/syncQueue';
 
 const AuthContext = createContext(null);
@@ -51,6 +51,27 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
+  // Unlike runMigration, this always re-runs on every sign-in rather than
+  // being one-time-flag-guarded - a single settings row is cheap to pull
+  // (unlike the ~7000-row progress merge), and "always take the latest
+  // remote settings" is the simplest correct rule for a preference blob
+  // with no per-item timestamps to reconcile. Two devices editing settings
+  // in the same window is an accepted, unsolved edge case (last write
+  // wins) - not worth the complexity progress sync's per-card merge has,
+  // given how much lower-stakes a filter preference is than an SM-2 grade.
+  const runSettingsSync = useCallback(async (user) => {
+    const local = getPrefs();
+    const remoteResult = await pullSettings(user.id);
+    if (!remoteResult.ok) return; // fail-open: try again on the next sign-in
+
+    if (remoteResult.data) {
+      hydratePrefsFromRemote(remoteResult.data);
+    } else {
+      await pushSettings(user.id, local);
+    }
+    setSyncVersion((v) => v + 1);
+  }, []);
+
   useEffect(() => {
     if (!supabase) {
       setIsAuthReady(true);
@@ -66,6 +87,7 @@ export function AuthProvider({ children }) {
       setIsAuthReady(true);
       if (initialSession?.user) {
         runMigration(initialSession.user);
+        runSettingsSync(initialSession.user);
         flushSyncQueue(pushFnFor(initialSession.user.id));
       }
     });
@@ -75,6 +97,7 @@ export function AuthProvider({ children }) {
       setCurrentSyncUser(newSession?.user?.id || null);
       if (event === 'SIGNED_IN' && newSession?.user) {
         runMigration(newSession.user);
+        runSettingsSync(newSession.user);
         flushSyncQueue(pushFnFor(newSession.user.id));
       }
     });
@@ -83,7 +106,7 @@ export function AuthProvider({ children }) {
       unsubscribed = true;
       subscription.unsubscribe();
     };
-  }, [runMigration]);
+  }, [runMigration, runSettingsSync]);
 
   // Retry queued pushes whenever the device comes back online.
   useEffect(() => {

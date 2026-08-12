@@ -3,7 +3,7 @@ import './App.css';
 import HanziCanvas from './components/HanziCanvas';
 import useSwipeGesture from './hooks/useSwipeGesture';
 import { calculateSM2 } from './utils/sm2';
-import { getProgress, saveCardProgress, getCardMasteryStats } from './utils/storage';
+import { getProgress, saveCardProgress, getCardMasteryStats, getPrefs, savePrefs } from './utils/storage';
 import { speakText } from './utils/tts';
 import { ColorPinyin } from './utils/pinyinColor';
 import { getFilteredDeck } from './data/vocabLoader';
@@ -39,8 +39,10 @@ function HighlightedSentence({ sentence, targetChar, muted = false }) {
 export default function App() {
   // Empty = no filter, learn from the full frequency-ranked deck. A
   // non-empty selection (set from Settings) narrows to specific HSK levels
-  // for targeted revision.
-  const [revisionLevels, setRevisionLevels] = useState([]);
+  // for targeted revision. Initialized from localStorage (not a hardcoded
+  // default) so a saved filter survives a page reload.
+  const [revisionLevels, setRevisionLevels] = useState(() => getPrefs().revisionLevels);
+  const [includeNonHsk, setIncludeNonHsk] = useState(() => getPrefs().includeNonHsk);
   const [showSettings, setShowSettings] = useState(false);
   const [showAccount, setShowAccount] = useState(false);
   const [showMistakeReport, setShowMistakeReport] = useState(false);
@@ -57,6 +59,17 @@ export default function App() {
 
   const [appState, setAppState] = useState('launch');
   const [countdownNum, setCountdownNum] = useState(3);
+
+  // The nav bar (and its sign-out control) is reachable from every screen,
+  // but the marketing/dashboard switch only lives in the 'launch' state -
+  // without this, signing out mid-session left the studying screen up
+  // indefinitely even though the user was already signed out. Only fires
+  // on a real sign-out transition (user: object -> null); on initial
+  // mount user is already null and appState is already 'launch', so this
+  // is a harmless no-op then, and it doesn't fire on sign-in at all.
+  useEffect(() => {
+    if (!user) setAppState('launch');
+  }, [user]);
 
   const [score, setScore] = useState(0);
   const [combo, setCombo] = useState(0);
@@ -84,8 +97,8 @@ export default function App() {
   useEffect(() => {
     async function loadDeck() {
       setIsLoadingDeck(true);
-      const localWords = await getFilteredDeck(revisionLevels);
-      
+      const localWords = await getFilteredDeck(revisionLevels, includeNonHsk);
+
       const savedProgress = getProgress();
 
       const merged = localWords.map((card, index) => {
@@ -109,11 +122,24 @@ export default function App() {
     } catch (e) {
       setStreak(1);
     }
-    // syncVersion isn't read above - it's a signal, not data. It bumps once
+    // syncVersion isn't read above - it's a signal, not data. It bumps
     // after AuthContext hydrates localStorage from a signed-in account's
-    // remote progress, so this effect re-runs and rawDeck picks up the
-    // merged stats (sign-in doesn't otherwise change revisionLevels).
-  }, [revisionLevels, syncVersion]);
+    // remote progress OR remote settings, so this effect re-runs and
+    // rawDeck picks up the merged stats even when revisionLevels/
+    // includeNonHsk haven't themselves changed by reference.
+  }, [revisionLevels, includeNonHsk, syncVersion]);
+
+  // revisionLevels/includeNonHsk are plain useState, read from localStorage
+  // once at mount - unlike getProgress() (read fresh every loadDeck run),
+  // they don't automatically pick up a post-sign-in remote hydration on
+  // their own, so this explicitly re-reads them whenever syncVersion bumps
+  // (either a progress sync or a settings sync). A no-op re-read after a
+  // progress-only bump is harmless.
+  useEffect(() => {
+    const fresh = getPrefs();
+    setRevisionLevels(fresh.revisionLevels);
+    setIncludeNonHsk(fresh.includeNonHsk);
+  }, [syncVersion]);
 
   const weakCards = useMemo(() => rawDeck.filter((c) => c.stats.repetitions > 0 && c.stats.interval <= 2), [rawDeck]);
 
@@ -470,16 +496,39 @@ export default function App() {
                       key={lvl}
                       className={`level-toggle-btn ${revisionLevels.includes(lvl) ? 'active' : ''}`}
                       onClick={() => {
-                        if (revisionLevels.includes(lvl)) {
-                          setRevisionLevels(revisionLevels.filter(l => l !== lvl));
-                        } else {
-                          setRevisionLevels([...revisionLevels, lvl]);
-                        }
+                        const next = revisionLevels.includes(lvl)
+                          ? revisionLevels.filter(l => l !== lvl)
+                          : [...revisionLevels, lvl];
+                        setRevisionLevels(next);
+                        savePrefs({ revisionLevels: next, includeNonHsk });
                       }}
                     >
                       HSK {lvl}
                     </button>
                   ))}
+                </div>
+
+                <div className="settings-toggle-row">
+                  <div>
+                    <p className="settings-toggle-label">Include non-HSK words</p>
+                    <p className="settings-toggle-sublabel">
+                      {includeNonHsk
+                        ? 'Also studying ~2,400 extra high-frequency words outside the HSK list.'
+                        : 'Only official HSK vocabulary — non-HSK frequency words excluded.'}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={includeNonHsk}
+                    aria-label="Include non-HSK words"
+                    className={`toggle-switch ${includeNonHsk ? 'active' : ''}`}
+                    onClick={() => {
+                      const next = !includeNonHsk;
+                      setIncludeNonHsk(next);
+                      savePrefs({ revisionLevels, includeNonHsk: next });
+                    }}
+                  />
                 </div>
               </div>
 

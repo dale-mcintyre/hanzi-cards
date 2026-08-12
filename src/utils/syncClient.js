@@ -108,6 +108,52 @@ export function mergeLocalAndRemoteProgress(local, remote) {
   return { merged, toPush };
 }
 
+/** Fetches this user's single study-preferences row, if any. `data: null`
+ * (not an error) means the account has no row yet - callers should treat
+ * that as "seed remote from local", not a failure. */
+export async function pullSettings(userId) {
+  if (!supabase) return unavailable();
+  try {
+    const { data, error } = await supabase
+      .from('user_settings')
+      .select('revision_levels, include_non_hsk')
+      .eq('user_id', userId)
+      .maybeSingle();
+    if (error) return { ok: false, error };
+    if (!data) return { ok: true, data: null };
+    return {
+      ok: true,
+      data: {
+        revisionLevels: data.revision_levels || [],
+        includeNonHsk: data.include_non_hsk ?? true,
+      },
+    };
+  } catch (error) {
+    return { ok: false, error };
+  }
+}
+
+/** Upserts the user's single settings row. Used both for live pushes on
+ * every preference change and to seed a brand new account's first row. */
+export async function pushSettings(userId, prefs) {
+  if (!supabase) return unavailable();
+  try {
+    const { error } = await supabase.from('user_settings').upsert(
+      {
+        user_id: userId,
+        revision_levels: prefs.revisionLevels ?? [],
+        include_non_hsk: prefs.includeNonHsk ?? true,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: 'user_id' }
+    );
+    if (error) return { ok: false, error };
+    return { ok: true };
+  } catch (error) {
+    return { ok: false, error };
+  }
+}
+
 /** Inserts a mistake report. Insert-only from the client by RLS design -
  * there's no corresponding read function; reports are triaged directly in
  * the Supabase dashboard. */

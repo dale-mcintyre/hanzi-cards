@@ -22,17 +22,24 @@ export async function fetchUnifiedVocab() {
 }
 
 /**
- * Filters the vocab dataset based on selected HSK levels (e.g., ['1', '2']).
- * An empty/missing selection means no filter - the full frequency-ranked
- * deck (HSK words plus the non-HSK top-frequency words), used for the main
- * "Learn" flow. A non-empty selection is a targeted revision filter.
+ * Filters the vocab dataset by HSK level selection and non-HSK inclusion,
+ * independently of each other:
+ *  - selectedLevels: [] = no level filter (every HSK level passes);
+ *    non-empty = only those HSK levels pass.
+ *  - includeNonHsk: whether the ~2,400 level:null CC-CEDICT filler words
+ *    (see build-vocab.py) are included, regardless of selectedLevels.
+ * Defaults ([], true) reproduce the deck's only-ever-observed steady
+ * state before these were persisted: the full frequency-ranked deck,
+ * HSK and non-HSK words together.
  */
-export async function getFilteredDeck(selectedLevels = []) {
+export async function getFilteredDeck(selectedLevels = [], includeNonHsk = true) {
   const allVocab = await fetchUnifiedVocab();
 
-  const filtered = selectedLevels.length > 0
-    ? allVocab.filter((item) => selectedLevels.includes(String(item.level)))
-    : allVocab;
+  const filtered = allVocab.filter((item) => {
+    const isNonHsk = item.level === null || item.level === undefined;
+    if (isNonHsk) return includeNonHsk;
+    return selectedLevels.length === 0 || selectedLevels.includes(String(item.level));
+  });
 
   const sentenceMap = await getSentencesFor(filtered.map((item) => item.character));
 

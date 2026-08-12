@@ -1,8 +1,10 @@
-import { pushCardProgress } from './syncClient';
+import { pushCardProgress, pushSettings } from './syncClient';
 import { enqueue as enqueueSync } from './syncQueue';
 
 const STORAGE_KEY = 'hanzi_deck_progress';
 const SENTENCE_CACHE_KEY = 'hz_sentence_cache';
+const PREFS_KEY = 'hz_study_prefs';
+const DEFAULT_PREFS = { revisionLevels: [], includeNonHsk: true };
 
 // Set by AuthContext on every auth state change (sign in/out). Kept as a
 // plain module-level value rather than storage.js importing React context,
@@ -60,6 +62,53 @@ export function hydrateLocalFromRemote(mergedProgress) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(mergedProgress));
   } catch (e) {
     console.error('Failed to hydrate local progress from remote:', e);
+  }
+}
+
+/**
+ * Study preferences: HSK level filter + whether non-HSK frequency words
+ * are included. Same local-first, fail-open shape as progress above, but
+ * simpler - a single preference blob has no per-item loss risk the way a
+ * graded card does, so a failed push here just isn't queued for retry;
+ * the next explicit change or the next sign-in's pull naturally
+ * reconciles it (see AuthContext.jsx's runSettingsSync).
+ */
+export function getPrefs() {
+  try {
+    const saved = localStorage.getItem(PREFS_KEY);
+    if (!saved) return { ...DEFAULT_PREFS };
+    const parsed = JSON.parse(saved);
+    return {
+      revisionLevels: Array.isArray(parsed.revisionLevels) ? parsed.revisionLevels : [],
+      includeNonHsk: typeof parsed.includeNonHsk === 'boolean' ? parsed.includeNonHsk : true,
+    };
+  } catch (e) {
+    console.error('Failed to load study preferences:', e);
+    return { ...DEFAULT_PREFS };
+  }
+}
+
+export function savePrefs(prefs) {
+  try {
+    localStorage.setItem(PREFS_KEY, JSON.stringify(prefs));
+  } catch (e) {
+    console.error('Failed to save study preferences:', e);
+  }
+
+  if (currentSyncUserId) {
+    pushSettings(currentSyncUserId, prefs);
+  }
+
+  return prefs;
+}
+
+/** Replaces local preferences with a signed-in account's remote settings
+ * row - used once after sign-in (see runSettingsSync). */
+export function hydratePrefsFromRemote(remotePrefs) {
+  try {
+    localStorage.setItem(PREFS_KEY, JSON.stringify(remotePrefs));
+  } catch (e) {
+    console.error('Failed to hydrate study preferences from remote:', e);
   }
 }
 
