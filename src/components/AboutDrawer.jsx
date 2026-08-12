@@ -43,6 +43,14 @@ export default function AboutDrawer({ onClose }) {
             end, character rendering powered by HanziWriter, and Supabase for accounts
             and cross-device sync.
           </p>
+          <a
+            className="about-coffee-link"
+            href="https://buymeacoffee.com/dalemcintyre"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            ☕ Buy me a coffee
+          </a>
         </div>
       </div>
     </div>
