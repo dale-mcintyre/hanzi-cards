@@ -57,6 +57,11 @@ body {
   min-height: 100vh;
   position: relative;
   overflow: hidden;
+  /* index.html's viewport meta sets viewport-fit=cover, which lets content
+     extend under the notch/status bar/browser-chrome area rather than being
+     pushed down automatically - without this, whatever renders first (the
+     beta banner) ends up drawn behind that area instead of below it. */
+  padding-top: env(safe-area-inset-top, 0px);
 }
 
 button {
