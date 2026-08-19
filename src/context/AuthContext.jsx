@@ -66,23 +66,21 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
-  // One-time reconciliation between this device's local progress and the
-  // signed-in account's remote progress. Idempotent and safe to call more
-  // than once (guarded by a per-account localStorage flag) - see PLAN.md's
-  // "Anonymous -> account migration" section for the local-wins-by-default
-  // reasoning.
+  // Reconciliation between this device's local progress and the signed-in
+  // account's remote progress. Runs on every app load/sign-in, not just the
+  // first time on a device - progress made on other devices only ever
+  // reaches this one through this pull, since saveCardProgress's live push
+  // is one-directional (device -> remote). Without re-running this every
+  // load, two devices on the same account silently drift apart: each one's
+  // seen/learning/mastered counts (getCardMasteryStats/getTierStats) read
+  // straight off the local cache, which would otherwise be frozen at
+  // whatever it looked like the one time this ran. Idempotent either way -
+  // see PLAN.md's "Anonymous -> account migration" section for the
+  // local-wins-on-conflict reasoning mergeLocalAndRemoteProgress applies.
   const runMigration = useCallback(async (user) => {
-    const migratedFlag = `hz_synced_account_${user.id}`;
-    try {
-      if (localStorage.getItem(migratedFlag) === 'true') return;
-    } catch (e) {
-      // localStorage unavailable - fall through and attempt the merge
-      // anyway rather than getting stuck never syncing.
-    }
-
     const local = getProgress();
     const remoteResult = await pullAllProgress(user.id);
-    if (!remoteResult.ok) return; // fail-open: try again on the next sign-in
+    if (!remoteResult.ok) return; // fail-open: try again on the next load
 
     const { merged, toPush } = mergeLocalAndRemoteProgress(local, remoteResult.data);
 
@@ -91,12 +89,6 @@ export function AuthProvider({ children }) {
     );
     hydrateLocalFromRemote(merged);
     setSyncVersion((v) => v + 1);
-
-    try {
-      localStorage.setItem(migratedFlag, 'true');
-    } catch (e) {
-      // Non-fatal: worst case the merge (harmlessly) runs again next sign-in.
-    }
   }, []);
 
   // Unlike runMigration, this always re-runs on every sign-in rather than
