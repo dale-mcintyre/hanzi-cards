@@ -3,6 +3,7 @@ import HanziCanvas from './HanziCanvas';
 import useSwipeGesture from '../hooks/useSwipeGesture';
 import { speakText } from '../utils/tts';
 import { ColorPinyin } from '../utils/pinyinColor';
+import { MASTERED_INTERVAL_DAYS } from '../utils/storage';
 
 function HighlightedSentence({ sentence, targetChar, muted = false }) {
   if (!sentence || !targetChar) return <span>{sentence}</span>;
@@ -48,6 +49,16 @@ export default function StudySession({
 
   const primaryMeaning = meaningList[0]?.trim();
   const secondaryMeanings = meaningList.slice(1).join('; ').trim();
+
+  // Quiet review-history indicator - nothing for a never-studied card (no
+  // history to report), "Mastered" once the SM-2 interval crosses the same
+  // threshold the Settings drawer's mastery matrix uses, otherwise a plain
+  // seen-count. Deliberately the unstyled `.meta-pill` (no color variant)
+  // to stay the quietest pill on the card.
+  const repetitions = card?.stats?.repetitions || 0;
+  const interval = card?.stats?.interval || 0;
+  const historyLabel =
+    repetitions === 0 ? null : interval >= MASTERED_INTERVAL_DAYS ? 'Mastered' : `Seen ${repetitions}×`;
 
   return (
     <>
@@ -130,6 +141,7 @@ export default function StudySession({
                 <div className="card-meta-row">
                   {card.level && <span className="meta-pill meta-pill--hsk">HSK {card.level}</span>}
                   {card.freq_rank && <span className="meta-pill meta-pill--freq">Freq #{card.freq_rank}</span>}
+                  {historyLabel && <span className="meta-pill">{historyLabel}</span>}
                 </div>
 
                 <div className="card-internal-divider" />

@@ -701,6 +701,15 @@
   text-align: center;
   gap: 14px;
   width: 100%;
+  /* .victory-card has a fixed height (see .card) and centers its single
+     child - without this, a long session recap can push total content
+     taller than that fixed height and get silently clipped (from both
+     ends, since centered) instead of scrolling. Mirrors the study card's
+     own .back-scrollable-content fix for the identical problem. Short
+     content (today's default, or a recap-free session) is unaffected -
+     it still just centers within the available space. */
+  max-height: 100%;
+  overflow-y: auto;
 }
 
 .victory-emoji {
@@ -808,6 +817,42 @@
   font-weight: 800;
   color: var(--ink);
   margin: 0;
+}
+
+/* ==================== Card inspect drawer (recap tap-through) ==================== */
+.card-inspect-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.card-inspect-char {
+  font-size: 32px;
+  font-weight: 700;
+  font-family: var(--font-hanzi);
+  color: var(--ink);
+}
+
+.card-inspect-outcome {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 20px;
+  border: 1px solid;
+  white-space: nowrap;
+}
+
+.card-inspect-outcome--know {
+  color: var(--easy);
+  border-color: rgba(52, 211, 153, 0.3);
+  background: var(--easy-dim);
+}
+
+.card-inspect-outcome--again {
+  color: var(--hard);
+  border-color: rgba(251, 113, 133, 0.3);
+  background: var(--hard-dim);
 }
 
 /* ==================== About drawer ==================== */
@@ -1008,6 +1053,28 @@
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.07);
   min-width: 52px;
+  cursor: pointer;
+}
+
+.mastery-chip--know {
+  border-color: rgba(52, 211, 153, 0.25);
+}
+
+.mastery-chip--again {
+  border-color: rgba(251, 113, 133, 0.25);
+}
+
+/* ==================== Post-session recap (Completion screen) ==================== */
+.session-recap {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+  text-align: left;
+}
+
+.session-recap-group .box-section-label {
+  margin-bottom: 8px;
 }
 
 .chip-char {

@@ -11,6 +11,7 @@ import { useAuth } from './context/AuthContext';
 import LaunchScreen from './components/LaunchScreen';
 import StudySession from './components/StudySession';
 import CompletionScreen from './components/CompletionScreen';
+import CardInspectDrawer from './components/CardInspectDrawer';
 import SyncStatusDot from './components/SyncStatusDot';
 import AccountDrawer from './components/AccountDrawer';
 import MistakeReportDrawer from './components/MistakeReportDrawer';
@@ -67,6 +68,14 @@ export default function App() {
   const [combo, setCombo] = useState(0);
   const [maxCombo, setMaxCombo] = useState(0);
   const [floatingPopups, setFloatingPopups] = useState([]);
+
+  // Per-card outcomes for the session currently in progress (or just
+  // finished) - feeds the post-session recap on CompletionScreen. Reset
+  // alongside score/combo/maxCombo at the start of every session, appended
+  // to in handleNextCard. inspectedResult drives the tap-to-inspect drawer
+  // from that recap.
+  const [sessionResults, setSessionResults] = useState([]);
+  const [inspectedResult, setInspectedResult] = useState(null);
 
   // Visit-level (not per-session-queue) grade count for the anonymous
   // sign-up flow - accumulates across however many mini-sessions happen in
@@ -259,6 +268,7 @@ export default function App() {
     setScore(0);
     setCombo(0);
     setMaxCombo(0);
+    setSessionResults([]);
 
     setAppState('countdown');
     setCountdownNum(3);
@@ -267,7 +277,7 @@ export default function App() {
   const launchHardModeSession = () => {
     const savedProgress = getProgress();
     const hardQueue = getHardModeDeck(rawDeck, savedProgress);
-    
+
     if (hardQueue.length === 0) return;
 
     setSessionQueue(hardQueue);
@@ -276,6 +286,7 @@ export default function App() {
     setScore(0);
     setCombo(0);
     setMaxCombo(0);
+    setSessionResults([]);
 
     setAppState('countdown');
     setCountdownNum(3);
@@ -333,6 +344,14 @@ export default function App() {
     // sees this card's real lastReviewed/interval - otherwise it'd still
     // look "never studied" until the next full deck reload.
     setRawDeck((prev) => prev.map((c) => (c.id === card.id ? { ...c, stats: stamped } : c)));
+
+    // Feeds the post-session recap on CompletionScreen - a lightweight
+    // per-card log distinct from rawDeck (which only ever holds each
+    // card's latest stats, not a history of this session's grades).
+    setSessionResults((prev) => [
+      ...prev,
+      { id: card.id, character: card.character, pinyin: card.pinyin, meaning: card.meaning, isSuccess },
+    ]);
 
     // Computed as local values, not read back from state this same tick -
     // the setters below wouldn't be visible yet if we read the state
@@ -451,6 +470,8 @@ export default function App() {
             maxCombo={maxCombo}
             visitGradeCount={visitGradeCount}
             isSoftWallGated={isSoftWallGated}
+            sessionResults={sessionResults}
+            onInspectCard={setInspectedResult}
             onSignIn={() => setShowAccount(true)}
             onContinue={() => setAppState('launch')}
           />
@@ -538,6 +559,10 @@ export default function App() {
         {showFeedback && <BetaFeedbackDrawer onClose={() => setShowFeedback(false)} />}
 
         {showAbout && <AboutDrawer onClose={() => setShowAbout(false)} />}
+
+        {inspectedResult && (
+          <CardInspectDrawer result={inspectedResult} onClose={() => setInspectedResult(null)} />
+        )}
 
         {showMistakeReport && card && (
           <MistakeReportDrawer

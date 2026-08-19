@@ -9,9 +9,10 @@ const LAST_ACTIVE_DATE_KEY = 'hz_last_active_date';
 const DEFAULT_PREFS = { revisionLevels: [], includeNonHsk: true };
 
 // SM-2 interval (days) at which a card counts as "mastered" - shared by
-// getCardMasteryStats and getTierStats below so the two never drift onto
-// different thresholds for the same underlying question.
-const MASTERED_INTERVAL_DAYS = 21;
+// getCardMasteryStats and getTierStats below (and StudySession's per-card
+// history pill) so none of them drift onto different thresholds for the
+// same underlying question.
+export const MASTERED_INTERVAL_DAYS = 21;
 
 // --- One-time card-ID migration (vocab_<index>_<char> -> <char>) ---------
 // The old ID embedded a word's position within whatever HSK/non-HSK filter
