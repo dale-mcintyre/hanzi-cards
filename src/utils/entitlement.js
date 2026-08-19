@@ -15,7 +15,7 @@ function loadCache() {
   try {
     const saved = localStorage.getItem(CACHE_KEY);
     return saved ? JSON.parse(saved) : null;
-  } catch (e) {
+  } catch {
     return null;
   }
 }
@@ -23,7 +23,7 @@ function loadCache() {
 function saveCache(entitlement) {
   try {
     localStorage.setItem(CACHE_KEY, JSON.stringify({ entitlement, checkedAt: Date.now() }));
-  } catch (e) {
+  } catch {
     // localStorage unavailable - harmless, next launch just re-fetches
   }
 }
@@ -64,7 +64,7 @@ export async function getEntitlement() {
     const entitlement = await fetchRemoteEntitlement();
     saveCache(entitlement);
     return entitlement;
-  } catch (e) {
+  } catch {
     return cached?.entitlement || DEFAULT_ENTITLEMENT;
   }
 }

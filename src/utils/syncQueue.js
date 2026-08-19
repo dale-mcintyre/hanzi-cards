@@ -67,7 +67,7 @@ export async function flush(pushFn) {
         if (result?.ok) {
           dequeue(cardId);
         }
-      } catch (e) {
+      } catch {
         // Leave it queued - next flush (on reconnect, sign-in, or next
         // grade) will retry. No backoff bookkeeping beyond `attempts`;
         // this app's sync volume is small enough not to need it.

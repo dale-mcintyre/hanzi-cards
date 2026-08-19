@@ -46,7 +46,7 @@ function rekeyByPattern(obj, getTimestamp) {
 function migrateLocalCardIds() {
   try {
     if (localStorage.getItem(LOCAL_MIGRATION_FLAG) === 'true') return;
-  } catch (e) {
+  } catch {
     return; // localStorage unavailable - nothing to migrate, nothing to flag
   }
 

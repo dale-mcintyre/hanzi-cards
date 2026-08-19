@@ -21,6 +21,7 @@
   --easy-dim: rgba(52, 211, 153, 0.14);
   --hard: #fb7185;
   --hard-dim: rgba(251, 113, 133, 0.14);
+  --pending: #fbbf24;
 
   --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-data: 'JetBrains Mono', ui-monospace, 'SF Mono', monospace;

@@ -40,6 +40,18 @@
   text-underline-offset: 2px;
 }
 
+.paywall-banner {
+  width: 100%;
+  padding: 10px 16px;
+  background: rgba(251, 191, 36, 0.14);
+  color: var(--pending);
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+  border-bottom: 1px solid rgba(251, 191, 36, 0.3);
+  box-sizing: border-box;
+}
+
 .stage {
   flex: 1;
   display: flex;
@@ -1025,6 +1037,35 @@
 
 .account-trigger-btn:hover {
   background: rgba(255, 255, 255, 0.1);
+}
+
+.account-trigger-wrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.sync-status-dot {
+  position: absolute;
+  top: -1px;
+  right: -1px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 1.5px solid var(--bg);
+}
+
+.sync-status-dot--synced {
+  background: var(--easy);
+}
+
+.sync-status-dot--pending {
+  background: var(--pending);
+  animation: sync-dot-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes sync-dot-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
 }
 
 /* ==================== Report-mistake button (card back) ==================== */

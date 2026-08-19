@@ -30,7 +30,7 @@ export function AuthProvider({ children }) {
     const migratedFlag = `hz_card_id_migrated_account_${user.id}`;
     try {
       if (localStorage.getItem(migratedFlag) === 'true') return;
-    } catch (e) {
+    } catch {
       // fall through and attempt anyway rather than getting stuck
     }
 
@@ -61,7 +61,7 @@ export function AuthProvider({ children }) {
 
     try {
       localStorage.setItem(migratedFlag, 'true');
-    } catch (e) {
+    } catch {
       // Non-fatal: worst case this (harmlessly) re-runs next sign-in.
     }
   }, []);
@@ -207,7 +207,8 @@ export function AuthProvider({ children }) {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
-export function useAuth() {
+// useAuth is intentionally colocated with its Provider, not a component itself.
+export function useAuth() { // oxlint-disable-line react/only-export-components
   const ctx = useContext(AuthContext);
   if (!ctx) throw new Error('useAuth must be used within an AuthProvider');
   return ctx;

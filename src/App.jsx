@@ -1,17 +1,17 @@
 import { useEffect, useState, useMemo } from 'react';
 import './App.css';
-import HanziCanvas from './components/HanziCanvas';
-import useSwipeGesture from './hooks/useSwipeGesture';
 import { calculateSM2 } from './utils/sm2';
 import { getProgress, saveCardProgress, getCardMasteryStats, getPrefs, savePrefs, getTierStats } from './utils/storage';
 import { speakText } from './utils/tts';
-import { ColorPinyin } from './utils/pinyinColor';
 import { getFilteredDeck, fetchUnifiedVocab } from './data/vocabLoader';
 import { getHardModeDeck } from './data/hskLoader';
 import { buildLearnQueue } from './utils/sessionQueue';
 import { getEntitlement } from './utils/entitlement';
 import { useAuth } from './context/AuthContext';
-import MarketingLanding from './components/MarketingLanding';
+import LaunchScreen from './components/LaunchScreen';
+import StudySession from './components/StudySession';
+import CompletionScreen from './components/CompletionScreen';
+import SyncStatusDot from './components/SyncStatusDot';
 import AccountDrawer from './components/AccountDrawer';
 import MistakeReportDrawer from './components/MistakeReportDrawer';
 import BetaFeedbackDrawer from './components/BetaFeedbackDrawer';
@@ -25,27 +25,6 @@ const ALL_HSK_LEVELS = ['1', '2', '3', '4', '5', '6'];
 // and, from that point on, before any session's completion screen gates on
 // sign-in instead of offering a "Continue" escape.
 const SOFT_WALL_THRESHOLD = 5;
-
-function HighlightedSentence({ sentence, targetChar, muted = false }) {
-  if (!sentence || !targetChar) return <span>{sentence}</span>;
-  const parts = sentence.split(targetChar);
-  if (parts.length === 1) return <span>{sentence}</span>;
-
-  return (
-    <span>
-      {parts.map((part, i) => (
-        <span key={i}>
-          {part}
-          {i < parts.length - 1 && (
-            <span className={muted ? "char-highlight-muted" : "char-highlight"}>
-              {targetChar}
-            </span>
-          )}
-        </span>
-      ))}
-    </span>
-  );
-}
 
 export default function App() {
   // Empty = no filter, learn from the full frequency-ranked deck. A
@@ -144,7 +123,7 @@ export default function App() {
     try {
       const savedCount = parseInt(localStorage.getItem('hz_streak_count') || '1', 10);
       setStreak(savedCount);
-    } catch (e) {
+    } catch {
       setStreak(1);
     }
     // syncVersion isn't read above - it's a signal, not data. It bumps
@@ -191,7 +170,10 @@ export default function App() {
     // rawDeck/syncVersion are cheap "something changed" triggers, not the
     // data source - getProgress() is re-read fresh each time, matching how
     // getCardMasteryStats already re-reads progress rather than trusting a
-    // stale closure.
+    // stale closure. Keeping them as deps is intentional (removing them
+    // would make tierStats go stale after every grade/sync), so the
+    // exhaustive-deps warning here is a false positive, not a real issue.
+    // oxlint-disable-next-line react-hooks/exhaustive-deps
     [fullVocab, rawDeck, syncVersion]
   );
 
@@ -378,19 +360,7 @@ export default function App() {
     }
   };
 
-  const { dragX, dragY, isDragging, pointerHandlers } = useSwipeGesture({
-    onSwipeLeft: () => handleNextCard(5),
-    onSwipeRight: () => handleNextCard(1),
-    onTap: handleFlip
-  });
-
-  const meaningList = useMemo(() => {
-    if (!card?.meaning) return ['meaning'];
-    return typeof card.meaning === 'string' ? card.meaning.split(';') : [card.meaning];
-  }, [card]);
-
-  const primaryMeaning = meaningList[0]?.trim();
-  const secondaryMeanings = meaningList.slice(1).join('; ').trim();
+  const progressPercent = ((currentIndex) / (sessionQueue.length || 1)) * 100;
 
   // Once an anonymous user has crossed SOFT_WALL_THRESHOLD for this visit,
   // every subsequent session-completion screen gates on sign-in - no
@@ -406,6 +376,12 @@ export default function App() {
         <span className="beta-banner-cta">Click here to provide feedback.</span>
       </button>
 
+      {entitlement.paywalled && (
+        <div className="paywall-banner">
+          {entitlement.message || 'This app now requires an active subscription.'}
+        </div>
+      )}
+
       {/* Top Navbar */}
       <nav className="top-nav-bar">
         <div className="nav-left">
@@ -418,9 +394,12 @@ export default function App() {
           )}
         </div>
         <div className="nav-right">
-          <button className="account-trigger-btn" onClick={() => setShowAccount(true)} aria-label="Account">
-            {user ? '👤' : '👤 Sign in'}
-          </button>
+          <div className="account-trigger-wrap">
+            <button className="account-trigger-btn" onClick={() => setShowAccount(true)} aria-label="Account">
+              {user ? '👤' : '👤 Sign in'}
+            </button>
+            <SyncStatusDot />
+          </div>
           <button className="settings-trigger-btn" onClick={() => setShowSettings(true)} aria-label="Settings">
             ⚙️ {revisionLevels.length > 0 ? `HSK ${revisionLevels.join(',')}` : 'Settings'}
           </button>
@@ -428,15 +407,6 @@ export default function App() {
       </nav>
 
       <div className="stage">
-        {appState === 'studying' && (
-          <div className="progress-bar-container">
-            <div 
-              className="progress-bar-fill" 
-              style={{ width: `${((currentIndex) / (sessionQueue.length || 1)) * 100}%` }}
-            />
-          </div>
-        )}
-
         <div className="floating-popups-container">
           {floatingPopups.map((p) => (
             <div key={p.id} className="arcade-popup">{p.text}</div>
@@ -446,192 +416,44 @@ export default function App() {
         {/* 1. LAUNCH SCREEN - marketing pitch for logged-out visitors,
                action-first dashboard for everyone else */}
         {appState === 'launch' && (
-          showMarketing ? (
-            <MarketingLanding
-              revisionLevels={revisionLevels}
-              isLoadingDeck={isLoadingDeck}
-              cardCount={rawDeck.length}
-              onStart={() => launchArcadeSession(20, 'all')}
-              onSignIn={() => setShowAccount(true)}
-            />
-          ) : (
-            <>
-              <div className="card launch-card">
-                <div className="launch-card-header">
-                  <span className="deck-level-pill">
-                    {revisionLevels.length > 0 ? `Revising HSK ${revisionLevels.join(', ')}` : 'All Levels'}
-                  </span>
-                  <span className="deck-ready-tag">
-                    {isLoadingDeck ? 'Loading database...' : `${rawDeck.length} Cards Loaded`}
-                  </span>
-                </div>
-
-                <div className="launch-card-body">
-                  <h1 className="launch-title">Learn Hanzi</h1>
-                  <p className="launch-subtitle">Unified frequency & HSK dataset</p>
-                </div>
-
-                <div className="launch-card-actions">
-                  <button
-                    className="primary-launch-btn"
-                    disabled={isLoadingDeck || rawDeck.length === 0}
-                    onClick={() => launchArcadeSession(20, 'all')}
-                  >
-                    {isLoadingDeck ? 'Preparing Deck...' : 'Learn ⚡'}
-                  </button>
-
-                  <button className="hard-mode-btn" onClick={launchHardModeSession}>
-                    🔥 Hard Mode (Targeted Mistake Blitz)
-                  </button>
-
-                  {weakCards.length > 0 && (
-                    <button className="secondary-launch-btn" onClick={() => launchArcadeSession(20, 'weak')}>
-                      🎯 Review {weakCards.length} Weak Cards
-                    </button>
-                  )}
-
-                  {seenCards.length > 0 && (
-                    <button className="secondary-launch-btn" onClick={() => launchArcadeSession(seenCards.length, 'seen')}>
-                      📖 Review All {seenCards.length} Seen Cards
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              <div className="dashboard-tier-strip">
-                <div className="tier-ring-strip-scroll">{renderTierTiles(48)}</div>
-              </div>
-            </>
-          )
+          <LaunchScreen
+            showMarketing={showMarketing}
+            revisionLevels={revisionLevels}
+            isLoadingDeck={isLoadingDeck}
+            cardCount={rawDeck.length}
+            weakCardsCount={weakCards.length}
+            seenCardsCount={seenCards.length}
+            launchArcadeSession={launchArcadeSession}
+            launchHardModeSession={launchHardModeSession}
+            onSignIn={() => setShowAccount(true)}
+            renderTierTiles={renderTierTiles}
+          />
         )}
 
-        {/* 2. COUNTDOWN */}
-        {appState === 'countdown' && (
-          <div className="card countdown-card">
-            <div className="countdown-overlay">
-              <span className="countdown-number">{countdownNum > 0 ? countdownNum : 'GO!'}</span>
-            </div>
-          </div>
-        )}
-
-        {/* 3. STUDYING SESSION */}
-        {appState === 'studying' && card && (
-          <div
-            className="card card--study"
-            style={{
-              transform: `translateX(${dragX}px) translateY(${dragY}px) rotate(${dragX * 0.03}deg)`,
-              transition: isDragging ? 'none' : 'transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-            }}
-            {...pointerHandlers}
-          >
-            {dragX < -30 && <div className="badge badge--know">KNOW</div>}
-            {dragX > 30 && <div className="badge badge--again">AGAIN</div>}
-
-            <div className={`card-flip-inner ${isFlipped ? 'is-flipped' : ''}`}>
-              <div className="card-face front-face">
-                <button
-                  className="audio-icon-btn"
-                  onClick={(e) => { e.stopPropagation(); speakText(card.character); }}
-                  aria-label="Play pronunciation"
-                >
-                  🔊
-                </button>
-
-                <div className="canvas-frame">
-                  <HanziCanvas character={card.character} mode="view" />
-                </div>
-
-                <button
-                  className="flip-hint-btn"
-                  onClick={(e) => { e.stopPropagation(); handleFlip(); }}
-                  aria-label="Flip card"
-                >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M3 12a9 9 0 0 1 15-6.7L21 8" />
-                    <path d="M21 3v5h-5" />
-                    <path d="M21 12a9 9 0 0 1-15 6.7L3 16" />
-                    <path d="M8 16H3v5" />
-                  </svg>
-                </button>
-              </div>
-
-              <div className="card-face back-face">
-                <div className="back-scrollable-content">
-                  <div className="back-header-group">
-                    <div>
-                      <h1 className="pinyin-title"><ColorPinyin pinyin={card.pinyin} /></h1>
-                      <p className="meaning-primary">{primaryMeaning}</p>
-                      {secondaryMeanings && <p className="meaning-secondary">{secondaryMeanings}</p>}
-                    </div>
-                    <div className="back-header-actions">
-                      <button className="audio-icon-btn" onClick={() => speakText(card.character)} aria-label="Play pronunciation">
-                        🔊
-                      </button>
-                      <button
-                        className="report-mistake-btn"
-                        onClick={(e) => { e.stopPropagation(); setShowMistakeReport(true); }}
-                        aria-label="Report an issue with this card"
-                      >
-                        🚩
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="card-meta-row">
-                    {card.level && <span className="meta-pill meta-pill--hsk">HSK {card.level}</span>}
-                    {card.freq_rank && <span className="meta-pill meta-pill--freq">Freq #{card.freq_rank}</span>}
-                  </div>
-
-                  <div className="card-internal-divider" />
-
-                  <div className="card-sentence-box">
-                    <span className="box-section-label">Context Example</span>
-                    <p className="sentence-zh">
-                      <HighlightedSentence sentence={card.sentence} targetChar={card.character} muted={false} />
-                    </p>
-                    <p className="sentence-py"><ColorPinyin pinyin={card.sentencePinyin} /></p>
-                    <p className="sentence-en">{card.sentenceEnglish}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+        {/* 2 & 3. COUNTDOWN + STUDYING SESSION */}
+        {(appState === 'countdown' || appState === 'studying') && (
+          <StudySession
+            appState={appState}
+            countdownNum={countdownNum}
+            card={card}
+            isFlipped={isFlipped}
+            onFlip={handleFlip}
+            onGrade={handleNextCard}
+            onReportMistake={() => setShowMistakeReport(true)}
+            progressPercent={progressPercent}
+          />
         )}
 
         {/* 4. COMPLETED SCREEN */}
         {appState === 'completed' && (
-          <div className="card victory-card">
-            <div className="victory-content">
-              <span className="victory-emoji">🏆</span>
-              <h2>Session Complete!</h2>
-              <div className="stats-summary-grid">
-                <div className="stat-box">
-                  <span className="stat-label">Earned XP</span>
-                  <span className="stat-value">+{score}</span>
-                </div>
-                <div className="stat-box">
-                  <span className="stat-label">Max Combo</span>
-                  <span className="stat-value">🔥 {maxCombo}x</span>
-                </div>
-              </div>
-
-              {isSoftWallGated ? (
-                <div className="soft-wall-gate">
-                  <p className="soft-wall-message">
-                    Great work! You've reviewed {visitGradeCount} cards this visit. Create a
-                    free account to save your results and keep your streak going.
-                  </p>
-                  <button className="primary-launch-btn" onClick={() => setShowAccount(true)}>
-                    Sign In / Create Account
-                  </button>
-                </div>
-              ) : (
-                <button className="primary-launch-btn" onClick={() => setAppState('launch')}>
-                  Continue ⚡
-                </button>
-              )}
-            </div>
-          </div>
+          <CompletionScreen
+            score={score}
+            maxCombo={maxCombo}
+            visitGradeCount={visitGradeCount}
+            isSoftWallGated={isSoftWallGated}
+            onSignIn={() => setShowAccount(true)}
+            onContinue={() => setAppState('launch')}
+          />
         )}
 
         {/* SETTINGS DRAWER */}
