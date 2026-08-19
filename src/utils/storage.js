@@ -1,9 +1,11 @@
 import { pushCardProgress, pushSettings } from './syncClient';
-import { enqueue as enqueueSync, QUEUE_KEY as SYNC_QUEUE_KEY } from './syncQueue';
+import { enqueue as enqueueSync, clear as clearSyncQueue, QUEUE_KEY as SYNC_QUEUE_KEY } from './syncQueue';
 
 const STORAGE_KEY = 'hanzi_deck_progress';
 const SENTENCE_CACHE_KEY = 'hz_sentence_cache';
 const PREFS_KEY = 'hz_study_prefs';
+const STREAK_COUNT_KEY = 'hz_streak_count';
+const LAST_ACTIVE_DATE_KEY = 'hz_last_active_date';
 const DEFAULT_PREFS = { revisionLevels: [], includeNonHsk: true };
 
 // SM-2 interval (days) at which a card counts as "mastered" - shared by
@@ -179,6 +181,28 @@ export function hydratePrefsFromRemote(remotePrefs) {
   } catch (e) {
     console.error('Failed to hydrate study preferences from remote:', e);
   }
+}
+
+/**
+ * Wipes every locally-cached piece of the just-signed-out account's data -
+ * card progress, study prefs, streak, and any not-yet-flushed sync queue
+ * items - so a shared/public device doesn't keep showing the previous
+ * account's characters and stats after logout. Deliberately leaves the
+ * sentence cache and entitlement cache alone: neither is account-specific,
+ * and both are expensive/pointless to rebuild. Called from AuthContext's
+ * signOut, followed by a full reload - clearing localStorage alone doesn't
+ * touch whatever's already sitting in React state on the current page.
+ */
+export function clearLocalUserData() {
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(PREFS_KEY);
+    localStorage.removeItem(STREAK_COUNT_KEY);
+    localStorage.removeItem(LAST_ACTIVE_DATE_KEY);
+  } catch (e) {
+    console.error('Failed to clear local user data:', e);
+  }
+  clearSyncQueue();
 }
 
 /**

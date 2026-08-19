@@ -46,6 +46,20 @@ export function queueSize() {
   return Object.keys(loadQueue()).length;
 }
 
+/**
+ * Drops every queued item outright, no flush attempt. Used on sign-out
+ * (see storage.js's clearLocalUserData) - queue entries aren't tagged with
+ * the user they came from, so leaving them behind risks a later sign-in on
+ * this device flushing a previous account's grades onto a different one.
+ */
+export function clear() {
+  try {
+    localStorage.removeItem(QUEUE_KEY);
+  } catch (e) {
+    console.error('Failed to clear sync queue:', e);
+  }
+}
+
 let isFlushing = false;
 
 /**

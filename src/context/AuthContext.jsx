@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { supabase } from '../lib/supabaseClient';
-import { getProgress, hydrateLocalFromRemote, setCurrentSyncUser, getPrefs, hydratePrefsFromRemote } from '../utils/storage';
+import { getProgress, hydrateLocalFromRemote, setCurrentSyncUser, getPrefs, hydratePrefsFromRemote, clearLocalUserData } from '../utils/storage';
 import { pullAllProgress, mergeLocalAndRemoteProgress, pushCardProgress, pullSettings, pushSettings } from '../utils/syncClient';
 import { flush as flushSyncQueue } from '../utils/syncQueue';
 
@@ -191,6 +191,15 @@ export function AuthProvider({ children }) {
       await supabase.auth.signOut();
     } catch (error) {
       console.error('Sign out failed:', error);
+    } finally {
+      // Always clear local data, even if the network call above failed -
+      // this device's cached characters/progress shouldn't linger just
+      // because Supabase couldn't be reached. A full reload (rather than
+      // resetting React state piece by piece) guarantees nothing from the
+      // signed-out account survives in memory either - important on a
+      // shared/public device, which is exactly the scenario this exists for.
+      clearLocalUserData();
+      window.location.reload();
     }
   }, []);
 
