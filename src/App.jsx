@@ -2,7 +2,6 @@ import { useEffect, useState, useMemo } from 'react';
 import './App.css';
 import { calculateSM2 } from './utils/sm2';
 import { getProgress, saveCardProgress, getCardMasteryStats, getPrefs, savePrefs, getTierStats, getOfflineMode, setOfflineMode } from './utils/storage';
-import { speakText } from './utils/tts';
 import { getFilteredDeck, fetchUnifiedVocab } from './data/vocabLoader';
 import { getHardModeDeck } from './data/hskLoader';
 import { buildLearnQueue } from './utils/sessionQueue';
@@ -323,12 +322,11 @@ export default function App() {
 
   const card = sessionQueue[currentIndex];
 
+  // Speaking on flip is StudySession's job now (it also owns the delayed
+  // auto-play timer and needs to dedupe against it - see its
+  // card/isFlipped effect) - this just toggles the visual state.
   const handleFlip = () => {
-    const nextFlipped = !isFlipped;
-    setIsFlipped(nextFlipped);
-    if (nextFlipped && card?.character) {
-      speakText(card.character);
-    }
+    setIsFlipped((prev) => !prev);
   };
 
   const handleNextCard = (quality) => {
