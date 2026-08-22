@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import HanziCanvas from './HanziCanvas';
 import useSwipeGesture from '../hooks/useSwipeGesture';
-import { speakText, getSoundEnabled, setSoundEnabled } from '../utils/tts';
+import { speakText, getSoundEnabled } from '../utils/tts';
 import { ColorPinyin } from '../utils/pinyinColor';
 import { MASTERED_INTERVAL_DAYS } from '../utils/storage';
 
@@ -44,13 +44,6 @@ export default function StudySession({
     onTap: onFlip,
   });
 
-  const [soundEnabled, setSoundEnabledState] = useState(() => getSoundEnabled());
-  const toggleSound = () => {
-    const next = !soundEnabled;
-    setSoundEnabledState(next);
-    setSoundEnabled(next);
-  };
-
   // Tracks which card.id has already had its pronunciation resolved (either
   // the delayed auto-play fired, or the user flipped before it did) so
   // neither path double-speaks and flipping back and forth on the same card
@@ -65,7 +58,10 @@ export default function StudySession({
       // Flipped (tap, swipe-tap, or the flip-hint button) before the delay
       // elapsed - speak immediately instead of waiting out the timer.
       if (autoPlayedRef.current !== card.id) {
-        autoPlayedRef.current = card.id;
+        // Only mark resolved if sound was actually on - otherwise a card
+        // whose auto-play window passed while muted would stay silently
+        // "resolved" forever, even after the user unmutes.
+        if (getSoundEnabled()) autoPlayedRef.current = card.id;
         speakText(card.character);
       }
       return;
@@ -74,7 +70,7 @@ export default function StudySession({
     if (autoPlayedRef.current === card.id) return;
 
     const timer = setTimeout(() => {
-      autoPlayedRef.current = card.id;
+      if (getSoundEnabled()) autoPlayedRef.current = card.id;
       speakText(card.character);
     }, AUTO_PLAY_DELAY_MS);
     // Cleared whenever `card`/`isFlipped`/`appState` change before the
@@ -128,19 +124,6 @@ export default function StudySession({
         >
           {dragX < -30 && <div className="badge badge--know">KNOW</div>}
           {dragX > 30 && <div className="badge badge--again">AGAIN</div>}
-
-          {/* Sibling of card-flip-inner (not inside either face) so it stays
-              in the same place regardless of flip state - quick access,
-              not tucked behind whichever face happens to be showing. */}
-          <button
-            type="button"
-            className="mute-toggle-btn"
-            onClick={(e) => { e.stopPropagation(); toggleSound(); }}
-            aria-pressed={!soundEnabled}
-            aria-label={soundEnabled ? 'Sound on - tap to mute' : 'Sound off - tap to unmute'}
-          >
-            {soundEnabled ? '🔊' : '🔇'}
-          </button>
 
           <div className={`card-flip-inner ${isFlipped ? 'is-flipped' : ''}`}>
             <div className="card-face front-face">

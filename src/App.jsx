@@ -2,6 +2,7 @@ import { useEffect, useState, useMemo } from 'react';
 import './App.css';
 import { calculateSM2 } from './utils/sm2';
 import { getProgress, saveCardProgress, getCardMasteryStats, getPrefs, savePrefs, getTierStats, getOfflineMode, setOfflineMode } from './utils/storage';
+import { getSoundEnabled, setSoundEnabled } from './utils/tts';
 import { getFilteredDeck, fetchUnifiedVocab } from './data/vocabLoader';
 import { getHardModeDeck } from './data/hskLoader';
 import { buildLearnQueue } from './utils/sessionQueue';
@@ -38,6 +39,11 @@ export default function App() {
   // flag that turns off syncing can't itself be synced without propagating
   // to every other device too.
   const [offlineMode, setOfflineModeState] = useState(() => getOfflineMode());
+  // Lives here (not in StudySession) so the toggle can sit in the persistent
+  // nav bar and work from every screen, not just mid-session. speakText
+  // itself gates on this internally, so nothing downstream needs to know
+  // about it beyond rendering the toggle's own icon/label.
+  const [soundEnabled, setSoundEnabledState] = useState(() => getSoundEnabled());
   const [showSettings, setShowSettings] = useState(false);
   const [showAccount, setShowAccount] = useState(false);
   const [showMistakeReport, setShowMistakeReport] = useState(false);
@@ -232,6 +238,12 @@ export default function App() {
     window.location.reload();
   };
 
+  const toggleSound = () => {
+    const next = !soundEnabled;
+    setSoundEnabledState(next);
+    setSoundEnabled(next);
+  };
+
   function renderTierTiles(size) {
     return (
       <>
@@ -424,6 +436,15 @@ export default function App() {
             ℹ️
           </button>
           <span className="streak-badge">🔥 {streak}d</span>
+          <button
+            type="button"
+            className={`sound-toggle-pill ${soundEnabled ? '' : 'sound-toggle-pill--muted'}`}
+            onClick={toggleSound}
+            aria-pressed={!soundEnabled}
+            aria-label={soundEnabled ? 'Sound on - tap to mute' : 'Sound off - tap to unmute'}
+          >
+            {soundEnabled ? '🔊 Sound' : '🔇 Muted'}
+          </button>
           {appState === 'studying' && (
             <span className="xp-pill">⚡ {score} XP</span>
           )}
