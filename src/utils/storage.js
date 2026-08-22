@@ -6,7 +6,36 @@ const SENTENCE_CACHE_KEY = 'hz_sentence_cache';
 const PREFS_KEY = 'hz_study_prefs';
 const STREAK_COUNT_KEY = 'hz_streak_count';
 const LAST_ACTIVE_DATE_KEY = 'hz_last_active_date';
+const OFFLINE_MODE_KEY = 'hz_offline_mode';
 const DEFAULT_PREFS = { revisionLevels: [], includeNonHsk: true };
+
+// Deliberately its own localStorage key, entirely outside getPrefs/savePrefs/
+// hydratePrefsFromRemote - this flag must never be pushed to or pulled from
+// Supabase. Syncing a flag that controls whether syncing happens would mean
+// one device turning it on silently turns it on for every other device too,
+// which defeats the point of a per-device "stop talking to my account" switch.
+function readOfflineMode() {
+  try {
+    return localStorage.getItem(OFFLINE_MODE_KEY) === 'true';
+  } catch {
+    return false;
+  }
+}
+
+let offlineModeEnabled = readOfflineMode();
+
+export function getOfflineMode() {
+  return offlineModeEnabled;
+}
+
+export function setOfflineMode(enabled) {
+  offlineModeEnabled = enabled;
+  try {
+    localStorage.setItem(OFFLINE_MODE_KEY, enabled ? 'true' : 'false');
+  } catch {
+    // localStorage unavailable - in-memory flag still applies this session
+  }
+}
 
 // SM-2 interval (days) at which a card counts as "mastered" - shared by
 // getCardMasteryStats and getTierStats below (and StudySession's per-card
@@ -112,10 +141,17 @@ export function saveCardProgress(cardId, newStats) {
   // network push must never delay grading or lose the grade event, so
   // this runs unawaited and queues for retry on failure instead of
   // throwing. See syncQueue.js and PLAN.md's "Fail-open philosophy".
-  if (currentSyncUserId) {
+  //
+  // Offline Mode treats every grade as if the push already failed - straight
+  // to the queue, no network attempt - so it stays a purely local write
+  // (enqueueSync only ever touches localStorage) while still preserving the
+  // grade for automatic resync once Offline Mode is turned back off.
+  if (currentSyncUserId && !offlineModeEnabled) {
     pushCardProgress(currentSyncUserId, cardId, stamped).then((result) => {
       if (!result.ok) enqueueSync(cardId, stamped);
     });
+  } else if (currentSyncUserId) {
+    enqueueSync(cardId, stamped);
   }
 
   return stamped;
@@ -167,7 +203,7 @@ export function savePrefs(prefs) {
     console.error('Failed to save study preferences:', e);
   }
 
-  if (currentSyncUserId) {
+  if (currentSyncUserId && !offlineModeEnabled) {
     pushSettings(currentSyncUserId, prefs);
   }
 

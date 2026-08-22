@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { queueSize } from '../utils/syncQueue';
+import { getOfflineMode } from '../utils/storage';
 
 const POLL_INTERVAL_MS = 4000;
 
@@ -8,9 +9,12 @@ export default function SyncStatusDot() {
   const { user, isSupabaseConfigured } = useAuth();
   const [isOnline, setIsOnline] = useState(() => (typeof navigator === 'undefined' ? true : navigator.onLine));
   const [pending, setPending] = useState(0);
+  // Read once - offline mode can't change without the full reload App.jsx's
+  // toggle triggers, so there's nothing to poll here.
+  const [offlineMode] = useState(() => getOfflineMode());
 
   useEffect(() => {
-    if (!isSupabaseConfigured || !user) return;
+    if (!isSupabaseConfigured || !user || offlineMode) return;
 
     function tick() {
       setPending(queueSize());
@@ -28,9 +32,19 @@ export default function SyncStatusDot() {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
     };
-  }, [isSupabaseConfigured, user]);
+  }, [isSupabaseConfigured, user, offlineMode]);
 
   if (!isSupabaseConfigured || !user) return null;
+
+  if (offlineMode) {
+    return (
+      <span
+        className="sync-status-dot sync-status-dot--offline"
+        title="Offline Mode - sync disabled"
+        aria-label="Offline Mode - sync disabled"
+      />
+    );
+  }
 
   const isSynced = isOnline && pending === 0;
   const title = !isOnline

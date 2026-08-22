@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo } from 'react';
 import './App.css';
 import { calculateSM2 } from './utils/sm2';
-import { getProgress, saveCardProgress, getCardMasteryStats, getPrefs, savePrefs, getTierStats } from './utils/storage';
+import { getProgress, saveCardProgress, getCardMasteryStats, getPrefs, savePrefs, getTierStats, getOfflineMode, setOfflineMode } from './utils/storage';
 import { speakText } from './utils/tts';
 import { getFilteredDeck, fetchUnifiedVocab } from './data/vocabLoader';
 import { getHardModeDeck } from './data/hskLoader';
@@ -34,6 +34,11 @@ export default function App() {
   // default) so a saved filter survives a page reload.
   const [revisionLevels, setRevisionLevels] = useState(() => getPrefs().revisionLevels);
   const [includeNonHsk, setIncludeNonHsk] = useState(() => getPrefs().includeNonHsk);
+  // Deliberately local-only (see storage.js's getOfflineMode/setOfflineMode) -
+  // never part of the synced revisionLevels/includeNonHsk prefs blob, since a
+  // flag that turns off syncing can't itself be synced without propagating
+  // to every other device too.
+  const [offlineMode, setOfflineModeState] = useState(() => getOfflineMode());
   const [showSettings, setShowSettings] = useState(false);
   const [showAccount, setShowAccount] = useState(false);
   const [showMistakeReport, setShowMistakeReport] = useState(false);
@@ -213,6 +218,19 @@ export default function App() {
     const next = !includeNonHsk;
     setIncludeNonHsk(next);
     savePrefs({ revisionLevels, includeNonHsk: next });
+  };
+
+  // A full reload (mirrors the same pattern signOut already uses) is the
+  // simplest way to guarantee AuthContext's mount-time logic picks up the
+  // new flag correctly in both directions - skip everything if now on, or
+  // immediately resume migration/settings-sync/queue-flush if now off -
+  // without needing separate reactive re-sync plumbing for the "turn back
+  // on" case.
+  const toggleOfflineMode = () => {
+    const next = !offlineMode;
+    setOfflineModeState(next);
+    setOfflineMode(next);
+    window.location.reload();
   };
 
   function renderTierTiles(size) {
@@ -537,6 +555,27 @@ export default function App() {
                     </div>
                   )}
                 </div>
+              </div>
+
+              <div className="card-internal-divider" />
+
+              <div className="settings-toggle-row">
+                <div>
+                  <label className="box-section-label" style={{ marginBottom: '2px' }}>Offline Mode (Local Only)</label>
+                  <p style={{ fontSize: '12px', color: 'var(--ink-faint)', margin: 0 }}>
+                    Nothing syncs to or from your account while this is on - progress stays on this device only.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={offlineMode}
+                  aria-label="Offline Mode (Local Only)"
+                  className={`settings-toggle-track ${offlineMode ? 'active' : ''}`}
+                  onClick={toggleOfflineMode}
+                >
+                  <span className="settings-toggle-thumb" />
+                </button>
               </div>
 
               <div className="card-internal-divider" />

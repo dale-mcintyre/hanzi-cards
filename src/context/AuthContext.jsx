@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { supabase } from '../lib/supabaseClient';
-import { getProgress, hydrateLocalFromRemote, setCurrentSyncUser, getPrefs, hydratePrefsFromRemote, clearLocalUserData } from '../utils/storage';
+import { getProgress, hydrateLocalFromRemote, setCurrentSyncUser, getPrefs, hydratePrefsFromRemote, clearLocalUserData, getOfflineMode } from '../utils/storage';
 import { pullAllProgress, mergeLocalAndRemoteProgress, pushCardProgress, pullSettings, pushSettings } from '../utils/syncClient';
 import { flush as flushSyncQueue } from '../utils/syncQueue';
 
@@ -125,7 +125,9 @@ export function AuthProvider({ children }) {
       setSession(initialSession);
       setCurrentSyncUser(initialSession?.user?.id || null);
       setIsAuthReady(true);
-      if (initialSession?.user) {
+      // Offline Mode: skip every pull/push - boot straight from whatever's
+      // already in localStorage, no network activity at all.
+      if (initialSession?.user && !getOfflineMode()) {
         const user = initialSession.user;
         runCardIdMigration(user).then(() => {
           runMigration(user);
@@ -138,7 +140,7 @@ export function AuthProvider({ children }) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, newSession) => {
       setSession(newSession);
       setCurrentSyncUser(newSession?.user?.id || null);
-      if (event === 'SIGNED_IN' && newSession?.user) {
+      if (event === 'SIGNED_IN' && newSession?.user && !getOfflineMode()) {
         const user = newSession.user;
         runCardIdMigration(user).then(() => {
           runMigration(user);
@@ -159,7 +161,7 @@ export function AuthProvider({ children }) {
     const userId = session?.user?.id;
     if (!userId) return;
     function handleOnline() {
-      flushSyncQueue(pushFnFor(userId));
+      if (!getOfflineMode()) flushSyncQueue(pushFnFor(userId));
     }
     window.addEventListener('online', handleOnline);
     return () => window.removeEventListener('online', handleOnline);
