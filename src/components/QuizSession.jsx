@@ -86,9 +86,14 @@ export default function QuizSession({ appState, countdownNum, card, onAnswer, pr
                   onClick={() => handleSelect(option.character)}
                 >
                   <span className="quiz-option-char">{option.character}</span>
-                  {showResult && (
-                    <span className="quiz-option-pinyin"><ColorPinyin pinyin={option.pinyin} /></span>
-                  )}
+                  {/* Always rendered (never conditionally mounted) so its
+                      height is reserved from the first frame - otherwise
+                      revealing it on answer would resize every button and
+                      reflow the whole grid. visibility (not display) keeps
+                      the space without showing the content early. */}
+                  <span className={`quiz-option-pinyin ${showResult ? '' : 'quiz-option-pinyin--hidden'}`}>
+                    <ColorPinyin pinyin={option.pinyin} />
+                  </span>
                 </button>
               );
             })}
