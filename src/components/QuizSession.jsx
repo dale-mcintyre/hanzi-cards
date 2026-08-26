@@ -1,12 +1,16 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import Countdown from './Countdown';
 import { speakText } from '../utils/tts';
+import { ColorPinyin } from '../utils/pinyinColor';
 import { fitScaleForLength } from '../utils/textFit';
 
 // Correct-and-fast vs. correct-but-hesitant map to different SM-2 qualities
 // (5 vs 4) so the schedule reflects genuine confidence, not just right/wrong.
 const FAST_ANSWER_MS = 3000;
-const REVEAL_DELAY_MS = 1200;
+// Reveal window before auto-advancing - pinyin appears on all 6 options for
+// this long, not just the correct one, so even a wrong guess is a quick
+// lesson on the other 5 characters shown that round.
+const REVEAL_DELAY_MS = 1500;
 const QUESTION_BASE_FONT_PX = 26;
 
 export default function QuizSession({ appState, countdownNum, card, onAnswer, progressPercent }) {
@@ -64,10 +68,10 @@ export default function QuizSession({ appState, countdownNum, card, onAnswer, pr
           <p className="quiz-question-english" style={{ fontSize: `${questionFontSize}px` }}>{primaryMeaning}</p>
 
           <div className="quiz-options-grid">
-            {card.quizOptions.map((optionChar) => {
-              const isCorrectOption = optionChar === card.character;
+            {card.quizOptions.map((option) => {
+              const isCorrectOption = option.character === card.character;
               const showResult = selected !== null;
-              const isWrongPick = showResult && selected === optionChar && !isCorrectOption;
+              const isWrongPick = showResult && selected === option.character && !isCorrectOption;
 
               let className = 'quiz-option-btn';
               if (showResult && isCorrectOption) className += ' quiz-option-btn--correct';
@@ -75,13 +79,16 @@ export default function QuizSession({ appState, countdownNum, card, onAnswer, pr
 
               return (
                 <button
-                  key={optionChar}
+                  key={option.character}
                   type="button"
                   className={className}
                   disabled={selected !== null}
-                  onClick={() => handleSelect(optionChar)}
+                  onClick={() => handleSelect(option.character)}
                 >
-                  {optionChar}
+                  <span className="quiz-option-char">{option.character}</span>
+                  {showResult && (
+                    <span className="quiz-option-pinyin"><ColorPinyin pinyin={option.pinyin} /></span>
+                  )}
                 </button>
               );
             })}

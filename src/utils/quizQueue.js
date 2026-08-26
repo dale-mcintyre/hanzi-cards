@@ -3,7 +3,10 @@
  * already-studied cards (quizzing on something never seen is just
  * guessing, no learning value), each carrying a precomputed set of 6
  * answer options (`quizOptions`, correct answer's position randomized) so
- * QuizSession never has to recompute/reshuffle them on re-render.
+ * QuizSession never has to recompute/reshuffle them on re-render. Each
+ * option keeps its pinyin alongside the character - QuizSession reveals
+ * pinyin for all 6 after answering, not just the correct one, so a wrong
+ * guess still teaches you the other 5 characters shown that round.
  */
 export function buildQuizQueue(seenCards, fullDeck, count = 10) {
   const questions = [...seenCards].sort(() => 0.5 - Math.random()).slice(0, count);
@@ -23,5 +26,7 @@ function buildDistractorOptions(correctCard, fullDeck) {
   }
 
   const distractors = [...pool].sort(() => 0.5 - Math.random()).slice(0, 5);
-  return [...distractors, correctCard].sort(() => 0.5 - Math.random()).map((c) => c.character);
+  return [...distractors, correctCard]
+    .sort(() => 0.5 - Math.random())
+    .map((c) => ({ character: c.character, pinyin: c.pinyin }));
 }
