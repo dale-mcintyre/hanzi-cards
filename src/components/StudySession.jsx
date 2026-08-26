@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef } from 'react';
+import Countdown from './Countdown';
 import HanziCanvas from './HanziCanvas';
 import useSwipeGesture from '../hooks/useSwipeGesture';
 import { speakText, getSoundEnabled } from '../utils/tts';
@@ -105,13 +106,7 @@ export default function StudySession({
         </div>
       )}
 
-      {appState === 'countdown' && (
-        <div className="card countdown-card">
-          <div className="countdown-overlay">
-            <span className="countdown-number">{countdownNum > 0 ? countdownNum : 'GO!'}</span>
-          </div>
-        </div>
-      )}
+      {appState === 'countdown' && <Countdown countdownNum={countdownNum} />}
 
       {appState === 'studying' && card && (
         <div
@@ -177,7 +172,7 @@ export default function StudySession({
 
                 <div className="card-meta-row">
                   {card.level && <span className="meta-pill meta-pill--hsk">HSK {card.level}</span>}
-                  {card.freq_rank && <span className="meta-pill meta-pill--freq">Freq #{card.freq_rank}</span>}
+                  {card.frequency && <span className="meta-pill meta-pill--freq">Freq #{card.frequency}</span>}
                   {historyLabel && <span className="meta-pill">{historyLabel}</span>}
                 </div>
 

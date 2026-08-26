@@ -6,10 +6,12 @@ import { getSoundEnabled, setSoundEnabled } from './utils/tts';
 import { getFilteredDeck, fetchUnifiedVocab } from './data/vocabLoader';
 import { getHardModeDeck } from './data/hskLoader';
 import { buildLearnQueue } from './utils/sessionQueue';
+import { buildQuizQueue } from './utils/quizQueue';
 import { getEntitlement } from './utils/entitlement';
 import { useAuth } from './context/AuthContext';
 import LaunchScreen from './components/LaunchScreen';
 import StudySession from './components/StudySession';
+import QuizSession from './components/QuizSession';
 import CompletionScreen from './components/CompletionScreen';
 import CardInspectDrawer from './components/CardInspectDrawer';
 import SyncStatusDot from './components/SyncStatusDot';
@@ -102,6 +104,11 @@ export default function App() {
   const [rawDeck, setRawDeck] = useState([]);
   const [sessionQueue, setSessionQueue] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
+  // Which per-card UI StudySession/QuizSession's shared appState==='studying'
+  // slot should render - set by whichever launch* function starts the
+  // session. Everything else (progress bar, completion screen, recap,
+  // handleNextCard's SM-2/XP/combo logic) is identical either way.
+  const [sessionMode, setSessionMode] = useState('learn');
 
   const [isFlipped, setIsFlipped] = useState(false);
   const [streak, setStreak] = useState(1);
@@ -298,6 +305,7 @@ export default function App() {
     setCombo(0);
     setMaxCombo(0);
     setSessionResults([]);
+    setSessionMode('learn');
 
     setAppState('countdown');
     setCountdownNum(3);
@@ -316,6 +324,29 @@ export default function App() {
     setCombo(0);
     setMaxCombo(0);
     setSessionResults([]);
+    setSessionMode('learn');
+
+    setAppState('countdown');
+    setCountdownNum(3);
+  };
+
+  // Quizzes only ever test cards you've already studied at least once -
+  // multiple choice among characters you've never seen is just guessing,
+  // not a memory test. Distractors (buildQuizQueue) come from the whole
+  // deck, not just seen cards, so pool size there isn't a constraint.
+  const launchQuizSession = () => {
+    const quizQueue = buildQuizQueue(seenCards, rawDeck, 10);
+
+    if (quizQueue.length === 0) return;
+
+    setSessionQueue(quizQueue);
+    setCurrentIndex(0);
+    setIsFlipped(false);
+    setScore(0);
+    setCombo(0);
+    setMaxCombo(0);
+    setSessionResults([]);
+    setSessionMode('quiz');
 
     setAppState('countdown');
     setCountdownNum(3);
@@ -481,6 +512,7 @@ export default function App() {
             seenCardsCount={seenCards.length}
             launchArcadeSession={launchArcadeSession}
             launchHardModeSession={launchHardModeSession}
+            launchQuizSession={launchQuizSession}
             onSignIn={() => setShowAccount(true)}
             renderTierTiles={renderTierTiles}
           />
@@ -488,16 +520,26 @@ export default function App() {
 
         {/* 2 & 3. COUNTDOWN + STUDYING SESSION */}
         {(appState === 'countdown' || appState === 'studying') && (
-          <StudySession
-            appState={appState}
-            countdownNum={countdownNum}
-            card={card}
-            isFlipped={isFlipped}
-            onFlip={handleFlip}
-            onGrade={handleNextCard}
-            onReportMistake={() => setShowMistakeReport(true)}
-            progressPercent={progressPercent}
-          />
+          sessionMode === 'quiz' ? (
+            <QuizSession
+              appState={appState}
+              countdownNum={countdownNum}
+              card={card}
+              onAnswer={handleNextCard}
+              progressPercent={progressPercent}
+            />
+          ) : (
+            <StudySession
+              appState={appState}
+              countdownNum={countdownNum}
+              card={card}
+              isFlipped={isFlipped}
+              onFlip={handleFlip}
+              onGrade={handleNextCard}
+              onReportMistake={() => setShowMistakeReport(true)}
+              progressPercent={progressPercent}
+            />
+          )
         )}
 
         {/* 4. COMPLETED SCREEN */}

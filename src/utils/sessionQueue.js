@@ -11,7 +11,7 @@ function overdueAmount(stats) {
 }
 
 function byFrequency(a, b) {
-  return (a.freq_rank ?? Infinity) - (b.freq_rank ?? Infinity);
+  return (a.frequency ?? Infinity) - (b.frequency ?? Infinity);
 }
 
 /**

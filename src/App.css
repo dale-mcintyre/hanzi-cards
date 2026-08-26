@@ -1009,6 +1009,59 @@
   border-color: var(--accent-cyan);
 }
 
+/* ==================== Quiz mode ==================== */
+.quiz-card {
+  gap: 16px;
+}
+
+.quiz-question-english {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--ink);
+  line-height: 1.3;
+  margin: 4px 0 0;
+}
+
+.quiz-options-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.quiz-option-btn {
+  padding: 18px 8px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--ink);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 26px;
+  font-family: var(--font-hanzi);
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, opacity 0.2s;
+}
+
+.quiz-option-btn--correct {
+  background: var(--easy-dim);
+  border-color: var(--easy);
+  color: var(--easy);
+}
+
+.quiz-option-btn--incorrect {
+  background: var(--hard-dim);
+  border-color: var(--hard);
+  color: var(--hard);
+}
+
+.quiz-option-btn:disabled {
+  cursor: default;
+}
+
+.quiz-option-btn:disabled:not(.quiz-option-btn--correct):not(.quiz-option-btn--incorrect) {
+  opacity: 0.4;
+}
+
 /* ==================== Tier ring tiles ==================== */
 .tier-ring-tile {
   display: flex;

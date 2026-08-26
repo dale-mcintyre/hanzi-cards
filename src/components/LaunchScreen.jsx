@@ -9,6 +9,7 @@ export default function LaunchScreen({
   seenCardsCount,
   launchArcadeSession,
   launchHardModeSession,
+  launchQuizSession,
   onSignIn,
   renderTierTiles,
 }) {
@@ -63,6 +64,12 @@ export default function LaunchScreen({
           {seenCardsCount > 0 && (
             <button className="secondary-launch-btn" onClick={() => launchArcadeSession(seenCardsCount, 'seen')}>
               📖 Review All {seenCardsCount} Seen Cards
+            </button>
+          )}
+
+          {seenCardsCount > 0 && (
+            <button className="secondary-launch-btn" onClick={launchQuizSession}>
+              🧠 Quiz Mode (Multiple Choice)
             </button>
           )}
         </div>
