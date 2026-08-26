@@ -1,8 +1,9 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import './App.css';
 import { calculateSM2 } from './utils/sm2';
-import { getProgress, saveCardProgress, getCardMasteryStats, getPrefs, savePrefs, getTierStats, getOfflineMode, setOfflineMode } from './utils/storage';
+import { getProgress, saveCardProgress, getCardMasteryStats, getPrefs, savePrefs, getTierStats, getOfflineMode, setOfflineMode, MASTERED_INTERVAL_DAYS } from './utils/storage';
 import { getSoundEnabled, setSoundEnabled } from './utils/tts';
+import { playCorrectFeedback, playIncorrectFeedback, playMasteryFeedback } from './utils/feedback';
 import { getFilteredDeck, fetchUnifiedVocab } from './data/vocabLoader';
 import { getHardModeDeck } from './data/hskLoader';
 import { buildLearnQueue } from './utils/sessionQueue';
@@ -14,6 +15,7 @@ import StudySession from './components/StudySession';
 import QuizSession from './components/QuizSession';
 import CompletionScreen from './components/CompletionScreen';
 import CardInspectDrawer from './components/CardInspectDrawer';
+import MasteryCelebration from './components/MasteryCelebration';
 import SyncStatusDot from './components/SyncStatusDot';
 import AccountDrawer from './components/AccountDrawer';
 import MistakeReportDrawer from './components/MistakeReportDrawer';
@@ -88,6 +90,16 @@ export default function App() {
   // from that recap.
   const [sessionResults, setSessionResults] = useState([]);
   const [inspectedResult, setInspectedResult] = useState(null);
+
+  // Drives the full-screen celebration when a grade pushes a card's SM-2
+  // interval past MASTERED_INTERVAL_DAYS - set in handleNextCard, cleared
+  // by MasteryCelebration itself once its display timer elapses.
+  const [masteredCelebration, setMasteredCelebration] = useState(null);
+  // Stable reference (not an inline arrow in JSX) - MasteryCelebration's
+  // own dismiss-timer effect depends on this prop, so a fresh function
+  // identity on every unrelated App.jsx re-render would otherwise restart
+  // its 2.2s timer indefinitely instead of ever actually firing.
+  const dismissMasteryCelebration = useCallback(() => setMasteredCelebration(null), []);
 
   // Visit-level (not per-session-queue) grade count for the anonymous
   // sign-up flow - accumulates across however many mini-sessions happen in
@@ -391,12 +403,26 @@ export default function App() {
       }, 1000);
     }
 
+    const wasAlreadyMastered = (card.stats?.interval || 1) >= MASTERED_INTERVAL_DAYS;
+
     const newStats = calculateSM2(
       quality,
       card.stats?.repetitions || 0,
       card.stats?.interval || 1,
       card.stats?.easeFactor || 2.5
     );
+
+    // A mastery moment supersedes the routine correct/incorrect chime
+    // rather than playing both - it's a bigger, distinct event.
+    const justMastered = !wasAlreadyMastered && newStats.interval >= MASTERED_INTERVAL_DAYS;
+    if (justMastered) {
+      playMasteryFeedback();
+      setMasteredCelebration({ character: card.character, pinyin: card.pinyin });
+    } else if (isSuccess) {
+      playCorrectFeedback();
+    } else {
+      playIncorrectFeedback();
+    }
 
     const stamped = saveCardProgress(card.id, newStats);
     // Keep rawDeck in sync so a subsequent session (built from rawDeck)
@@ -662,6 +688,14 @@ export default function App() {
 
         {inspectedResult && (
           <CardInspectDrawer result={inspectedResult} onClose={() => setInspectedResult(null)} />
+        )}
+
+        {masteredCelebration && (
+          <MasteryCelebration
+            character={masteredCelebration.character}
+            pinyin={masteredCelebration.pinyin}
+            onDone={dismissMasteryCelebration}
+          />
         )}
 
         {showMistakeReport && card && (

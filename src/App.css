@@ -834,6 +834,71 @@
   margin: 0;
 }
 
+/* ==================== Mastery celebration ==================== */
+.mastery-celebration {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  background: rgba(0, 0, 0, 0.35);
+  animation: mastery-backdrop-fade 2.2s ease forwards;
+}
+
+.mastery-celebration-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 28px 36px;
+  border-radius: 24px;
+  background: linear-gradient(165deg, var(--surface-raised), var(--surface));
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  box-shadow: 0 20px 60px -20px rgba(0, 0, 0, 0.7);
+  animation: mastery-pop 2.2s ease forwards;
+}
+
+.mastery-celebration-trophy {
+  font-size: 40px;
+}
+
+.mastery-celebration-char {
+  font-size: 48px;
+  font-weight: 800;
+  font-family: var(--font-hanzi);
+  color: var(--ink);
+}
+
+.mastery-celebration-pinyin {
+  font-size: 16px;
+}
+
+.mastery-celebration-label {
+  margin-top: 4px;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--easy);
+}
+
+@keyframes mastery-pop {
+  0% { opacity: 0; transform: scale(0.6); }
+  12% { opacity: 1; transform: scale(1.08); }
+  20% { transform: scale(1); }
+  85% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(0.95); }
+}
+
+@keyframes mastery-backdrop-fade {
+  0% { opacity: 0; }
+  15% { opacity: 1; }
+  85% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
 /* ==================== Settings drawer ==================== */
 .drawer-overlay {
   position: fixed;
