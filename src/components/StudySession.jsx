@@ -5,8 +5,10 @@ import useSwipeGesture from '../hooks/useSwipeGesture';
 import { speakText, getSoundEnabled } from '../utils/tts';
 import { ColorPinyin } from '../utils/pinyinColor';
 import { MASTERED_INTERVAL_DAYS } from '../utils/storage';
+import { fitScaleForLength } from '../utils/textFit';
 
 const AUTO_PLAY_DELAY_MS = 1500;
+const MEANING_BASE_FONT_PX = 19;
 
 function HighlightedSentence({ sentence, targetChar, muted = false }) {
   if (!sentence || !targetChar) return <span>{sentence}</span>;
@@ -86,6 +88,10 @@ export default function StudySession({
   }, [card]);
 
   const primaryMeaning = meaningList[0]?.trim();
+  // Some definitions run 80+ characters - shrink proportionally so a long
+  // one doesn't dominate the card (the back face itself already scrolls,
+  // this just keeps a long definition from looking oversized/awkward).
+  const meaningFontSize = MEANING_BASE_FONT_PX * fitScaleForLength(primaryMeaning?.length || 0);
   const secondaryMeanings = meaningList.slice(1).join('; ').trim();
 
   // Quiet review-history indicator - nothing for a never-studied card (no
@@ -153,7 +159,7 @@ export default function StudySession({
                 <div className="back-header-group">
                   <div>
                     <h1 className="pinyin-title"><ColorPinyin pinyin={card.pinyin} /></h1>
-                    <p className="meaning-primary">{primaryMeaning}</p>
+                    <p className="meaning-primary" style={{ fontSize: `${meaningFontSize}px` }}>{primaryMeaning}</p>
                     {secondaryMeanings && <p className="meaning-secondary">{secondaryMeanings}</p>}
                   </div>
                   <div className="back-header-actions">

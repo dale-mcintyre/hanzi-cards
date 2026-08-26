@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import Countdown from './Countdown';
 import { speakText } from '../utils/tts';
+import { fitScaleForLength } from '../utils/textFit';
 
 // Correct-and-fast vs. correct-but-hesitant map to different SM-2 qualities
 // (5 vs 4) so the schedule reflects genuine confidence, not just right/wrong.
 const FAST_ANSWER_MS = 3000;
 const REVEAL_DELAY_MS = 1200;
+const QUESTION_BASE_FONT_PX = 26;
 
 export default function QuizSession({ appState, countdownNum, card, onAnswer, progressPercent }) {
   const [selected, setSelected] = useState(null);
@@ -28,6 +30,11 @@ export default function QuizSession({ appState, countdownNum, card, onAnswer, pr
     const first = typeof card.meaning === 'string' ? card.meaning.split(';')[0] : card.meaning;
     return first?.trim() || '';
   }, [card]);
+
+  // Some dictionary definitions run 80+ characters - at a fixed large font
+  // that would overflow the quiz card, which (unlike the study card's back
+  // face) has no scroll region of its own. Shrink proportionally instead.
+  const questionFontSize = QUESTION_BASE_FONT_PX * fitScaleForLength(primaryMeaning.length);
 
   function handleSelect(optionChar) {
     if (selected || !card) return; // first tap wins - no changing your answer
@@ -54,7 +61,7 @@ export default function QuizSession({ appState, countdownNum, card, onAnswer, pr
       {appState === 'studying' && card && (
         <div className="card quiz-card">
           <span className="box-section-label">Which character means this?</span>
-          <p className="quiz-question-english">{primaryMeaning}</p>
+          <p className="quiz-question-english" style={{ fontSize: `${questionFontSize}px` }}>{primaryMeaning}</p>
 
           <div className="quiz-options-grid">
             {card.quizOptions.map((optionChar) => {

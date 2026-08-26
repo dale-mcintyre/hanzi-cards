@@ -1012,6 +1012,10 @@
 /* ==================== Quiz mode ==================== */
 .quiz-card {
   gap: 16px;
+  /* Safety net alongside the JS font-scaling in QuizSession - .card is a
+     fixed height with overflow:hidden, and an especially long definition
+     even at the smallest scale tier should scroll rather than clip. */
+  overflow-y: auto;
 }
 
 .quiz-question-english {
