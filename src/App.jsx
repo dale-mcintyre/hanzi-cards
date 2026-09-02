@@ -6,7 +6,7 @@ import { getSoundEnabled, setSoundEnabled } from './utils/tts';
 import { playCorrectFeedback, playIncorrectFeedback, playMasteryFeedback } from './utils/feedback';
 import { getFilteredDeck, fetchUnifiedVocab } from './data/vocabLoader';
 import { getHardModeDeck } from './data/hskLoader';
-import { buildLearnQueue } from './utils/sessionQueue';
+import { buildLearnQueue, getDueCount } from './utils/sessionQueue';
 import { buildQuizQueue } from './utils/quizQueue';
 import { buildWritingQueue } from './utils/writingQueue';
 import { calculateWritingSchedule, WRITING_MASTERED_LEVEL } from './utils/writingSchedule';
@@ -203,6 +203,9 @@ export default function App() {
   }, [syncVersion]);
 
   const weakCards = useMemo(() => rawDeck.filter((c) => c.stats.repetitions > 0 && c.stats.interval <= 2), [rawDeck]);
+
+  // Drives the LaunchScreen primary CTA's "Review Due (N)" label.
+  const dueCount = useMemo(() => getDueCount(rawDeck), [rawDeck]);
 
   // Every card the user has graded at least once, regardless of how it's
   // currently doing on the SM-2 curve - a free-form review pool distinct
@@ -545,11 +548,6 @@ export default function App() {
 
   return (
     <div className="app-container">
-      <button type="button" className="beta-banner" onClick={() => setShowFeedback(true)}>
-        <span className="beta-banner-tag">BETA TESTING.</span>
-        <span className="beta-banner-cta">Click here to provide feedback.</span>
-      </button>
-
       {entitlement.paywalled && (
         <div className="paywall-banner">
           {entitlement.message || 'This app now requires an active subscription.'}
@@ -559,18 +557,15 @@ export default function App() {
       {/* Top Navbar */}
       <nav className="top-nav-bar">
         <div className="nav-left">
-          <button className="about-trigger-btn" onClick={() => setShowAbout(true)} aria-label="About Learn Hanzi">
-            ℹ️
-          </button>
           <span className="streak-badge">🔥 {streak}d</span>
           <button
             type="button"
-            className={`sound-toggle-pill ${soundEnabled ? '' : 'sound-toggle-pill--muted'}`}
-            onClick={toggleSound}
-            aria-pressed={!soundEnabled}
-            aria-label={soundEnabled ? 'Sound on - tap to mute' : 'Sound off - tap to unmute'}
+            className="beta-feedback-pill"
+            onClick={() => setShowFeedback(true)}
+            aria-label="Send beta feedback"
           >
-            {soundEnabled ? '🔊 Sound' : '🔇 Muted'}
+            <span className="beta-feedback-dot" />
+            Beta Feedback
           </button>
           {appState === 'studying' && (
             <span className="xp-pill">⚡ {score} XP</span>
@@ -604,6 +599,7 @@ export default function App() {
             revisionLevels={revisionLevels}
             isLoadingDeck={isLoadingDeck}
             cardCount={rawDeck.length}
+            dueCount={dueCount}
             weakCardsCount={weakCards.length}
             seenCardsCount={seenCards.length}
             launchArcadeSession={launchArcadeSession}
@@ -723,6 +719,27 @@ export default function App() {
                     </div>
                   )}
                 </div>
+              </div>
+
+              <div className="card-internal-divider" />
+
+              <div className="settings-toggle-row">
+                <div>
+                  <label className="box-section-label" style={{ marginBottom: '2px' }}>Sound</label>
+                  <p style={{ fontSize: '12px', color: 'var(--ink-faint)', margin: 0 }}>
+                    Pronunciation playback and grading feedback chimes.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={soundEnabled}
+                  aria-label="Sound"
+                  className={`settings-toggle-track ${soundEnabled ? 'active' : ''}`}
+                  onClick={toggleSound}
+                >
+                  <span className="settings-toggle-thumb" />
+                </button>
               </div>
 
               <div className="card-internal-divider" />

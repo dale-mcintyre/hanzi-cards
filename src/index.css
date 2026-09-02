@@ -1,17 +1,19 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 :root {
-  /* Obsidian slate palette */
-  --bg: #090d16;
-  --surface: #131c2e;
-  --surface-raised: #1a2540;
-  --surface-line: #24304d;
+  /* Warm obsidian palette - jade accent */
+  --bg-canvas: #0d0e11;
+  --surface-card: #15161a;
+  --surface-card-raised: #1c1d22;
+  --surface-line: #2a2b31;
+  --surface-border: rgba(255, 255, 255, 0.08);
+  --accent-primary: #2dd4bf;
+  --accent-primary-dim: rgba(45, 212, 191, 0.14);
+  --accent-primary-ink: #04211d;
 
   --canvas-bg: #030712;
   --outline-slate: #64748b;
   --stroke-white: #ffffff;
-  --accent-cyan: #38bdf8;
-  --draw-cyan: #22d3ee;
 
   --ink: #f5f7fa;
   --ink-dim: #8b93a7;
@@ -22,6 +24,17 @@
   --hard: #fb7185;
   --hard-dim: rgba(251, 113, 133, 0.14);
   --pending: #fbbf24;
+
+  /* Legacy aliases - most of App.css was written against these names
+     against the previous cold slate/navy + cyan palette. Pointing them at
+     the new warm-obsidian tokens above applies the redesign app-wide from
+     one place instead of a risky mechanical rename across every call site;
+     any new CSS should reach for the tokens above directly. */
+  --bg: var(--bg-canvas);
+  --surface: var(--surface-card);
+  --surface-raised: var(--surface-card-raised);
+  --accent-cyan: var(--accent-primary);
+  --draw-cyan: var(--accent-primary);
 
   --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-data: 'JetBrains Mono', ui-monospace, 'SF Mono', monospace;

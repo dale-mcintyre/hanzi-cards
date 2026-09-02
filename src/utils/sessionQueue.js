@@ -14,6 +14,14 @@ function byFrequency(a, b) {
   return (a.frequency ?? Infinity) - (b.frequency ?? Infinity);
 }
 
+// Count of already-seen cards whose SM-2 interval has elapsed - drives the
+// LaunchScreen primary CTA's "Review Due (N)" label. Deliberately excludes
+// never-studied cards (buildLearnQueue's "fresh" bucket) - those aren't
+// "due" in the overdue-review sense, they're just new material.
+export function getDueCount(deck) {
+  return deck.filter((c) => c.stats.lastReviewed && isDue(c.stats)).length;
+}
+
 /**
  * Builds a "Learn" session queue that respects spaced repetition and the
  * deck's frequency ranking, instead of a flat random shuffle:

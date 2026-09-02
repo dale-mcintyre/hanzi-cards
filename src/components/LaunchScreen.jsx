@@ -1,20 +1,42 @@
+import { useEffect, useState } from 'react';
 import MarketingLanding from './MarketingLanding';
+
+const MODES = [
+  { key: 'learn', label: 'Learn' },
+  { key: 'quiz', label: 'Quiz' },
+  { key: 'writing', label: 'Write' },
+];
 
 export default function LaunchScreen({
   showMarketing,
   revisionLevels,
   isLoadingDeck,
   cardCount,
+  dueCount,
   weakCardsCount,
   seenCardsCount,
+  writingEligibleCount,
   launchArcadeSession,
   launchHardModeSession,
   launchQuizSession,
   launchWritingSession,
-  writingEligibleCount,
   onSignIn,
   renderTierTiles,
 }) {
+  const [selectedMode, setSelectedMode] = useState('learn');
+
+  const quizAvailable = seenCardsCount > 0;
+  const writingAvailable = writingEligibleCount > 0;
+
+  // If the currently-selected mode's prerequisite cards disappear (e.g.
+  // right after a session that was the only source of quiz-eligible or
+  // writing-eligible cards), fall back to Learn rather than leaving the
+  // switch pointed at a segment that's now disabled.
+  useEffect(() => {
+    if (selectedMode === 'quiz' && !quizAvailable) setSelectedMode('learn');
+    if (selectedMode === 'writing' && !writingAvailable) setSelectedMode('learn');
+  }, [selectedMode, quizAvailable, writingAvailable]);
+
   if (showMarketing) {
     return (
       <MarketingLanding
@@ -26,6 +48,26 @@ export default function LaunchScreen({
       />
     );
   }
+
+  const writingWordCount = Math.min(writingEligibleCount, 6);
+
+  let primaryLabel = 'Start Study';
+  let primaryDisabled = cardCount === 0;
+  let onPrimaryClick = () => launchArcadeSession(20, 'all');
+
+  if (selectedMode === 'quiz') {
+    primaryLabel = 'Start Quiz';
+    onPrimaryClick = launchQuizSession;
+    primaryDisabled = !quizAvailable;
+  } else if (selectedMode === 'writing') {
+    primaryLabel = `Start Writing Drill (${writingWordCount} Words)`;
+    onPrimaryClick = launchWritingSession;
+    primaryDisabled = !writingAvailable;
+  } else if (dueCount > 0) {
+    primaryLabel = `Review Due (${dueCount})`;
+  }
+
+  if (isLoadingDeck) primaryLabel = 'Preparing Deck...';
 
   return (
     <>
@@ -45,40 +87,51 @@ export default function LaunchScreen({
         </div>
 
         <div className="launch-card-actions">
+          <div className="mode-switch" role="tablist" aria-label="Study mode">
+            {MODES.map(({ key, label }) => {
+              const disabled = key === 'quiz' ? !quizAvailable : key === 'writing' ? !writingAvailable : false;
+              return (
+                <button
+                  key={key}
+                  type="button"
+                  role="tab"
+                  aria-selected={selectedMode === key}
+                  className={`mode-switch-btn ${selectedMode === key ? 'active' : ''}`}
+                  disabled={disabled}
+                  onClick={() => setSelectedMode(key)}
+                >
+                  {label}
+                </button>
+              );
+            })}
+          </div>
+
           <button
             className="primary-launch-btn"
-            disabled={isLoadingDeck || cardCount === 0}
-            onClick={() => launchArcadeSession(20, 'all')}
+            disabled={isLoadingDeck || primaryDisabled}
+            onClick={onPrimaryClick}
           >
-            {isLoadingDeck ? 'Preparing Deck...' : 'Learn ⚡'}
+            {primaryLabel}
           </button>
 
-          <button className="hard-mode-btn" onClick={launchHardModeSession}>
-            🔥 Hard Mode (Targeted Mistake Blitz)
-          </button>
-
-          {weakCardsCount > 0 && (
-            <button className="secondary-launch-btn" onClick={() => launchArcadeSession(20, 'weak')}>
-              🎯 Review {weakCardsCount} Weak Cards
-            </button>
-          )}
-
-          {seenCardsCount > 0 && (
-            <button className="secondary-launch-btn" onClick={() => launchArcadeSession(seenCardsCount, 'seen')}>
-              📖 Review All {seenCardsCount} Seen Cards
-            </button>
-          )}
-
-          {seenCardsCount > 0 && (
-            <button className="secondary-launch-btn" onClick={launchQuizSession}>
-              🧠 Quiz Mode (Multiple Choice)
-            </button>
-          )}
-
-          {writingEligibleCount > 0 && (
-            <button className="secondary-launch-btn" onClick={launchWritingSession}>
-              ✍️ Write {Math.min(writingEligibleCount, 6)} Characters
-            </button>
+          {(weakCardsCount > 0 || seenCardsCount > 0) && (
+            <div className="secondary-chip-row">
+              {weakCardsCount > 0 && (
+                <button className="secondary-chip" onClick={() => launchArcadeSession(20, 'weak')}>
+                  {weakCardsCount} Weak Cards
+                </button>
+              )}
+              {seenCardsCount > 0 && (
+                <button className="secondary-chip" onClick={() => launchArcadeSession(seenCardsCount, 'seen')}>
+                  {seenCardsCount} Seen Cards
+                </button>
+              )}
+              {weakCardsCount > 0 && (
+                <button className="secondary-chip" onClick={launchHardModeSession}>
+                  Mistake Blitz
+                </button>
+              )}
+            </div>
           )}
         </div>
       </div>
