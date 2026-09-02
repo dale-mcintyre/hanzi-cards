@@ -8,6 +8,7 @@ const STREAK_COUNT_KEY = 'hz_streak_count';
 const LAST_ACTIVE_DATE_KEY = 'hz_last_active_date';
 const OFFLINE_MODE_KEY = 'hz_offline_mode';
 const DEFAULT_PREFS = { revisionLevels: [], includeNonHsk: true };
+const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
 // Deliberately its own localStorage key, entirely outside getPrefs/savePrefs/
 // hydratePrefsFromRemote - this flag must never be pushed to or pulled from
@@ -128,9 +129,15 @@ export function getProgress() {
 
 export function saveCardProgress(cardId, newStats) {
   const stamped = { ...newStats, lastReviewed: Date.now() };
+  // Merge onto whatever's already stored (not a full replace) - a
+  // reading-only grade must never wipe that card's writing-progress
+  // fields (writingLevel/writingReps/writingIntervalDays/writingNextDue/
+  // lastWrittenAt), since both halves now share one per-card object.
+  let merged = stamped;
   try {
     const progress = getProgress();
-    progress[cardId] = stamped;
+    merged = { ...progress[cardId], ...stamped };
+    progress[cardId] = merged;
     localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
   } catch (e) {
     console.error('Failed to save progress:', e);
@@ -146,15 +153,58 @@ export function saveCardProgress(cardId, newStats) {
   // to the queue, no network attempt - so it stays a purely local write
   // (enqueueSync only ever touches localStorage) while still preserving the
   // grade for automatic resync once Offline Mode is turned back off.
+  //
+  // The full merged object (not just this grade's delta) is what gets
+  // pushed/queued - pushCardProgress's upsert writes every column in its
+  // payload, so pushing only `stamped` would blank out this card's other
+  // half (writing fields, here) in Supabase.
   if (currentSyncUserId && !offlineModeEnabled) {
-    pushCardProgress(currentSyncUserId, cardId, stamped).then((result) => {
-      if (!result.ok) enqueueSync(cardId, stamped);
+    pushCardProgress(currentSyncUserId, cardId, merged).then((result) => {
+      if (!result.ok) enqueueSync(cardId, merged);
     });
   } else if (currentSyncUserId) {
-    enqueueSync(cardId, stamped);
+    enqueueSync(cardId, merged);
   }
 
-  return stamped;
+  return merged;
+}
+
+/**
+ * Writing Recall Mode's counterpart to saveCardProgress - same local-first,
+ * fail-open, merge-onto-existing shape, but stamps the writing-specific
+ * timestamp/due-date fields instead of lastReviewed. Kept as a separate
+ * function (not a mode flag on saveCardProgress) because the two stamp
+ * different fields and read from a different schedule (writingSchedule.js
+ * vs sm2.js) - the shared logic that matters (merge-not-replace, push the
+ * full object, queue on failure) is identical either way.
+ */
+export function saveWritingProgress(cardId, newWritingStats) {
+  const now = Date.now();
+  const stamped = {
+    ...newWritingStats,
+    lastWrittenAt: now,
+    writingNextDue: now + newWritingStats.writingIntervalDays * MS_PER_DAY,
+  };
+
+  let merged = stamped;
+  try {
+    const progress = getProgress();
+    merged = { ...progress[cardId], ...stamped };
+    progress[cardId] = merged;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+  } catch (e) {
+    console.error('Failed to save writing progress:', e);
+  }
+
+  if (currentSyncUserId && !offlineModeEnabled) {
+    pushCardProgress(currentSyncUserId, cardId, merged).then((result) => {
+      if (!result.ok) enqueueSync(cardId, merged);
+    });
+  } else if (currentSyncUserId) {
+    enqueueSync(cardId, merged);
+  }
+
+  return merged;
 }
 
 /**

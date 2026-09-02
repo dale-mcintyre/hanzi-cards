@@ -2,13 +2,18 @@ import React, { useEffect, useRef, useState } from 'react';
 import HanziWriter from 'hanzi-writer';
 
 // Single Character Tianzige Cell
-function SingleHanziBox({ char, mode, size }) {
+function SingleHanziBox({ char, mode, size, shouldAnimate, onComplete }) {
   const containerRef = useRef(null);
   const writerRef = useRef(null);
   const [writerLoaded, setWriterLoaded] = useState(false);
 
+  // 'hidden' mode (Writing Recall Mode's prompt state) never creates a
+  // HanziWriter instance at all - just the tianzige grid lines below, no
+  // glyph, no fallback span. Skipping instance creation entirely (rather
+  // than creating one and hiding it) avoids wasted stroke-data fetches for
+  // a card that might get graded before it's ever revealed.
   useEffect(() => {
-    if (!containerRef.current || !char) return;
+    if (mode === 'hidden' || !containerRef.current || !char) return;
 
     containerRef.current.innerHTML = '';
     setWriterLoaded(false);
@@ -39,21 +44,40 @@ function SingleHanziBox({ char, mode, size }) {
         });
 
         writerRef.current = writer;
-
-        if (mode === 'animate') {
-          writer.animateCharacter();
-        }
       } catch (e) {
         console.warn('HanziWriter fallback:', e);
       }
     });
 
     return () => cancelAnimationFrame(rafId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [char, mode, size]);
+
+  // Triggers this box's animation exactly once per "turn": fires when
+  // either the writer finishes loading (single-box / already-active box)
+  // or shouldAnimate flips true later (a later box in a sequential
+  // hand-off) - whichever happens last. Gating on writerLoaded here
+  // (rather than calling animateCharacter unconditionally on mount, as
+  // the pre-writing-mode version did) avoids double-firing: mount-time
+  // creation and the load callback would otherwise both try to start it.
+  useEffect(() => {
+    if (mode !== 'animate' || !shouldAnimate || !writerLoaded) return;
+    writerRef.current?.animateCharacter({ onComplete });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [shouldAnimate, writerLoaded]);
+
+  // Tap-to-replay: once loaded, tapping this specific box replays just its
+  // character - animateCharacter() cancels any in-flight quiz/animation and
+  // redraws from scratch, so calling it again is safe without recreating
+  // the writer instance.
+  function handleTap() {
+    if (mode === 'animate' && writerLoaded) writerRef.current?.animateCharacter();
+  }
 
   return (
     <div
       className="tianzige-cell"
+      onClick={handleTap}
       style={{
         width: `${size}px`,
         height: `${size}px`,
@@ -67,6 +91,7 @@ function SingleHanziBox({ char, mode, size }) {
         boxShadow: 'inset 0 2px 6px rgba(0,0,0,0.6)',
         overflow: 'hidden',
         flexShrink: 0,
+        cursor: mode === 'animate' && writerLoaded ? 'pointer' : 'default',
       }}
     >
       {/* Tianzige SVG Grid */}
@@ -91,39 +116,51 @@ function SingleHanziBox({ char, mode, size }) {
         <line x1="100" y1="0" x2="0" y2="100" stroke="#1e293b" strokeWidth="0.75" strokeDasharray="2,4" />
       </svg>
 
-      {/* Immediate System Font Fallback */}
-      <span
-        style={{
-          position: 'absolute',
-          fontSize: `${size * 0.58}px`,
-          color: '#f8fafc',
-          zIndex: writerLoaded ? 1 : 2,
-          opacity: writerLoaded ? 0 : 1,
-          transition: 'opacity 0.2s ease',
-          fontFamily: '"PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif',
-          lineHeight: 1,
-          userSelect: 'none',
-        }}
-      >
-        {char}
-      </span>
+      {mode !== 'hidden' && (
+        <>
+          {/* Immediate System Font Fallback */}
+          <span
+            style={{
+              position: 'absolute',
+              fontSize: `${size * 0.58}px`,
+              color: '#f8fafc',
+              zIndex: writerLoaded ? 1 : 2,
+              opacity: writerLoaded ? 0 : 1,
+              transition: 'opacity 0.2s ease',
+              fontFamily: '"PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif',
+              lineHeight: 1,
+              userSelect: 'none',
+            }}
+          >
+            {char}
+          </span>
 
-      {/* HanziWriter Render Target */}
-      <div
-        ref={containerRef}
-        style={{
-          width: `${size}px`,
-          height: `${size}px`,
-          position: 'relative',
-          zIndex: 3,
-        }}
-      />
+          {/* HanziWriter Render Target */}
+          <div
+            ref={containerRef}
+            style={{
+              width: `${size}px`,
+              height: `${size}px`,
+              position: 'relative',
+              zIndex: 3,
+            }}
+          />
+        </>
+      )}
     </div>
   );
 }
 
 // Parent Wrapper (Maintains Card Container Integrity)
-export default function HanziCanvas({ character, mode = 'view' }) {
+export default function HanziCanvas({ character, mode = 'view', sequential = false, onAllComplete, sizeByLength }) {
+  // Tracks which box is currently animating when `sequential` is on -
+  // reset to 0 whenever the character (or reveal state) changes so a new
+  // prompt always starts its sequence from box 1.
+  const [activeIndex, setActiveIndex] = useState(0);
+  useEffect(() => {
+    setActiveIndex(0);
+  }, [character, mode]);
+
   // Guard clause: if character hasn't loaded yet, render an empty placeholder box
   if (!character) {
     return (
@@ -136,11 +173,22 @@ export default function HanziCanvas({ character, mode = 'view' }) {
   const charString = typeof character === 'string' ? character : String(character || '');
   const charArray = Array.from(charString.trim());
 
-  // Strict sizing calculation to fit inside the card padding (Max width ~310px)
-  let boxSize = 210;
-  if (charArray.length === 2) boxSize = 135;
-  if (charArray.length === 3) boxSize = 92;
-  if (charArray.length >= 4) boxSize = 72;
+  // Strict sizing calculation to fit inside the card padding (Max width ~310px).
+  // sizeByLength lets a caller (WritingSession) override this ladder
+  // entirely; omitted, the original hardcoded values apply unchanged.
+  const ladder = sizeByLength || { 1: 210, 2: 135, 3: 92, 4: 72 };
+  const lengthKey = Math.min(charArray.length, 4); // 4 means "4 or more", matching the original ladder
+  const boxSize = ladder[lengthKey] ?? ladder[1];
+
+  const isSequential = mode === 'animate' && sequential && charArray.length > 1;
+
+  function handleBoxComplete(index) {
+    if (index + 1 < charArray.length) {
+      setActiveIndex(index + 1);
+    } else {
+      onAllComplete?.();
+    }
+  }
 
   return (
     <div
@@ -156,7 +204,14 @@ export default function HanziCanvas({ character, mode = 'view' }) {
       }}
     >
       {charArray.map((char, index) => (
-        <SingleHanziBox key={`${char}_${index}`} char={char} mode={mode} size={boxSize} />
+        <SingleHanziBox
+          key={`${char}_${index}`}
+          char={char}
+          mode={mode}
+          size={boxSize}
+          shouldAnimate={isSequential ? index === activeIndex : mode === 'animate'}
+          onComplete={isSequential ? () => handleBoxComplete(index) : onAllComplete}
+        />
       ))}
     </div>
   );

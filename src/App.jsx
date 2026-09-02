@@ -1,18 +1,22 @@
 import { useEffect, useState, useMemo, useCallback } from 'react';
 import './App.css';
 import { calculateSM2 } from './utils/sm2';
-import { getProgress, saveCardProgress, getCardMasteryStats, getPrefs, savePrefs, getTierStats, getOfflineMode, setOfflineMode, MASTERED_INTERVAL_DAYS } from './utils/storage';
+import { getProgress, saveCardProgress, saveWritingProgress, getCardMasteryStats, getPrefs, savePrefs, getTierStats, getOfflineMode, setOfflineMode, MASTERED_INTERVAL_DAYS } from './utils/storage';
 import { getSoundEnabled, setSoundEnabled } from './utils/tts';
 import { playCorrectFeedback, playIncorrectFeedback, playMasteryFeedback } from './utils/feedback';
 import { getFilteredDeck, fetchUnifiedVocab } from './data/vocabLoader';
 import { getHardModeDeck } from './data/hskLoader';
 import { buildLearnQueue } from './utils/sessionQueue';
 import { buildQuizQueue } from './utils/quizQueue';
+import { buildWritingQueue } from './utils/writingQueue';
+import { calculateWritingSchedule, WRITING_MASTERED_LEVEL } from './utils/writingSchedule';
 import { getEntitlement } from './utils/entitlement';
 import { useAuth } from './context/AuthContext';
 import LaunchScreen from './components/LaunchScreen';
 import StudySession from './components/StudySession';
 import QuizSession from './components/QuizSession';
+import WritingSession from './components/WritingSession';
+import WritingBadge from './components/WritingBadge';
 import CompletionScreen from './components/CompletionScreen';
 import CardInspectDrawer from './components/CardInspectDrawer';
 import MasteryCelebration from './components/MasteryCelebration';
@@ -148,7 +152,22 @@ export default function App() {
         return {
           ...card,
           id: cardId,
-          stats: savedProgress[cardId] || { repetitions: 0, interval: 1, easeFactor: 2.5, lastReviewed: null },
+          // Defaults merged underneath (not a bare `||` fallback) so a
+          // card saved before Writing Recall Mode shipped - which has
+          // reading fields but no writing ones yet - still gets the
+          // writing defaults filled in, rather than leaving them undefined.
+          stats: {
+            repetitions: 0,
+            interval: 1,
+            easeFactor: 2.5,
+            lastReviewed: null,
+            writingLevel: 0,
+            writingReps: 0,
+            writingIntervalDays: 0,
+            writingNextDue: null,
+            lastWrittenAt: null,
+            ...savedProgress[cardId],
+          },
         };
       });
 
@@ -193,6 +212,11 @@ export default function App() {
   const mastery = useMemo(() => {
     return getCardMasteryStats(rawDeck);
   }, [rawDeck]);
+
+  // Sized generously (Infinity) purely to get an accurate eligible count for
+  // the LaunchScreen button label/gate - launchWritingSession itself caps
+  // the actual session queue at 6 via buildWritingQueue's own count arg.
+  const writingEligibleCards = useMemo(() => buildWritingQueue(rawDeck, Infinity), [rawDeck]);
 
   // Independent of the current HSK/non-HSK filter - rawDeck only contains
   // whatever tiers are currently selected, but the tier tiles need stats
@@ -364,6 +388,28 @@ export default function App() {
     setCountdownNum(3);
   };
 
+  // Writing practice is only ever offered on characters already
+  // read-mastered (see buildWritingQueue), so it has no "learn something
+  // new" mode of its own the way Learn/Quiz do - just review, batched 6 at
+  // a time per the spec.
+  const launchWritingSession = () => {
+    const writingQueue = buildWritingQueue(rawDeck, 6);
+
+    if (writingQueue.length === 0) return;
+
+    setSessionQueue(writingQueue);
+    setCurrentIndex(0);
+    setIsFlipped(false);
+    setScore(0);
+    setCombo(0);
+    setMaxCombo(0);
+    setSessionResults([]);
+    setSessionMode('writing');
+
+    setAppState('countdown');
+    setCountdownNum(3);
+  };
+
   useEffect(() => {
     if (appState !== 'countdown') return;
 
@@ -387,7 +433,14 @@ export default function App() {
   const handleNextCard = (quality) => {
     if (!card) return;
 
-    const isSuccess = quality >= 4;
+    // Writing grades (1/2/3 - Amnesia/Hesitated/Spontaneous) and reading
+    // grades (SM-2's 1-5 quality scale) don't share a "success" threshold -
+    // Spontaneous (3) is writing's best outcome, but on the reading scale 3
+    // is a middling grade. isSuccess/combo/score/XP-popups/soft-wall/queue-
+    // advance below are otherwise fully shared between the two modes, per
+    // the unified handleNextCard design - only this threshold and the
+    // stats-calculation/persistence step (right below) branch on mode.
+    const isSuccess = sessionMode === 'writing' ? quality >= 3 : quality >= 4;
     let newCombo = isSuccess ? combo + 1 : 0;
     setCombo(newCombo);
     if (newCombo > maxCombo) setMaxCombo(newCombo);
@@ -403,18 +456,31 @@ export default function App() {
       }, 1000);
     }
 
-    const wasAlreadyMastered = (card.stats?.interval || 1) >= MASTERED_INTERVAL_DAYS;
+    let newStats;
+    let justMastered;
 
-    const newStats = calculateSM2(
-      quality,
-      card.stats?.repetitions || 0,
-      card.stats?.interval || 1,
-      card.stats?.easeFactor || 2.5
-    );
+    if (sessionMode === 'writing') {
+      const wasReflexive = (card.stats?.writingLevel || 0) >= WRITING_MASTERED_LEVEL;
+      const newWritingStats = calculateWritingSchedule(quality, card.stats);
+      justMastered = !wasReflexive && newWritingStats.writingLevel >= WRITING_MASTERED_LEVEL;
+      newStats = saveWritingProgress(card.id, newWritingStats);
+    } else {
+      const wasAlreadyMastered = (card.stats?.interval || 1) >= MASTERED_INTERVAL_DAYS;
+      const computedStats = calculateSM2(
+        quality,
+        card.stats?.repetitions || 0,
+        card.stats?.interval || 1,
+        card.stats?.easeFactor || 2.5
+      );
+      justMastered = !wasAlreadyMastered && computedStats.interval >= MASTERED_INTERVAL_DAYS;
+      newStats = saveCardProgress(card.id, computedStats);
+    }
 
     // A mastery moment supersedes the routine correct/incorrect chime
-    // rather than playing both - it's a bigger, distinct event.
-    const justMastered = !wasAlreadyMastered && newStats.interval >= MASTERED_INTERVAL_DAYS;
+    // rather than playing both - it's a bigger, distinct event. Reaching
+    // Writing Level 3 (Reflexive) reuses this same celebration as reaching
+    // a 21-day reading interval - both are comparably significant
+    // "you've truly got this" milestones.
     if (justMastered) {
       playMasteryFeedback();
       setMasteredCelebration({ character: card.character, pinyin: card.pinyin });
@@ -424,11 +490,15 @@ export default function App() {
       playIncorrectFeedback();
     }
 
-    const stamped = saveCardProgress(card.id, newStats);
     // Keep rawDeck in sync so a subsequent session (built from rawDeck)
-    // sees this card's real lastReviewed/interval - otherwise it'd still
-    // look "never studied" until the next full deck reload.
-    setRawDeck((prev) => prev.map((c) => (c.id === card.id ? { ...c, stats: stamped } : c)));
+    // sees this card's real stats - otherwise it'd still look stale until
+    // the next full deck reload. Merged onto the existing stats (not
+    // replaced) since newStats here only ever carries the half (reading or
+    // writing) this grade just touched - saveCardProgress/
+    // saveWritingProgress already return the full merged-with-localStorage
+    // object, but rawDeck's copy of this card may be a render or two
+    // behind that, so merging here too keeps it correct regardless.
+    setRawDeck((prev) => prev.map((c) => (c.id === card.id ? { ...c, stats: { ...c.stats, ...newStats } } : c)));
 
     // Feeds the post-session recap on CompletionScreen - a lightweight
     // per-card log distinct from rawDeck (which only ever holds each
@@ -539,6 +609,8 @@ export default function App() {
             launchArcadeSession={launchArcadeSession}
             launchHardModeSession={launchHardModeSession}
             launchQuizSession={launchQuizSession}
+            launchWritingSession={launchWritingSession}
+            writingEligibleCount={writingEligibleCards.length}
             onSignIn={() => setShowAccount(true)}
             renderTierTiles={renderTierTiles}
           />
@@ -552,6 +624,14 @@ export default function App() {
               countdownNum={countdownNum}
               card={card}
               onAnswer={handleNextCard}
+              progressPercent={progressPercent}
+            />
+          ) : sessionMode === 'writing' ? (
+            <WritingSession
+              appState={appState}
+              countdownNum={countdownNum}
+              card={card}
+              onGrade={handleNextCard}
               progressPercent={progressPercent}
             />
           ) : (
@@ -635,6 +715,7 @@ export default function App() {
                     <div className="mastery-grid-chips">
                       {mastery[activeMasteryTab].map((c) => (
                         <div key={c.id} className="mastery-chip" title={`${c.pinyin} - ${c.meaning}`}>
+                          <WritingBadge stats={c.stats} />
                           <span className="chip-char">{c.character}</span>
                           <span className="chip-py">{c.pinyin}</span>
                         </div>

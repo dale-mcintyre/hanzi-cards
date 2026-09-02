@@ -1149,6 +1149,111 @@
   opacity: 0.4;
 }
 
+/* ==================== Writing Recall Mode ==================== */
+.card--writing {
+  gap: 16px;
+  align-items: center;
+  text-align: center;
+}
+
+.writing-prompt-meta {
+  flex-shrink: 0;
+}
+
+.writing-canvas-frame {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  cursor: pointer;
+}
+
+.writing-reveal-hint {
+  position: absolute;
+  bottom: 6px;
+  left: 0;
+  right: 0;
+  margin: 0;
+  font-size: 12px;
+  color: var(--ink-faint);
+  text-align: center;
+}
+
+.writing-grade-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  width: 100%;
+  flex-shrink: 0;
+}
+
+.writing-grade-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 10px 6px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.writing-grade-key {
+  font-family: var(--font-data);
+  font-size: 11px;
+  color: var(--ink-faint);
+}
+
+.writing-grade-label {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.writing-grade-hint {
+  font-size: 10px;
+  color: var(--ink-faint);
+  line-height: 1.2;
+}
+
+.writing-grade-btn--1 { color: var(--hard); }
+.writing-grade-btn--1:hover { background: var(--hard-dim); border-color: var(--hard); }
+
+.writing-grade-btn--2 { color: var(--pending); }
+.writing-grade-btn--2:hover { background: rgba(251, 191, 36, 0.14); border-color: var(--pending); }
+
+.writing-grade-btn--3 { color: var(--easy); }
+.writing-grade-btn--3:hover { background: var(--easy-dim); border-color: var(--easy); }
+
+/* Small progress indicator mounted on the Settings drawer's Character
+   Mastery Matrix chips (.mastery-chip, see below) - independent of that
+   chip's own reading-mastery grouping. */
+.writing-badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.writing-badge--struggling {
+  background: transparent;
+  border: 1.5px solid var(--pending);
+}
+
+.writing-badge--spontaneous {
+  background: var(--accent-cyan);
+}
+
+.writing-badge--reflexive {
+  background: var(--accent-cyan);
+  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.35), 0 0 6px 2px rgba(56, 189, 248, 0.5);
+}
+
 /* ==================== Tier ring tiles ==================== */
 .tier-ring-tile {
   display: flex;
@@ -1245,6 +1350,7 @@
 }
 
 .mastery-chip {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;

@@ -10,6 +10,8 @@ export default function LaunchScreen({
   launchArcadeSession,
   launchHardModeSession,
   launchQuizSession,
+  launchWritingSession,
+  writingEligibleCount,
   onSignIn,
   renderTierTiles,
 }) {
@@ -70,6 +72,12 @@ export default function LaunchScreen({
           {seenCardsCount > 0 && (
             <button className="secondary-launch-btn" onClick={launchQuizSession}>
               🧠 Quiz Mode (Multiple Choice)
+            </button>
+          )}
+
+          {writingEligibleCount > 0 && (
+            <button className="secondary-launch-btn" onClick={launchWritingSession}>
+              ✍️ Write {Math.min(writingEligibleCount, 6)} Characters
             </button>
           )}
         </div>
