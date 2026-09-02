@@ -595,43 +595,25 @@
   box-shadow: none;
 }
 
-/* Learn/Quiz/Write segmented switch */
-.mode-switch {
+/* Paper-writing environmental toggle, directly beneath the hero CTA */
+.writing-toggle-row {
   display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
   width: 100%;
-  padding: 4px;
-  gap: 4px;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid var(--surface-border);
+  padding: 2px 4px;
 }
 
-.mode-switch-btn {
-  flex: 1;
-  padding: 10px 8px;
-  border-radius: 12px;
+.writing-toggle-label {
   font-size: 13px;
-  font-weight: 700;
-  color: var(--ink-faint);
-  text-align: center;
-  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
-}
-
-.mode-switch-btn:hover:not(:disabled):not(.active) {
+  font-weight: 600;
   color: var(--ink-dim);
 }
 
-.mode-switch-btn.active {
-  background: var(--surface-card-raised);
-  color: var(--ink);
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.04) inset,
-    0 4px 12px -6px rgba(0, 0, 0, 0.6);
-}
-
-.mode-switch-btn:disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
+.writing-toggle-count {
+  color: var(--ink-faint);
+  font-weight: 500;
 }
 
 /* Demoted secondary queues - small ghost chips, not full-width buttons */
@@ -1233,6 +1215,19 @@
 
 .writing-grade-btn--3 { color: var(--easy); }
 .writing-grade-btn--3:hover { background: var(--easy-dim); border-color: var(--easy); }
+
+.writing-cant-write-btn {
+  flex-shrink: 0;
+  font-size: 12px;
+  color: var(--ink-faint);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  padding: 4px;
+}
+
+.writing-cant-write-btn:hover {
+  color: var(--ink-dim);
+}
 
 /* Small progress indicator mounted on the Settings drawer's Character
    Mastery Matrix chips (.mastery-chip, see below) - independent of that

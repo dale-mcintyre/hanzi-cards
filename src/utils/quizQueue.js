@@ -10,7 +10,17 @@
  */
 export function buildQuizQueue(seenCards, fullDeck, count = 10) {
   const questions = [...seenCards].sort(() => 0.5 - Math.random()).slice(0, count);
-  return questions.map((card) => ({ ...card, quizOptions: buildDistractorOptions(card, fullDeck) }));
+  return questions.map((card) => attachQuizOptions(card, fullDeck));
+}
+
+/** Attaches a precomputed quizOptions set to a single card - factored out
+ * of buildQuizQueue so the interleaved queue engine (sessionQueue.js) can
+ * give every card its multiple-choice options up front too, regardless of
+ * that card's initial promptType. That way a 'write' card downgraded to
+ * 'quiz' mid-session (the "Can't write right now" fallback) already has
+ * options ready instead of needing an on-the-fly recompute. */
+export function attachQuizOptions(card, fullDeck) {
+  return { ...card, quizOptions: buildDistractorOptions(card, fullDeck) };
 }
 
 /**

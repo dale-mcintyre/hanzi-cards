@@ -14,7 +14,7 @@ const GRADE_OPTIONS = [
   { quality: 3, key: '3', label: 'Spontaneous', hint: 'Wrote it instantly' },
 ];
 
-export default function WritingSession({ appState, countdownNum, card, onGrade, progressPercent }) {
+export default function WritingSession({ appState, countdownNum, card, onGrade, onCantWriteNow, progressPercent }) {
   const [revealed, setRevealed] = useState(false);
 
   // New prompt - reset to the hidden state. Also covers leaving 'studying'
@@ -91,6 +91,14 @@ export default function WritingSession({ appState, countdownNum, card, onGrade, 
               ))}
             </div>
           )}
+
+          {/* The "on my commute, no pen handy" escape hatch - swaps this
+              same card to a multiple-choice prompt in place. Not a grade:
+              no stats are touched, so this must never read as an Amnesia
+              writing attempt. */}
+          <button type="button" className="writing-cant-write-btn" onClick={onCantWriteNow}>
+            Can't write right now
+          </button>
         </div>
       )}
     </>

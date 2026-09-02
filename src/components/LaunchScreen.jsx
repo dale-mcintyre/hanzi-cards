@@ -1,11 +1,4 @@
-import { useEffect, useState } from 'react';
 import MarketingLanding from './MarketingLanding';
-
-const MODES = [
-  { key: 'learn', label: 'Learn' },
-  { key: 'quiz', label: 'Quiz' },
-  { key: 'writing', label: 'Write' },
-];
 
 export default function LaunchScreen({
   showMarketing,
@@ -15,28 +8,14 @@ export default function LaunchScreen({
   dueCount,
   weakCardsCount,
   seenCardsCount,
-  writingEligibleCount,
+  writingDueCount,
+  includeWriting,
+  onToggleIncludeWriting,
   launchArcadeSession,
-  launchHardModeSession,
-  launchQuizSession,
-  launchWritingSession,
+  launchUnifiedSession,
   onSignIn,
   renderTierTiles,
 }) {
-  const [selectedMode, setSelectedMode] = useState('learn');
-
-  const quizAvailable = seenCardsCount > 0;
-  const writingAvailable = writingEligibleCount > 0;
-
-  // If the currently-selected mode's prerequisite cards disappear (e.g.
-  // right after a session that was the only source of quiz-eligible or
-  // writing-eligible cards), fall back to Learn rather than leaving the
-  // switch pointed at a segment that's now disabled.
-  useEffect(() => {
-    if (selectedMode === 'quiz' && !quizAvailable) setSelectedMode('learn');
-    if (selectedMode === 'writing' && !writingAvailable) setSelectedMode('learn');
-  }, [selectedMode, quizAvailable, writingAvailable]);
-
   if (showMarketing) {
     return (
       <MarketingLanding
@@ -49,25 +28,11 @@ export default function LaunchScreen({
     );
   }
 
-  const writingWordCount = Math.min(writingEligibleCount, 6);
-
-  let primaryLabel = 'Start Study';
-  let primaryDisabled = cardCount === 0;
-  let onPrimaryClick = () => launchArcadeSession(20, 'all');
-
-  if (selectedMode === 'quiz') {
-    primaryLabel = 'Start Quiz';
-    onPrimaryClick = launchQuizSession;
-    primaryDisabled = !quizAvailable;
-  } else if (selectedMode === 'writing') {
-    primaryLabel = `Start Writing Drill (${writingWordCount} Words)`;
-    onPrimaryClick = launchWritingSession;
-    primaryDisabled = !writingAvailable;
-  } else if (dueCount > 0) {
-    primaryLabel = `Review Due (${dueCount})`;
-  }
-
-  if (isLoadingDeck) primaryLabel = 'Preparing Deck...';
+  const primaryLabel = isLoadingDeck
+    ? 'Preparing Deck...'
+    : dueCount > 0
+      ? `Start Session (${dueCount} Due)`
+      : 'Start Session';
 
   return (
     <>
@@ -87,48 +52,41 @@ export default function LaunchScreen({
         </div>
 
         <div className="launch-card-actions">
-          <div className="mode-switch" role="tablist" aria-label="Study mode">
-            {MODES.map(({ key, label }) => {
-              const disabled = key === 'quiz' ? !quizAvailable : key === 'writing' ? !writingAvailable : false;
-              return (
-                <button
-                  key={key}
-                  type="button"
-                  role="tab"
-                  aria-selected={selectedMode === key}
-                  className={`mode-switch-btn ${selectedMode === key ? 'active' : ''}`}
-                  disabled={disabled}
-                  onClick={() => setSelectedMode(key)}
-                >
-                  {label}
-                </button>
-              );
-            })}
-          </div>
-
           <button
             className="primary-launch-btn"
-            disabled={isLoadingDeck || primaryDisabled}
-            onClick={onPrimaryClick}
+            disabled={isLoadingDeck || cardCount === 0}
+            onClick={launchUnifiedSession}
           >
             {primaryLabel}
           </button>
+
+          <div className="writing-toggle-row">
+            <span className="writing-toggle-label">
+              Include Paper Writing
+              {writingDueCount > 0 && <span className="writing-toggle-count"> ({writingDueCount} due)</span>}
+            </span>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={includeWriting}
+              aria-label="Include Paper Writing"
+              className={`settings-toggle-track ${includeWriting ? 'active' : ''}`}
+              onClick={onToggleIncludeWriting}
+            >
+              <span className="settings-toggle-thumb" />
+            </button>
+          </div>
 
           {(weakCardsCount > 0 || seenCardsCount > 0) && (
             <div className="secondary-chip-row">
               {weakCardsCount > 0 && (
                 <button className="secondary-chip" onClick={() => launchArcadeSession(20, 'weak')}>
-                  {weakCardsCount} Weak Cards
+                  🎯 {weakCardsCount} Weak Cards
                 </button>
               )}
               {seenCardsCount > 0 && (
                 <button className="secondary-chip" onClick={() => launchArcadeSession(seenCardsCount, 'seen')}>
-                  {seenCardsCount} Seen Cards
-                </button>
-              )}
-              {weakCardsCount > 0 && (
-                <button className="secondary-chip" onClick={launchHardModeSession}>
-                  Mistake Blitz
+                  📖 {seenCardsCount} Seen Cards
                 </button>
               )}
             </div>

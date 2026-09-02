@@ -1,6 +1,9 @@
 import { MASTERED_INTERVAL_DAYS } from './storage';
 
-function isWritingDue(stats) {
+// Exported so the unified interleaved queue engine (sessionQueue.js) can
+// use the same writing-due predicate when deciding a card's promptType,
+// instead of duplicating this rule in two places.
+export function isWritingDue(stats) {
   if (!stats.lastWrittenAt) return true; // never attempted - due immediately
   return Date.now() >= (stats.writingNextDue || 0);
 }
