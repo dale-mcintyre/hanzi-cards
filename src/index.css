@@ -3,21 +3,30 @@
 :root {
   /* Warm obsidian palette - jade accent */
   --bg-canvas: #0d0e11;
-  --surface-card: #15161a;
-  --surface-card-raised: #1c1d22;
+  /* Nudged up a shade from the flat page background so the card reads as
+     a distinct elevated surface rather than nearly flush with the canvas. */
+  --surface-card: #16171c;
+  --surface-card-raised: #1e1f25;
   --surface-line: #2a2b31;
-  --surface-border: rgba(255, 255, 255, 0.08);
+  --surface-border: rgba(255, 255, 255, 0.07);
   --accent-primary: #2dd4bf;
   --accent-primary-dim: rgba(45, 212, 191, 0.14);
   --accent-primary-ink: #04211d;
+
+  /* Restrained "craft" accent, reserved for secondary/writing actions -
+     jade stays the ONE color for the single primary action, so it still
+     means something rather than being reused at lower opacity everywhere. */
+  --accent-secondary: #d9a441;
+  --accent-secondary-dim: rgba(217, 164, 65, 0.12);
+  --accent-secondary-border: rgba(217, 164, 65, 0.3);
 
   --canvas-bg: #030712;
   --outline-slate: #64748b;
   --stroke-white: #ffffff;
 
   --ink: #f5f7fa;
-  --ink-dim: #8b93a7;
-  --ink-faint: #4b5468;
+  --ink-dim: #9a9c9f;
+  --ink-faint: #5c5e63;
 
   --easy: #34d399;
   --easy-dim: rgba(52, 211, 153, 0.14);
@@ -42,6 +51,10 @@
      the serif stroke terminals make character structure easier to read,
      especially for characters with many strokes. */
   --font-hanzi: 'Songti SC', 'STSong', 'SimSun', 'Noto Serif SC', serif;
+  /* Editorial display face for headline moments only (e.g. .launch-title) -
+     an OS-native serif stack, no web font, matching --font-hanzi's approach. */
+  --font-display: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+  --tracking-caption: 0.07em;
 
   color-scheme: dark;
 }
@@ -58,7 +71,11 @@ html, body, #root {
 }
 
 body {
-  background: var(--bg);
+  /* A faint top vignette instead of flat black - just enough to give the
+     canvas some depth without reading as an obvious gradient. */
+  background:
+    radial-gradient(ellipse 120% 55% at 50% -10%, #1a1b20 0%, transparent 60%),
+    var(--bg);
   color: var(--ink);
   font-family: var(--font-ui);
   -webkit-font-smoothing: antialiased;

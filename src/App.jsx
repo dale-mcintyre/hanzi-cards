@@ -556,8 +556,11 @@ export default function App() {
             </button>
             <SyncStatusDot />
           </div>
+          {/* Icon-only at rest, matching the account button's own
+              "nothing extra to say" default - only expands to show the
+              active filter when one is actually narrowed down. */}
           <button className="settings-trigger-btn" onClick={() => setShowSettings(true)} aria-label="Settings">
-            ⚙️ {revisionLevels.length > 0 ? `HSK ${revisionLevels.join(',')}` : 'Settings'}
+            ⚙️{revisionLevels.length > 0 ? ` HSK ${revisionLevels.join(',')}` : ''}
           </button>
         </div>
       </nav>

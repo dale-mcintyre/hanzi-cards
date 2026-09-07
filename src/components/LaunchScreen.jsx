@@ -26,12 +26,6 @@ export default function LaunchScreen({
     );
   }
 
-  const studyLabel = isLoadingDeck
-    ? 'Preparing Deck...'
-    : dueCount > 0
-      ? `Study Session (${dueCount} Due)`
-      : 'Study Session';
-
   const writingWordCount = Math.min(writingEligibleCount, 6);
 
   return (
@@ -57,7 +51,14 @@ export default function LaunchScreen({
             disabled={isLoadingDeck || seenCardsCount === 0}
             onClick={launchQuizSession}
           >
-            {studyLabel}
+            {isLoadingDeck ? (
+              'Preparing Deck...'
+            ) : (
+              <>
+                Study Session
+                {dueCount > 0 && <span className="due-count"> ({dueCount} Due)</span>}
+              </>
+            )}
           </button>
 
           {writingEligibleCount > 0 && (
