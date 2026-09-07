@@ -326,21 +326,33 @@ export function getCardMasteryStats(deck) {
 }
 
 /**
- * Per-tier (HSK 1-6 + 'non-hsk') seen/mastered/writingMastered breakdown,
+ * Per-tier (HSK 1-6 + 'non-hsk') seen/mastered/writing breakdown,
  * independent of whatever HSK/non-HSK filter is currently active - takes
  * the FULL, unfiltered vocab list (see data/vocabLoader.js's
  * fetchUnifiedVocab) so a tier that's currently deselected still reports
  * accurate stats. Uses the same MASTERED_INTERVAL_DAYS threshold as
  * getCardMasteryStats above - one classification rule, two different
- * aggregations, so they can't drift. writingMastered counts cards that
- * have reached Writing Recall Mode's "Reflexive" level - independent of
- * reading mastery, since a card can be read-mastered long before (or
- * without ever) reaching Reflexive on the writing side.
+ * aggregations, so they can't drift.
+ *
+ * writingMastered counts cards that have reached Writing Recall Mode's
+ * "Reflexive" level - independent of reading mastery, since a card can be
+ * read-mastered long before (or without ever) reaching Reflexive on the
+ * writing side.
+ *
+ * writingProgress is a separate, smoothed score for the tier ring's fill
+ * amount: each attempted card contributes (writingLevel + 1) / 4 - so
+ * merely attempting a character at all (even a Missed grade) registers
+ * 25% instantly, climbing in even steps to a full 1.0 only once it
+ * reaches Reflexive. This gives visible, encouraging motion after every
+ * writing session instead of the ring sitting at 0% until the very first
+ * character is fully mastered - while still guaranteeing the ring can
+ * only ever reach 100% once literally every card in the tier has reached
+ * Reflexive (each card's own ceiling is 1.0, reached only there).
  */
 export function getTierStats(fullVocab, progress) {
   const tiers = {};
   for (const key of ['1', '2', '3', '4', '5', '6', 'non-hsk']) {
-    tiers[key] = { total: 0, seen: 0, mastered: 0, writingMastered: 0 };
+    tiers[key] = { total: 0, seen: 0, mastered: 0, writingMastered: 0, writingProgress: 0 };
   }
 
   fullVocab.forEach((word) => {
@@ -351,7 +363,13 @@ export function getTierStats(fullVocab, progress) {
 
     const stat = progress[word.character];
     if (!stat) return;
-    if ((stat.writingLevel || 0) >= WRITING_MASTERED_LEVEL) tier.writingMastered += 1;
+
+    if (stat.lastWrittenAt) {
+      const level = stat.writingLevel || 0;
+      tier.writingProgress += (level + 1) / (WRITING_MASTERED_LEVEL + 1);
+      if (level >= WRITING_MASTERED_LEVEL) tier.writingMastered += 1;
+    }
+
     if (stat.repetitions === 0) return;
     tier.seen += 1;
     if (stat.interval >= MASTERED_INTERVAL_DAYS) tier.mastered += 1;

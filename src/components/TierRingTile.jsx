@@ -17,21 +17,29 @@ function pct(part, total) {
 /**
  * A single HSK-tier (or "non-HSK") tile: three concentric SVG progress
  * rings - outer = % of the tier seen (repetitions > 0), middle = %
- * read-mastered (interval >= 21 days), inner = % writing-mastered
- * (Writing Recall Mode's "Reflexive" level) - wrapped in a real <button>
- * so tapping it toggles that tier in the active study filter. Reused at
- * two sizes (~72px in the Settings drawer, ~48px on the dashboard) via
- * the `size` prop rather than two separate components.
+ * read-mastered (interval >= 21 days), inner = writing progress - wrapped
+ * in a real <button> so tapping it toggles that tier in the active study
+ * filter. Reused at two sizes (~72px in the Settings drawer, ~48px on the
+ * dashboard) via the `size` prop rather than two separate components.
+ *
+ * The inner ring is deliberately NOT a raw "% fully Reflexive" count -
+ * see storage.js's getTierStats for why writingProgress is a smoothed
+ * score instead (25/50/75/100% per card as it climbs the writing ladder,
+ * so the ring visibly moves after every session instead of sitting at 0%
+ * until a character is completely done). writingMastered (the literal
+ * count of fully-Reflexive cards) is still surfaced separately in the
+ * tooltip so the honest "how many are actually finished" number is never
+ * hidden behind the smoothed ring fill.
  *
  * Percentages aren't rendered as SVG text - at 48-72px there's no room for
  * three numbers plus a label without becoming illegible - they're carried
  * in the native `title` tooltip and `aria-label` instead. The center
  * glyph is just the tier's short code so it reads at a glance.
  */
-export default function TierRingTile({ tierKey, label, total, seen, mastered, writingMastered, active, size = 64, onClick }) {
+export default function TierRingTile({ tierKey, label, total, seen, mastered, writingProgress, writingMastered, active, size = 64, onClick }) {
   const seenPct = pct(seen, total);
   const masteredPct = pct(mastered, total);
-  const writingMasteredPct = pct(writingMastered, total);
+  const writingPct = pct(writingProgress, total);
   const centerGlyph = tierKey === 'non-hsk' ? '+' : tierKey;
 
   return (
@@ -40,8 +48,8 @@ export default function TierRingTile({ tierKey, label, total, seen, mastered, wr
       className={`tier-ring-tile ${active ? 'active' : ''}`}
       onClick={onClick}
       aria-pressed={active}
-      aria-label={`${label}: ${seenPct}% seen, ${masteredPct}% mastered, ${writingMasteredPct}% writing-mastered. ${active ? 'Included' : 'Excluded'} in active study filter. Tap to toggle.`}
-      title={`${label}: ${seen}/${total} seen (${seenPct}%), ${mastered}/${total} mastered (${masteredPct}%), ${writingMastered}/${total} writing-mastered (${writingMasteredPct}%)`}
+      aria-label={`${label}: ${seenPct}% seen, ${masteredPct}% mastered, ${writingPct}% writing progress (${writingMastered} fully mastered). ${active ? 'Included' : 'Excluded'} in active study filter. Tap to toggle.`}
+      title={`${label}: ${seen}/${total} seen (${seenPct}%), ${mastered}/${total} mastered (${masteredPct}%), ${writingPct}% writing progress (${writingMastered}/${total} fully mastered)`}
     >
       <svg width={size} height={size} viewBox={`0 0 ${VIEWBOX} ${VIEWBOX}`} className="tier-ring-svg">
         <circle cx={CENTER} cy={CENTER} r={R_OUTER} fill="none" stroke="var(--surface-line)" strokeWidth={SW_OUTER} />
@@ -83,7 +91,7 @@ export default function TierRingTile({ tierKey, label, total, seen, mastered, wr
           strokeWidth={SW_INNER}
           strokeLinecap="round"
           strokeDasharray={`${C_INNER} ${C_INNER}`}
-          strokeDashoffset={C_INNER * (1 - writingMasteredPct / 100)}
+          strokeDashoffset={C_INNER * (1 - writingPct / 100)}
           transform={`rotate(-90 ${CENTER} ${CENTER})`}
         />
 

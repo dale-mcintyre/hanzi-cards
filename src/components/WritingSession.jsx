@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Countdown from './Countdown';
 import HanziCanvas from './HanziCanvas';
 import { ColorPinyin } from '../utils/pinyinColor';
@@ -8,6 +8,14 @@ import { speakText } from '../utils/tts';
 // of HanziCanvas's default ladder (used by the reading-mode StudySession
 // card), per the spec: 1 char = 180px, 2 = 120px, 3-4 = 84px.
 const WRITING_SIZE_LADDER = { 1: 180, 2: 120, 3: 84, 4: 84 };
+
+// A card that has already reached Spontaneous (level 2) at least once has
+// proven it can be recalled without a prompt - showing it the character
+// again in Priming right before testing it would just be recognition, not
+// a genuine spontaneous-recall test. Only cards below this level (still
+// learning the strokes, or never attempted) go through Priming; the rest
+// skip straight to Blind Recall.
+const SKIP_PRIMING_LEVEL = 2;
 
 const GRADE_OPTIONS = [
   { quality: 1, key: '1', label: 'Missed', hint: "Couldn't recall it" },
@@ -20,34 +28,45 @@ function firstMeaning(meaning) {
 }
 
 /**
- * Two-phase pen-and-paper session: Priming (watch the whole batch get
- * demonstrated, no grading) then Blind Recall (re-run the same batch from
- * memory, graded). `batch` is the full session queue - unlike the other
- * session components, this one needs the whole array up front (not just
- * the current `card`) so Priming can walk through it independently of
- * App.jsx's currentIndex/handleNextCard pipeline, which only ever
- * advances once Recall actually starts grading.
+ * Two-phase pen-and-paper session: Priming (watch the still-learning
+ * cards get demonstrated, no grading) then Blind Recall (test every card
+ * in the batch from memory, graded). `batch` is the full session queue -
+ * unlike the other session components, this one needs the whole array up
+ * front (not just the current `card`) so Priming can walk through its own
+ * subset independently of App.jsx's currentIndex/handleNextCard pipeline,
+ * which only ever advances once Recall actually starts grading.
+ *
+ * Priming only includes cards below SKIP_PRIMING_LEVEL - a card that's
+ * already proven Spontaneous recall before skips straight to Recall along
+ * with everyone else once Priming finishes (or immediately, if every card
+ * in this batch already qualifies to skip it).
  */
 export default function WritingSession({ appState, countdownNum, batch, card, onGrade, progressPercent }) {
-  const [phase, setPhase] = useState('priming');
+  const primeBatch = useMemo(
+    () => batch.filter((c) => (c.stats?.writingLevel || 0) < SKIP_PRIMING_LEVEL),
+    [batch]
+  );
+
+  const [phase, setPhase] = useState(() => (primeBatch.length === 0 ? 'recall' : 'priming'));
   const [primeIndex, setPrimeIndex] = useState(0);
   const [revealed, setRevealed] = useState(false);
 
-  // A brand new batch (new session launch) always restarts at the
-  // beginning of Priming - `batch` keeps the same array reference for the
-  // whole session, so this only fires on an actual new session.
+  // A brand new batch (new session launch) always restarts - `batch`
+  // keeps the same array reference for the whole session, so this only
+  // fires on an actual new session. Starts straight in Recall if nothing
+  // in this particular batch needs priming.
   useEffect(() => {
-    setPhase('priming');
+    setPhase(primeBatch.length === 0 ? 'recall' : 'priming');
     setPrimeIndex(0);
     setRevealed(false);
-  }, [batch]);
+  }, [batch, primeBatch]);
 
   // Recall's reveal state resets per card, same as before.
   useEffect(() => {
     if (phase === 'recall') setRevealed(false);
   }, [card, phase]);
 
-  const primeCard = batch[primeIndex];
+  const primeCard = primeBatch[primeIndex];
 
   // Demonstrates pronunciation immediately (not delayed, unlike
   // StudySession's flip reveal) - Priming is actively teaching the card,
@@ -59,7 +78,7 @@ export default function WritingSession({ appState, countdownNum, batch, card, on
   }, [appState, phase, primeCard]);
 
   function advancePriming() {
-    if (primeIndex + 1 >= batch.length) {
+    if (primeIndex + 1 >= primeBatch.length) {
       setPhase('recall');
     } else {
       setPrimeIndex((i) => i + 1);
@@ -92,7 +111,7 @@ export default function WritingSession({ appState, countdownNum, batch, card, on
     window.addEventListener('keydown', handleKeydown);
     return () => window.removeEventListener('keydown', handleKeydown);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [appState, phase, revealed, card, primeIndex, batch, onGrade]);
+  }, [appState, phase, revealed, card, primeIndex, primeBatch, onGrade]);
 
   const recallPosition = card ? batch.indexOf(card) + 1 : 0;
 
@@ -108,7 +127,7 @@ export default function WritingSession({ appState, countdownNum, batch, card, on
 
       {appState === 'studying' && phase === 'priming' && primeCard && (
         <div className="card card--writing">
-          <span className="box-section-label">Priming {primeIndex + 1} / {batch.length}</span>
+          <span className="box-section-label">Priming {primeIndex + 1} / {primeBatch.length}</span>
 
           <div className="writing-prompt-meta">
             <h1 className="pinyin-title"><ColorPinyin pinyin={primeCard.pinyin} /></h1>

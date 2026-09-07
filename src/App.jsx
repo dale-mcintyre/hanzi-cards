@@ -300,6 +300,7 @@ export default function App() {
             total={tierStats[lvl].total}
             seen={tierStats[lvl].seen}
             mastered={tierStats[lvl].mastered}
+            writingProgress={tierStats[lvl].writingProgress}
             writingMastered={tierStats[lvl].writingMastered}
             // An empty revisionLevels means "no filter - every level
             // included" (see loadDeck/getFilteredDeck), not "nothing
@@ -316,6 +317,7 @@ export default function App() {
           total={tierStats['non-hsk'].total}
           seen={tierStats['non-hsk'].seen}
           mastered={tierStats['non-hsk'].mastered}
+          writingProgress={tierStats['non-hsk'].writingProgress}
           writingMastered={tierStats['non-hsk'].writingMastered}
           active={includeNonHsk}
           size={size}
