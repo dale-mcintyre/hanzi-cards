@@ -5,6 +5,7 @@ import { getSoundEnabled } from './tts';
 // flag through getSoundEnabled() (it's module-private there by design, so
 // there's no binding to import directly).
 let audioCtx = null;
+let suspendTimeoutId = null;
 
 function getAudioContext() {
   const Ctx = window.AudioContext || window.webkitAudioContext;
@@ -15,6 +16,25 @@ function getAudioContext() {
   // (swipe release, quiz tap), so resuming is always safe.
   if (audioCtx.state === 'suspended') audioCtx.resume();
   return audioCtx;
+}
+
+// A running AudioContext holds the hardware audio output channel open
+// indefinitely, even with nothing currently scheduled - on some mobile
+// browsers this contends with (or delays) other audio on the page, most
+// relevantly StudySession's delayed auto-pronunciation (speakText, fired
+// ~1.5s after a card appears). Suspending once every scheduled tone has
+// actually finished playing releases the channel; getAudioContext()
+// above already resumes on the next feedback call. Debounced against a
+// single pending timeout (not one per call) so a fast correct/incorrect/
+// correct burst can't have an earlier call's timer suspend the context
+// out from under a later call's still-playing tones.
+function scheduleSuspend(ctx, endTime) {
+  if (suspendTimeoutId) clearTimeout(suspendTimeoutId);
+  const delayMs = Math.max(0, (endTime - ctx.currentTime) * 1000) + 50;
+  suspendTimeoutId = setTimeout(() => {
+    suspendTimeoutId = null;
+    if (ctx.state === 'running') ctx.suspend();
+  }, delayMs);
 }
 
 function playTone(ctx, freq, startTime, duration, peak = 0.15) {
@@ -45,6 +65,7 @@ export function playCorrectFeedback() {
   const now = ctx.currentTime;
   playTone(ctx, 880, now, 0.12); // A5
   playTone(ctx, 1318.5, now + 0.08, 0.16); // E6
+  scheduleSuspend(ctx, now + 0.08 + 0.16);
 }
 
 export function playIncorrectFeedback() {
@@ -52,7 +73,9 @@ export function playIncorrectFeedback() {
   if (!getSoundEnabled()) return;
   const ctx = getAudioContext();
   if (!ctx) return;
-  playTone(ctx, 180, ctx.currentTime, 0.18, 0.12);
+  const now = ctx.currentTime;
+  playTone(ctx, 180, now, 0.18, 0.12);
+  scheduleSuspend(ctx, now + 0.18);
 }
 
 // Supersedes playCorrectFeedback on the exact grade that crosses a card
@@ -63,7 +86,7 @@ export function playMasteryFeedback() {
   const ctx = getAudioContext();
   if (!ctx) return;
   const now = ctx.currentTime;
-  [523.25, 659.25, 783.99, 1046.5].forEach((freq, i) => // C5 E5 G5 C6 - ascending "ta-da"
-    playTone(ctx, freq, now + i * 0.11, 0.28, 0.16)
-  );
+  const notes = [523.25, 659.25, 783.99, 1046.5]; // C5 E5 G5 C6 - ascending "ta-da"
+  notes.forEach((freq, i) => playTone(ctx, freq, now + i * 0.11, 0.28, 0.16));
+  scheduleSuspend(ctx, now + (notes.length - 1) * 0.11 + 0.28);
 }

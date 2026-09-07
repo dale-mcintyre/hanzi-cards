@@ -24,6 +24,29 @@ export function setSoundEnabled(enabled) {
   }
 }
 
+const MIN_RATE = 0.9;
+const MAX_RATE = 1.0;
+const DEFAULT_RATE = 0.9; // Slightly slower for language learners, within the clamp below
+
+function clampRate(rate) {
+  return Math.min(MAX_RATE, Math.max(MIN_RATE, rate));
+}
+
+/** Prefers an on-device zh-CN voice (localService === true) over a
+ * network-backed one - remote voices add latency and are more prone to
+ * dropped/garbled playback on mobile, especially right after a cancel(),
+ * which is exactly the pattern speakText uses on every call. Falls back
+ * to any zh-CN voice, then any zh-* voice, so playback still works on a
+ * device with no local Chinese voice installed rather than going silent. */
+function pickVoice(voices) {
+  return (
+    voices.find((v) => v.lang === 'zh-CN' && v.localService) ||
+    voices.find((v) => v.lang === 'zh-CN') ||
+    voices.find((v) => v.lang.startsWith('zh')) ||
+    null
+  );
+}
+
 /** Safe, cross-browser Web Speech API wrapper for Mandarin (zh-CN).
  * Gated on the mute flag here, not at each call site, so every caller
  * (auto-play, flip, the manual replay buttons) automatically respects it -
@@ -36,17 +59,23 @@ export function speakText(text) {
     return;
   }
 
-  // Cancel any ongoing speech
+  // Cancel any in-flight utterance first, so rapid successive calls (flip
+  // then immediately tap the replay button, or swiping past a card whose
+  // delayed auto-play just fired) never stack. On several mobile browsers,
+  // calling speak() in the very same tick as cancel() can silently drop
+  // the new utterance instead of replacing the old one (a known
+  // speechSynthesis race, not specific to this app) - deferring the
+  // speak() one tick gives the cancellation time to actually land first.
   window.speechSynthesis.cancel();
 
-  const utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = 'zh-CN';
-  utterance.rate = 0.85; // Slightly slower for language learners
+  setTimeout(() => {
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'zh-CN';
+    utterance.rate = clampRate(DEFAULT_RATE);
 
-  // Pick a native Chinese voice if available
-  const voices = window.speechSynthesis.getVoices();
-  const zhVoice = voices.find((v) => v.lang.includes('zh') || v.lang.includes('CN'));
-  if (zhVoice) utterance.voice = zhVoice;
+    const zhVoice = pickVoice(window.speechSynthesis.getVoices());
+    if (zhVoice) utterance.voice = zhVoice;
 
-  window.speechSynthesis.speak(utterance);
+    window.speechSynthesis.speak(utterance);
+  }, 0);
 }
