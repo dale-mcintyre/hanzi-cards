@@ -3,6 +3,7 @@ import Countdown from './Countdown';
 import HanziCanvas from './HanziCanvas';
 import { ColorPinyin } from '../utils/pinyinColor';
 import { speakText } from '../utils/tts';
+import { SpeakerIcon } from './icons';
 
 // Fixed sizing ladder for Writing Recall Mode's grid boxes - independent
 // of HanziCanvas's default ladder (used by the reading-mode StudySession
@@ -140,7 +141,7 @@ export default function WritingSession({ appState, countdownNum, batch, card, on
             onClick={(e) => { e.stopPropagation(); speakText(primeCard.character); }}
             aria-label="Play pronunciation"
           >
-            🔊
+            <SpeakerIcon />
           </button>
 
           <div className="canvas-frame writing-canvas-frame">

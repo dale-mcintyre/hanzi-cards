@@ -74,7 +74,7 @@
   gap: 8px;
 }
 
-.streak-badge, .xp-pill {
+.streak-badge {
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -87,17 +87,14 @@
   color: var(--ink-dim);
 }
 
-.xp-pill {
-  color: var(--accent-cyan);
-  background: rgba(56, 189, 248, 0.1);
-  border-color: rgba(56, 189, 248, 0.2);
-}
-
 .settings-trigger-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.1);
   color: var(--ink);
-  padding: 7px 14px;
+  padding: 7px 12px;
   border-radius: 20px;
   font-size: 13px;
   font-weight: 600;
@@ -124,31 +121,6 @@
   background: var(--accent-cyan);
   border-radius: 4px;
   transition: width 0.3s ease;
-}
-
-/* ==================== Floating XP popups ==================== */
-.floating-popups-container {
-  position: absolute;
-  top: 20%;
-  left: 50%;
-  transform: translateX(-50%);
-  pointer-events: none;
-  z-index: 20;
-}
-
-.arcade-popup {
-  font-size: 20px;
-  font-weight: 800;
-  color: var(--easy);
-  text-shadow: 0 2px 12px rgba(52, 211, 153, 0.4);
-  animation: popup-float 1s ease forwards;
-  white-space: nowrap;
-}
-
-@keyframes popup-float {
-  0% { opacity: 0; transform: translateY(10px) scale(0.9); }
-  20% { opacity: 1; transform: translateY(0) scale(1.05); }
-  100% { opacity: 0; transform: translateY(-40px) scale(1); }
 }
 
 /* ==================== Card shell (shared by every screen) ==================== */
@@ -300,16 +272,18 @@
 }
 
 /* ==================== Swipe judgement badges ==================== */
+/* Live preview of what releasing the current swipe will register as -
+   a precise inline indicator, not a diagonal game-stamp. */
 .badge {
   position: absolute;
   top: 28px;
   z-index: 10;
-  font-size: 22px;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  padding: 6px 16px;
-  border-radius: 10px;
-  border: 3px solid;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: var(--tracking-caption);
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid;
   text-transform: uppercase;
   pointer-events: none;
 }
@@ -319,7 +293,6 @@
   color: var(--easy);
   border-color: var(--easy);
   background: var(--easy-dim);
-  transform: rotate(-8deg);
 }
 
 .badge--again {
@@ -327,7 +300,6 @@
   color: var(--hard);
   border-color: var(--hard);
   background: var(--hard-dim);
-  transform: rotate(8deg);
 }
 
 /* ==================== Back face content ==================== */
@@ -717,15 +689,15 @@
 }
 
 .countdown-number {
-  font-size: 96px;
-  font-weight: 800;
-  color: var(--accent-cyan);
-  animation: countdown-pop 0.6s ease;
+  font-family: var(--font-display);
+  font-size: 56px;
+  font-weight: 600;
+  color: var(--ink-dim);
+  animation: countdown-fade 0.5s ease;
 }
 
-@keyframes countdown-pop {
-  0% { opacity: 0; transform: scale(0.6); }
-  60% { opacity: 1; transform: scale(1.1); }
+@keyframes countdown-fade {
+  0% { opacity: 0; transform: scale(0.94); }
   100% { opacity: 1; transform: scale(1); }
 }
 
@@ -753,46 +725,21 @@
   overflow-y: auto;
 }
 
-.victory-emoji {
-  font-size: 52px;
-}
-
 .victory-content h2 {
-  font-size: 22px;
-  font-weight: 800;
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 600;
   color: var(--ink);
   margin: 0;
 }
 
-.stats-summary-grid {
-  display: flex;
-  gap: 12px;
-  width: 100%;
-}
-
-.stat-box {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding: 16px;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-}
-
-.stat-label {
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--ink-faint);
-  font-weight: 700;
-}
-
-.stat-value {
-  font-size: 22px;
-  font-weight: 800;
-  color: var(--ink);
+/* Single precise stat instead of a score/combo panel - "how much did I
+   actually recall", not a game score. */
+.session-stat-line {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink-dim);
+  margin: 0;
 }
 
 .soft-wall-gate {
@@ -815,6 +762,8 @@
 }
 
 /* ==================== Mastery celebration ==================== */
+/* No dimmed backdrop, no trophy, no scale-bounce - a real milestone
+   still gets a moment, just not a game "level up" treatment. */
 .mastery-celebration {
   position: fixed;
   inset: 0;
@@ -823,8 +772,6 @@
   align-items: center;
   justify-content: center;
   pointer-events: none;
-  background: rgba(0, 0, 0, 0.35);
-  animation: mastery-backdrop-fade 2.2s ease forwards;
 }
 
 .mastery-celebration-card {
@@ -832,49 +779,37 @@
   flex-direction: column;
   align-items: center;
   gap: 6px;
-  padding: 28px 36px;
-  border-radius: 24px;
-  background: linear-gradient(165deg, var(--surface-raised), var(--surface));
-  border: 1px solid rgba(56, 189, 248, 0.3);
-  box-shadow: 0 20px 60px -20px rgba(0, 0, 0, 0.7);
-  animation: mastery-pop 2.2s ease forwards;
-}
-
-.mastery-celebration-trophy {
-  font-size: 40px;
+  padding: 24px 32px;
+  border-radius: 20px;
+  background: var(--surface-card-raised);
+  border: 1px solid var(--surface-border);
+  box-shadow: 0 20px 50px -20px rgba(0, 0, 0, 0.6);
+  animation: mastery-fade 2.2s ease forwards;
 }
 
 .mastery-celebration-char {
-  font-size: 48px;
-  font-weight: 800;
   font-family: var(--font-hanzi);
+  font-size: 42px;
+  font-weight: 600;
   color: var(--ink);
 }
 
 .mastery-celebration-pinyin {
-  font-size: 16px;
+  font-size: 15px;
 }
 
 .mastery-celebration-label {
   margin-top: 4px;
-  font-size: 13px;
-  font-weight: 700;
+  font-size: 12px;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--easy);
+  letter-spacing: var(--tracking-caption);
+  color: var(--accent-primary);
 }
 
-@keyframes mastery-pop {
-  0% { opacity: 0; transform: scale(0.6); }
-  12% { opacity: 1; transform: scale(1.08); }
-  20% { transform: scale(1); }
-  85% { opacity: 1; transform: scale(1); }
-  100% { opacity: 0; transform: scale(0.95); }
-}
-
-@keyframes mastery-backdrop-fade {
-  0% { opacity: 0; }
-  15% { opacity: 1; }
+@keyframes mastery-fade {
+  0% { opacity: 0; transform: translateY(4px); }
+  10% { opacity: 1; transform: translateY(0); }
   85% { opacity: 1; }
   100% { opacity: 0; }
 }
@@ -1399,10 +1334,13 @@
 
 /* ==================== Account nav button ==================== */
 .account-trigger-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.1);
   color: var(--ink);
-  padding: 7px 14px;
+  padding: 7px 12px;
   border-radius: 20px;
   font-size: 13px;
   font-weight: 600;

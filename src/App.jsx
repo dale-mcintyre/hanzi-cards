@@ -25,6 +25,7 @@ import MistakeReportDrawer from './components/MistakeReportDrawer';
 import BetaFeedbackDrawer from './components/BetaFeedbackDrawer';
 import AboutDrawer from './components/AboutDrawer';
 import TierRingTile from './components/TierRingTile';
+import { PersonIcon, GearIcon } from './components/icons';
 
 const ALL_HSK_LEVELS = ['1', '2', '3', '4', '5', '6'];
 
@@ -81,16 +82,10 @@ export default function App() {
     if (!user) setAppState('launch');
   }, [user]);
 
-  const [score, setScore] = useState(0);
-  const [combo, setCombo] = useState(0);
-  const [maxCombo, setMaxCombo] = useState(0);
-  const [floatingPopups, setFloatingPopups] = useState([]);
-
   // Per-card outcomes for the session currently in progress (or just
   // finished) - feeds the post-session recap on CompletionScreen. Reset
-  // alongside score/combo/maxCombo at the start of every session, appended
-  // to in handleNextCard. inspectedResult drives the tap-to-inspect drawer
-  // from that recap.
+  // at the start of every session, appended to in handleNextCard.
+  // inspectedResult drives the tap-to-inspect drawer from that recap.
   const [sessionResults, setSessionResults] = useState([]);
   const [inspectedResult, setInspectedResult] = useState(null);
 
@@ -337,9 +332,6 @@ export default function App() {
     setSessionQueue(queue);
     setCurrentIndex(0);
     setIsFlipped(false);
-    setScore(0);
-    setCombo(0);
-    setMaxCombo(0);
     setSessionResults([]);
     setSessionMode('learn');
 
@@ -359,9 +351,6 @@ export default function App() {
     setSessionQueue(quizQueue);
     setCurrentIndex(0);
     setIsFlipped(false);
-    setScore(0);
-    setCombo(0);
-    setMaxCombo(0);
     setSessionResults([]);
     setSessionMode('quiz');
 
@@ -380,9 +369,6 @@ export default function App() {
     setSessionQueue(writingQueue);
     setCurrentIndex(0);
     setIsFlipped(false);
-    setScore(0);
-    setCombo(0);
-    setMaxCombo(0);
     setSessionResults([]);
     setSessionMode('writing');
 
@@ -416,34 +402,22 @@ export default function App() {
     // Writing grades (1/2/3 - Missed/Hesitated/Clean) and reading grades
     // (SM-2's 1-5 quality scale) don't share a "success" threshold -
     // Clean (3) is writing's best outcome, but on the reading scale 3 is a
-    // middling grade. isSuccess/combo/score/XP-popups/soft-wall/queue-
-    // advance below are otherwise fully shared regardless of session type -
-    // only this threshold and the stats-calculation/persistence step
-    // (right below) branch on it.
+    // middling grade. isSuccess drives the correct/incorrect chime, the
+    // session recap grouping, and the soft-wall counter below regardless
+    // of session type - only this threshold and the stats-calculation/
+    // persistence step (right below) branch on it.
     const isWritingCard = sessionMode === 'writing';
     const isSuccess = isWritingCard ? quality >= 3 : quality >= 4;
-    let newCombo = isSuccess ? combo + 1 : 0;
-    setCombo(newCombo);
-    if (newCombo > maxCombo) setMaxCombo(newCombo);
-
-    const points = isSuccess ? 100 * Math.max(1, newCombo) : 0;
-    setScore((prev) => prev + points);
-
-    if (isSuccess) {
-      const newPopup = { id: Date.now(), text: `+${points} XP! ${newCombo > 1 ? `🔥 ${newCombo}x` : ''}` };
-      setFloatingPopups((prev) => [...prev, newPopup]);
-      setTimeout(() => {
-        setFloatingPopups((prev) => prev.filter((p) => p.id !== newPopup.id));
-      }, 1000);
-    }
 
     let newStats;
     let justMastered;
+    let masteryLabel;
 
     if (isWritingCard) {
       const wasReflexive = (card.stats?.writingLevel || 0) >= WRITING_MASTERED_LEVEL;
       const newWritingStats = calculateWritingSchedule(quality, card.stats);
       justMastered = !wasReflexive && newWritingStats.writingLevel >= WRITING_MASTERED_LEVEL;
+      masteryLabel = 'Reflexive';
       newStats = saveWritingProgress(card.id, newWritingStats);
     } else {
       const wasAlreadyMastered = (card.stats?.interval || 1) >= MASTERED_INTERVAL_DAYS;
@@ -454,6 +428,7 @@ export default function App() {
         card.stats?.easeFactor || 2.5
       );
       justMastered = !wasAlreadyMastered && computedStats.interval >= MASTERED_INTERVAL_DAYS;
+      masteryLabel = 'Mastered';
       newStats = saveCardProgress(card.id, computedStats);
     }
 
@@ -461,10 +436,10 @@ export default function App() {
     // rather than playing both - it's a bigger, distinct event. Reaching
     // Writing Level 3 (Reflexive) reuses this same celebration as reaching
     // a 21-day reading interval - both are comparably significant
-    // "you've truly got this" milestones.
+    // "you've truly got this" milestones, distinguished by their label.
     if (justMastered) {
       playMasteryFeedback();
-      setMasteredCelebration({ character: card.character, pinyin: card.pinyin });
+      setMasteredCelebration({ character: card.character, pinyin: card.pinyin, label: masteryLabel });
     } else if (isSuccess) {
       playCorrectFeedback();
     } else {
@@ -535,7 +510,7 @@ export default function App() {
       {/* Top Navbar */}
       <nav className="top-nav-bar">
         <div className="nav-left">
-          <span className="streak-badge">🔥 {streak}d</span>
+          <span className="streak-badge">{streak}d</span>
           <button
             type="button"
             className="beta-feedback-pill"
@@ -545,14 +520,12 @@ export default function App() {
             <span className="beta-feedback-dot" />
             Beta Feedback
           </button>
-          {appState === 'studying' && (
-            <span className="xp-pill">⚡ {score} XP</span>
-          )}
         </div>
         <div className="nav-right">
           <div className="account-trigger-wrap">
             <button className="account-trigger-btn" onClick={() => setShowAccount(true)} aria-label="Account">
-              {user ? '👤' : '👤 Sign in'}
+              <PersonIcon />
+              {!user && <span>Sign in</span>}
             </button>
             <SyncStatusDot />
           </div>
@@ -560,18 +533,13 @@ export default function App() {
               "nothing extra to say" default - only expands to show the
               active filter when one is actually narrowed down. */}
           <button className="settings-trigger-btn" onClick={() => setShowSettings(true)} aria-label="Settings">
-            ⚙️{revisionLevels.length > 0 ? ` HSK ${revisionLevels.join(',')}` : ''}
+            <GearIcon />
+            {revisionLevels.length > 0 && <span>HSK {revisionLevels.join(',')}</span>}
           </button>
         </div>
       </nav>
 
       <div className="stage">
-        <div className="floating-popups-container">
-          {floatingPopups.map((p) => (
-            <div key={p.id} className="arcade-popup">{p.text}</div>
-          ))}
-        </div>
-
         {/* 1. LAUNCH SCREEN - marketing pitch for logged-out visitors,
                action-first dashboard for everyone else */}
         {appState === 'launch' && (
@@ -627,8 +595,6 @@ export default function App() {
         {/* 4. COMPLETED SCREEN */}
         {appState === 'completed' && (
           <CompletionScreen
-            score={score}
-            maxCombo={maxCombo}
             visitGradeCount={visitGradeCount}
             isSoftWallGated={isSoftWallGated}
             sessionResults={sessionResults}
@@ -666,21 +632,21 @@ export default function App() {
                     onClick={() => setActiveMasteryTab('new')}
                     style={{ fontSize: '12px', padding: '8px' }}
                   >
-                    🆕 New ({mastery.new.length})
+                    New ({mastery.new.length})
                   </button>
                   <button
                     className={`level-toggle-btn ${activeMasteryTab === 'learning' ? 'active' : ''}`}
                     onClick={() => setActiveMasteryTab('learning')}
                     style={{ fontSize: '12px', padding: '8px' }}
                   >
-                    📖 Learning ({mastery.learning.length})
+                    Learning ({mastery.learning.length})
                   </button>
                   <button
                     className={`level-toggle-btn ${activeMasteryTab === 'mastered' ? 'active' : ''}`}
                     onClick={() => setActiveMasteryTab('mastered')}
                     style={{ fontSize: '12px', padding: '8px' }}
                   >
-                    🏆 Mastered ({mastery.mastered.length})
+                    Mastered ({mastery.mastered.length})
                   </button>
                 </div>
 
@@ -751,7 +717,7 @@ export default function App() {
                 style={{ margin: '4px auto 0' }}
                 onClick={() => { setShowSettings(false); setShowAbout(true); }}
               >
-                ℹ️ About Learn Hanzi
+                About Learn Hanzi
               </button>
 
             </div>
@@ -772,6 +738,7 @@ export default function App() {
           <MasteryCelebration
             character={masteredCelebration.character}
             pinyin={masteredCelebration.pinyin}
+            label={masteredCelebration.label}
             onDone={dismissMasteryCelebration}
           />
         )}
@@ -792,10 +759,9 @@ export default function App() {
           <div className="drawer-overlay" onClick={() => setShowSoftWallOverlay(false)}>
             <div className="drawer-sheet" onClick={(e) => e.stopPropagation()}>
               <div className="drawer-handle" />
-              <h3>Nice progress! 🎉</h3>
+              <h3>{visitGradeCount} cards reviewed</h3>
               <p className="soft-wall-message" style={{ marginTop: '10px' }}>
-                You've reviewed {visitGradeCount} cards. Sign in to save your results, sync
-                across your devices, and keep your learning streak.
+                Create an account to sync your progress across devices.
               </p>
               <button
                 className="primary-launch-btn"

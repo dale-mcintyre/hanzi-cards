@@ -6,6 +6,7 @@ import { speakText, getSoundEnabled } from '../utils/tts';
 import { ColorPinyin } from '../utils/pinyinColor';
 import { MASTERED_INTERVAL_DAYS } from '../utils/storage';
 import { fitScaleForLength } from '../utils/textFit';
+import { SpeakerIcon, FlagIcon } from './icons';
 
 const AUTO_PLAY_DELAY_MS = 1500;
 const MEANING_BASE_FONT_PX = 19;
@@ -133,7 +134,7 @@ export default function StudySession({
                 onClick={(e) => { e.stopPropagation(); speakText(card.character); }}
                 aria-label="Play pronunciation"
               >
-                🔊
+                <SpeakerIcon />
               </button>
 
               <div className="canvas-frame">
@@ -164,14 +165,14 @@ export default function StudySession({
                   </div>
                   <div className="back-header-actions">
                     <button className="audio-icon-btn" onClick={() => speakText(card.character)} aria-label="Play pronunciation">
-                      🔊
+                      <SpeakerIcon />
                     </button>
                     <button
                       className="report-mistake-btn"
                       onClick={(e) => { e.stopPropagation(); onReportMistake(); }}
                       aria-label="Report an issue with this card"
                     >
-                      🚩
+                      <FlagIcon />
                     </button>
                   </div>
                 </div>

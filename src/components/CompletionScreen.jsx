@@ -1,6 +1,4 @@
 export default function CompletionScreen({
-  score,
-  maxCombo,
   visitGradeCount,
   isSoftWallGated,
   sessionResults,
@@ -14,24 +12,18 @@ export default function CompletionScreen({
   return (
     <div className="card victory-card">
       <div className="victory-content">
-        <span className="victory-emoji">🏆</span>
-        <h2>Session Complete!</h2>
-        <div className="stats-summary-grid">
-          <div className="stat-box">
-            <span className="stat-label">Earned XP</span>
-            <span className="stat-value">+{score}</span>
-          </div>
-          <div className="stat-box">
-            <span className="stat-label">Max Combo</span>
-            <span className="stat-value">🔥 {maxCombo}x</span>
-          </div>
-        </div>
+        <h2>Session Recap</h2>
+        {sessionResults.length > 0 && (
+          <p className="session-stat-line">
+            {nailedResults.length}/{sessionResults.length} recalled
+          </p>
+        )}
 
         {sessionResults.length > 0 && (
           <div className="session-recap">
             {nailedResults.length > 0 && (
               <div className="session-recap-group">
-                <span className="box-section-label">Nailed it · {nailedResults.length}</span>
+                <span className="box-section-label">Recalled · {nailedResults.length}</span>
                 <div className="mastery-grid-chips">
                   {nailedResults.map((r) => (
                     <button
@@ -50,7 +42,7 @@ export default function CompletionScreen({
 
             {struggledResults.length > 0 && (
               <div className="session-recap-group">
-                <span className="box-section-label">Needs practice · {struggledResults.length}</span>
+                <span className="box-section-label">Missed · {struggledResults.length}</span>
                 <div className="mastery-grid-chips">
                   {struggledResults.map((r) => (
                     <button
@@ -72,8 +64,8 @@ export default function CompletionScreen({
         {isSoftWallGated ? (
           <div className="soft-wall-gate">
             <p className="soft-wall-message">
-              Great work! You've reviewed {visitGradeCount} cards this visit. Create a
-              free account to save your results and keep your streak going.
+              {visitGradeCount} cards reviewed this visit. Create an account
+              to sync your progress across devices.
             </p>
             <button className="primary-launch-btn" onClick={onSignIn}>
               Sign In / Create Account
@@ -81,7 +73,7 @@ export default function CompletionScreen({
           </div>
         ) : (
           <button className="primary-launch-btn" onClick={onContinue}>
-            Continue ⚡
+            Continue
           </button>
         )}
       </div>

@@ -63,7 +63,7 @@ export default function LaunchScreen({
 
           {writingEligibleCount > 0 && (
             <button className="secondary-launch-btn" onClick={launchWritingSession}>
-              ✍️ Pen &amp; Paper ({writingWordCount} Words)
+              Pen &amp; Paper ({writingWordCount} Words)
             </button>
           )}
         </div>

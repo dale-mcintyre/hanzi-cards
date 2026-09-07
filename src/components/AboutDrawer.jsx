@@ -49,7 +49,7 @@ export default function AboutDrawer({ onClose }) {
             target="_blank"
             rel="noopener noreferrer"
           >
-            ☕ Buy me a coffee
+            Buy me a coffee
           </a>
         </div>
       </div>

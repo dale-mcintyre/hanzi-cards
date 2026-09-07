@@ -10,7 +10,7 @@ export default function CardInspectDrawer({ result, onClose }) {
         <div className="card-inspect-header">
           <span className="card-inspect-char">{character}</span>
           <span className={`card-inspect-outcome ${isSuccess ? 'card-inspect-outcome--know' : 'card-inspect-outcome--again'}`}>
-            {isSuccess ? 'Nailed it' : 'Needs practice'}
+            {isSuccess ? 'Recalled' : 'Missed'}
           </span>
         </div>
         <h1 className="pinyin-title" style={{ marginTop: '10px' }}><ColorPinyin pinyin={pinyin} /></h1>
