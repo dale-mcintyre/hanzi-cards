@@ -7,7 +7,6 @@ const PREFS_KEY = 'hz_study_prefs';
 const STREAK_COUNT_KEY = 'hz_streak_count';
 const LAST_ACTIVE_DATE_KEY = 'hz_last_active_date';
 const OFFLINE_MODE_KEY = 'hz_offline_mode';
-const INCLUDE_WRITING_KEY = 'hanzi_include_writing';
 const DEFAULT_PREFS = { revisionLevels: [], includeNonHsk: true };
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
@@ -39,27 +38,6 @@ export function setOfflineMode(enabled) {
   }
 }
 
-// Whether the unified interleaved session includes 'write' prompts for
-// due mastered cards, or always falls back those cards to 'quiz' instead -
-// e.g. "on my commute, no pen handy". Device-local only, like Offline
-// Mode above, since it's a per-device/per-moment convenience rather than
-// an account-level study preference.
-export function getIncludeWriting() {
-  try {
-    const saved = localStorage.getItem(INCLUDE_WRITING_KEY);
-    return saved === null ? true : saved === 'true';
-  } catch {
-    return true;
-  }
-}
-
-export function setIncludeWriting(enabled) {
-  try {
-    localStorage.setItem(INCLUDE_WRITING_KEY, enabled ? 'true' : 'false');
-  } catch {
-    // localStorage unavailable - in-memory flag still applies this session
-  }
-}
 
 // SM-2 interval (days) at which a card counts as "mastered" - shared by
 // getCardMasteryStats and getTierStats below (and StudySession's per-card

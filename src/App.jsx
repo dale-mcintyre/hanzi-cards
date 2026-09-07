@@ -1,11 +1,12 @@
 import { useEffect, useState, useMemo, useCallback } from 'react';
 import './App.css';
 import { calculateSM2 } from './utils/sm2';
-import { getProgress, saveCardProgress, saveWritingProgress, getCardMasteryStats, getPrefs, savePrefs, getTierStats, getOfflineMode, setOfflineMode, getIncludeWriting, setIncludeWriting, MASTERED_INTERVAL_DAYS } from './utils/storage';
+import { getProgress, saveCardProgress, saveWritingProgress, getCardMasteryStats, getPrefs, savePrefs, getTierStats, getOfflineMode, setOfflineMode, MASTERED_INTERVAL_DAYS } from './utils/storage';
 import { getSoundEnabled, setSoundEnabled } from './utils/tts';
 import { playCorrectFeedback, playIncorrectFeedback, playMasteryFeedback } from './utils/feedback';
 import { getFilteredDeck, fetchUnifiedVocab } from './data/vocabLoader';
-import { buildLearnQueue, buildInterleavedQueue, getUnifiedDueCount } from './utils/sessionQueue';
+import { buildLearnQueue, getDueCount } from './utils/sessionQueue';
+import { buildQuizQueue } from './utils/quizQueue';
 import { buildWritingQueue } from './utils/writingQueue';
 import { calculateWritingSchedule, WRITING_MASTERED_LEVEL } from './utils/writingSchedule';
 import { getEntitlement } from './utils/entitlement';
@@ -118,12 +119,12 @@ export default function App() {
   const [rawDeck, setRawDeck] = useState([]);
   const [sessionQueue, setSessionQueue] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
-
-  // Whether the unified session includes 'write' prompts for due mastered
-  // cards, or always falls those cards back to 'quiz' instead - see
-  // storage.js's getIncludeWriting for why this is device-local rather
-  // than a synced study preference.
-  const [includeWriting, setIncludeWritingState] = useState(() => getIncludeWriting());
+  // Which dedicated session type is active - 'learn' (plain flashcards,
+  // used by the anonymous marketing page's one-time trial session),
+  // 'quiz' (the dashboard's Study Session), or 'writing' (Pen & Paper).
+  // Each is its own dedicated flow with its own queue builder now, not a
+  // per-card promptType.
+  const [sessionMode, setSessionMode] = useState('learn');
 
   const [isFlipped, setIsFlipped] = useState(false);
   const [streak, setStreak] = useState(1);
@@ -201,12 +202,8 @@ export default function App() {
     setIncludeNonHsk(fresh.includeNonHsk);
   }, [syncVersion]);
 
-  const weakCards = useMemo(() => rawDeck.filter((c) => c.stats.repetitions > 0 && c.stats.interval <= 2), [rawDeck]);
-
-  // Drives the LaunchScreen hero CTA's "Start Session (N Due)" label -
-  // due by either the reading or the writing schedule, matching exactly
-  // what buildInterleavedQueue itself treats as "due" (see there).
-  const dueCount = useMemo(() => getUnifiedDueCount(rawDeck, includeWriting), [rawDeck, includeWriting]);
+  // Drives the LaunchScreen "Study Session (N Due)" label.
+  const dueCount = useMemo(() => getDueCount(rawDeck), [rawDeck]);
 
   // Every card the user has graded at least once, regardless of how it's
   // currently doing on the SM-2 curve - a free-form review pool distinct
@@ -217,10 +214,10 @@ export default function App() {
     return getCardMasteryStats(rawDeck);
   }, [rawDeck]);
 
-  // Sized generously (Infinity) purely to get an accurate writing-due
-  // count for LaunchScreen's "Include Paper Writing (M due)" toggle label -
-  // the interleaved queue itself (buildInterleavedQueue) decides per-card
-  // whether writing is actually due when it assigns each card's promptType.
+  // Sized generously (Infinity) purely to get an accurate eligible count
+  // for the LaunchScreen "Pen & Paper (N Words)" button label/gate -
+  // launchWritingSession itself caps the actual session queue at 6 via
+  // buildWritingQueue's own count arg.
   const writingEligibleCards = useMemo(() => buildWritingQueue(rawDeck, Infinity), [rawDeck]);
 
   // Independent of the current HSK/non-HSK filter - rawDeck only contains
@@ -292,12 +289,6 @@ export default function App() {
     setSoundEnabled(next);
   };
 
-  const toggleIncludeWriting = () => {
-    const next = !includeWriting;
-    setIncludeWritingState(next);
-    setIncludeWriting(next);
-  };
-
   function renderTierTiles(size) {
     return (
       <>
@@ -332,44 +323,13 @@ export default function App() {
     );
   }
 
-  const launchArcadeSession = (count = 20, mode = 'all') => {
-    let queue;
-    if (mode === 'weak' && weakCards.length > 0) {
-      queue = [...weakCards].sort(() => 0.5 - Math.random()).slice(0, count);
-    } else if (mode === 'seen') {
-      // "At their own leisure" - review every seen card in one sitting,
-      // not a fixed-size sample like the other modes.
-      queue = [...seenCards].sort(() => 0.5 - Math.random());
-    } else {
-      // Due-for-review cards first (most overdue first), then never-studied
-      // cards introduced in frequency order - not a flat random shuffle.
-      queue = buildLearnQueue(rawDeck, count);
-    }
-    // Every card in every queue carries a promptType - handleNextCard and
-    // the render dispatch below key off it exclusively, regardless of
-    // which launch* function built the queue. These arcade queues are
-    // always plain flashcards.
-    setSessionQueue(queue.map((c) => ({ ...c, promptType: 'learn' })));
-    setCurrentIndex(0);
-    setIsFlipped(false);
-    setScore(0);
-    setCombo(0);
-    setMaxCombo(0);
-    setSessionResults([]);
-
-    setAppState('countdown');
-    setCountdownNum(3);
-  };
-
-  // The primary dashboard action: one interleaved batch mixing flashcard,
-  // quiz, and (when includeWriting is on) paper-writing prompts, each
-  // card's promptType assigned by its own maturity - see
-  // buildInterleavedQueue for the full assignment rule.
-  const launchUnifiedSession = () => {
-    const queue = buildInterleavedQueue(rawDeck, { limit: 10, includeWriting });
-
-    if (queue.length === 0) return;
-
+  // Only reachable today from the anonymous marketing page's one-time
+  // trial CTA (see LaunchScreen.jsx) - the signed-in dashboard's own two
+  // dedicated actions are launchQuizSession/launchWritingSession below.
+  const launchArcadeSession = (count = 20) => {
+    // Due-for-review cards first (most overdue first), then never-studied
+    // cards introduced in frequency order - not a flat random shuffle.
+    const queue = buildLearnQueue(rawDeck, count);
     setSessionQueue(queue);
     setCurrentIndex(0);
     setIsFlipped(false);
@@ -377,6 +337,50 @@ export default function App() {
     setCombo(0);
     setMaxCombo(0);
     setSessionResults([]);
+    setSessionMode('learn');
+
+    setAppState('countdown');
+    setCountdownNum(3);
+  };
+
+  // Dashboard's primary action: a rapid, thumb-only multiple-choice
+  // review of already-seen cards. Distractors (buildQuizQueue) come from
+  // the whole deck, not just seen cards, so pool size there isn't a
+  // constraint.
+  const launchQuizSession = () => {
+    const quizQueue = buildQuizQueue(seenCards, rawDeck, 10);
+
+    if (quizQueue.length === 0) return;
+
+    setSessionQueue(quizQueue);
+    setCurrentIndex(0);
+    setIsFlipped(false);
+    setScore(0);
+    setCombo(0);
+    setMaxCombo(0);
+    setSessionResults([]);
+    setSessionMode('quiz');
+
+    setAppState('countdown');
+    setCountdownNum(3);
+  };
+
+  // Dashboard's secondary action: a dedicated pen-and-paper session,
+  // batched 4-6 words at a time (buildWritingQueue's own count arg) - only
+  // ever offered on characters already read-mastered.
+  const launchWritingSession = () => {
+    const writingQueue = buildWritingQueue(rawDeck, 6);
+
+    if (writingQueue.length === 0) return;
+
+    setSessionQueue(writingQueue);
+    setCurrentIndex(0);
+    setIsFlipped(false);
+    setScore(0);
+    setCombo(0);
+    setMaxCombo(0);
+    setSessionResults([]);
+    setSessionMode('writing');
 
     setAppState('countdown');
     setCountdownNum(3);
@@ -402,27 +406,17 @@ export default function App() {
     setIsFlipped((prev) => !prev);
   };
 
-  // WritingSession's "Can't write right now" escape hatch - downgrades
-  // just the current card's promptType to 'quiz' in place (its
-  // quizOptions are already precomputed by buildInterleavedQueue, so this
-  // needs no further lookups) without advancing the queue or touching
-  // stats at all - this isn't a grade event, so it must never be recorded
-  // as an Amnesia writing attempt.
-  const handleCantWriteNow = useCallback(() => {
-    setSessionQueue((prev) => prev.map((c, i) => (i === currentIndex ? { ...c, promptType: 'quiz' } : c)));
-  }, [currentIndex]);
-
   const handleNextCard = (quality) => {
     if (!card) return;
 
-    // Writing grades (1/2/3 - Amnesia/Hesitated/Spontaneous) and reading
-    // grades (SM-2's 1-5 quality scale) don't share a "success" threshold -
-    // Spontaneous (3) is writing's best outcome, but on the reading scale 3
-    // is a middling grade. isSuccess/combo/score/XP-popups/soft-wall/queue-
-    // advance below are otherwise fully shared regardless of promptType,
-    // per the unified handleNextCard design - only this threshold and the
-    // stats-calculation/persistence step (right below) branch on it.
-    const isWritingCard = card.promptType === 'write';
+    // Writing grades (1/2/3 - Missed/Hesitated/Clean) and reading grades
+    // (SM-2's 1-5 quality scale) don't share a "success" threshold -
+    // Clean (3) is writing's best outcome, but on the reading scale 3 is a
+    // middling grade. isSuccess/combo/score/XP-popups/soft-wall/queue-
+    // advance below are otherwise fully shared regardless of session type -
+    // only this threshold and the stats-calculation/persistence step
+    // (right below) branch on it.
+    const isWritingCard = sessionMode === 'writing';
     const isSuccess = isWritingCard ? quality >= 3 : quality >= 4;
     let newCombo = isSuccess ? combo + 1 : 0;
     setCombo(newCombo);
@@ -580,23 +574,19 @@ export default function App() {
             isLoadingDeck={isLoadingDeck}
             cardCount={rawDeck.length}
             dueCount={dueCount}
-            weakCardsCount={weakCards.length}
             seenCardsCount={seenCards.length}
-            writingDueCount={writingEligibleCards.length}
-            includeWriting={includeWriting}
-            onToggleIncludeWriting={toggleIncludeWriting}
+            writingEligibleCount={writingEligibleCards.length}
             launchArcadeSession={launchArcadeSession}
-            launchUnifiedSession={launchUnifiedSession}
+            launchQuizSession={launchQuizSession}
+            launchWritingSession={launchWritingSession}
             onSignIn={() => setShowAccount(true)}
             renderTierTiles={renderTierTiles}
           />
         )}
 
-        {/* 2 & 3. COUNTDOWN + STUDYING SESSION - each card carries its own
-            promptType (assigned when its queue was built), so the active
-            interface is chosen per card, not per session. */}
+        {/* 2 & 3. COUNTDOWN + STUDYING SESSION */}
         {(appState === 'countdown' || appState === 'studying') && (
-          card?.promptType === 'quiz' ? (
+          sessionMode === 'quiz' ? (
             <QuizSession
               appState={appState}
               countdownNum={countdownNum}
@@ -604,13 +594,13 @@ export default function App() {
               onAnswer={handleNextCard}
               progressPercent={progressPercent}
             />
-          ) : card?.promptType === 'write' ? (
+          ) : sessionMode === 'writing' ? (
             <WritingSession
               appState={appState}
               countdownNum={countdownNum}
+              batch={sessionQueue}
               card={card}
               onGrade={handleNextCard}
-              onCantWriteNow={handleCantWriteNow}
               progressPercent={progressPercent}
             />
           ) : (

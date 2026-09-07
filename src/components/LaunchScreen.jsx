@@ -6,13 +6,11 @@ export default function LaunchScreen({
   isLoadingDeck,
   cardCount,
   dueCount,
-  weakCardsCount,
   seenCardsCount,
-  writingDueCount,
-  includeWriting,
-  onToggleIncludeWriting,
+  writingEligibleCount,
   launchArcadeSession,
-  launchUnifiedSession,
+  launchQuizSession,
+  launchWritingSession,
   onSignIn,
   renderTierTiles,
 }) {
@@ -22,17 +20,19 @@ export default function LaunchScreen({
         revisionLevels={revisionLevels}
         isLoadingDeck={isLoadingDeck}
         cardCount={cardCount}
-        onStart={() => launchArcadeSession(20, 'all')}
+        onStart={() => launchArcadeSession(20)}
         onSignIn={onSignIn}
       />
     );
   }
 
-  const primaryLabel = isLoadingDeck
+  const studyLabel = isLoadingDeck
     ? 'Preparing Deck...'
     : dueCount > 0
-      ? `Start Session (${dueCount} Due)`
-      : 'Start Session';
+      ? `Study Session (${dueCount} Due)`
+      : 'Study Session';
+
+  const writingWordCount = Math.min(writingEligibleCount, 6);
 
   return (
     <>
@@ -54,42 +54,16 @@ export default function LaunchScreen({
         <div className="launch-card-actions">
           <button
             className="primary-launch-btn"
-            disabled={isLoadingDeck || cardCount === 0}
-            onClick={launchUnifiedSession}
+            disabled={isLoadingDeck || seenCardsCount === 0}
+            onClick={launchQuizSession}
           >
-            {primaryLabel}
+            {studyLabel}
           </button>
 
-          <div className="writing-toggle-row">
-            <span className="writing-toggle-label">
-              Include Paper Writing
-              {writingDueCount > 0 && <span className="writing-toggle-count"> ({writingDueCount} due)</span>}
-            </span>
-            <button
-              type="button"
-              role="switch"
-              aria-checked={includeWriting}
-              aria-label="Include Paper Writing"
-              className={`settings-toggle-track ${includeWriting ? 'active' : ''}`}
-              onClick={onToggleIncludeWriting}
-            >
-              <span className="settings-toggle-thumb" />
+          {writingEligibleCount > 0 && (
+            <button className="secondary-launch-btn" onClick={launchWritingSession}>
+              ✍️ Pen &amp; Paper ({writingWordCount} Words)
             </button>
-          </div>
-
-          {(weakCardsCount > 0 || seenCardsCount > 0) && (
-            <div className="secondary-chip-row">
-              {weakCardsCount > 0 && (
-                <button className="secondary-chip" onClick={() => launchArcadeSession(20, 'weak')}>
-                  🎯 {weakCardsCount} Weak Cards
-                </button>
-              )}
-              {seenCardsCount > 0 && (
-                <button className="secondary-chip" onClick={() => launchArcadeSession(seenCardsCount, 'seen')}>
-                  📖 {seenCardsCount} Seen Cards
-                </button>
-              )}
-            </div>
           )}
         </div>
       </div>
