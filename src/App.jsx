@@ -300,6 +300,7 @@ export default function App() {
             total={tierStats[lvl].total}
             seen={tierStats[lvl].seen}
             mastered={tierStats[lvl].mastered}
+            writingMastered={tierStats[lvl].writingMastered}
             // An empty revisionLevels means "no filter - every level
             // included" (see loadDeck/getFilteredDeck), not "nothing
             // selected" - so every HSK tile should read as active then,
@@ -315,6 +316,7 @@ export default function App() {
           total={tierStats['non-hsk'].total}
           seen={tierStats['non-hsk'].seen}
           mastered={tierStats['non-hsk'].mastered}
+          writingMastered={tierStats['non-hsk'].writingMastered}
           active={includeNonHsk}
           size={size}
           onClick={toggleNonHsk}

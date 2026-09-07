@@ -1,5 +1,6 @@
 import { pushCardProgress, pushSettings } from './syncClient';
 import { enqueue as enqueueSync, clear as clearSyncQueue, QUEUE_KEY as SYNC_QUEUE_KEY } from './syncQueue';
+import { WRITING_MASTERED_LEVEL } from './writingSchedule';
 
 const STORAGE_KEY = 'hanzi_deck_progress';
 const SENTENCE_CACHE_KEY = 'hz_sentence_cache';
@@ -325,17 +326,21 @@ export function getCardMasteryStats(deck) {
 }
 
 /**
- * Per-tier (HSK 1-6 + 'non-hsk') seen/mastered breakdown, independent of
- * whatever HSK/non-HSK filter is currently active - takes the FULL,
- * unfiltered vocab list (see data/vocabLoader.js's fetchUnifiedVocab) so a
- * tier that's currently deselected still reports accurate stats. Uses the
- * same MASTERED_INTERVAL_DAYS threshold as getCardMasteryStats above - one
- * classification rule, two different aggregations, so they can't drift.
+ * Per-tier (HSK 1-6 + 'non-hsk') seen/mastered/writingMastered breakdown,
+ * independent of whatever HSK/non-HSK filter is currently active - takes
+ * the FULL, unfiltered vocab list (see data/vocabLoader.js's
+ * fetchUnifiedVocab) so a tier that's currently deselected still reports
+ * accurate stats. Uses the same MASTERED_INTERVAL_DAYS threshold as
+ * getCardMasteryStats above - one classification rule, two different
+ * aggregations, so they can't drift. writingMastered counts cards that
+ * have reached Writing Recall Mode's "Reflexive" level - independent of
+ * reading mastery, since a card can be read-mastered long before (or
+ * without ever) reaching Reflexive on the writing side.
  */
 export function getTierStats(fullVocab, progress) {
   const tiers = {};
   for (const key of ['1', '2', '3', '4', '5', '6', 'non-hsk']) {
-    tiers[key] = { total: 0, seen: 0, mastered: 0 };
+    tiers[key] = { total: 0, seen: 0, mastered: 0, writingMastered: 0 };
   }
 
   fullVocab.forEach((word) => {
@@ -345,7 +350,9 @@ export function getTierStats(fullVocab, progress) {
     tier.total += 1;
 
     const stat = progress[word.character];
-    if (!stat || stat.repetitions === 0) return;
+    if (!stat) return;
+    if ((stat.writingLevel || 0) >= WRITING_MASTERED_LEVEL) tier.writingMastered += 1;
+    if (stat.repetitions === 0) return;
     tier.seen += 1;
     if (stat.interval >= MASTERED_INTERVAL_DAYS) tier.mastered += 1;
   });

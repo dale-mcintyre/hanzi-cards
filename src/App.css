@@ -1259,7 +1259,9 @@
 }
 
 .tier-ring-center-text {
-  font-size: 26px;
+  /* Sized down from the original two-ring version's 26px - a third
+     (writing-mastery) ring narrowed the available center disk. */
+  font-size: 20px;
   font-weight: 800;
   fill: var(--ink-dim);
 }
