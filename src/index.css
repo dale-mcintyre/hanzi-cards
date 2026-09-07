@@ -38,7 +38,10 @@
 
   --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-data: 'JetBrains Mono', ui-monospace, 'SF Mono', monospace;
-  --font-hanzi: 'PingFang SC', 'Noto Sans SC', 'Microsoft YaHei', 'Heiti SC', sans-serif;
+  /* Serif (Song/Ming style) rather than sans (gothic/PingFang style) -
+     the serif stroke terminals make character structure easier to read,
+     especially for characters with many strokes. */
+  --font-hanzi: 'Songti SC', 'STSong', 'SimSun', 'Noto Serif SC', serif;
 
   color-scheme: dark;
 }

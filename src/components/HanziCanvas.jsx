@@ -127,7 +127,7 @@ function SingleHanziBox({ char, mode, size, shouldAnimate, onComplete }) {
               zIndex: writerLoaded ? 1 : 2,
               opacity: writerLoaded ? 0 : 1,
               transition: 'opacity 0.2s ease',
-              fontFamily: '"PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif',
+              fontFamily: '"Songti SC", "STSong", "SimSun", "Noto Serif SC", serif',
               lineHeight: 1,
               userSelect: 'none',
             }}
