@@ -25,6 +25,50 @@ function firstMeaning(meaning) {
   return typeof meaning === 'string' ? meaning.split(';')[0].trim() : meaning;
 }
 
+// Splits a Cloze sentence around the target word, the same way
+// StudySession's HighlightedSentence does, but with a fill-in-the-blank
+// state for Recall - unrevealed renders a fixed-width blank (sized to the
+// target's own character count so nothing reflows on reveal), revealed
+// renders the target itself, accented. If the target word isn't found
+// verbatim in the sentence (shouldn't happen given how these are
+// generated, but data is data), the sentence renders untouched rather
+// than silently dropping content.
+function renderClozeSentence(sentenceCn, targetChar, isRevealed) {
+  if (!sentenceCn || !targetChar) return sentenceCn;
+  const parts = sentenceCn.split(targetChar);
+  if (parts.length === 1) return sentenceCn;
+
+  return parts.map((part, i) => (
+    <span key={i}>
+      {part}
+      {i < parts.length - 1 && (
+        isRevealed ? (
+          <span className="cloze-target-revealed">{targetChar}</span>
+        ) : (
+          <span className="cloze-blank" style={{ minWidth: `${targetChar.length}em` }}>____</span>
+        )
+      )}
+    </span>
+  ));
+}
+
+// Cloze sentence card shown beneath the Tianzige grid in both phases.
+// Priming always shows the target plainly and its pinyin (it's actively
+// teaching); Recall blanks the target and withholds pinyin until the
+// card is revealed, so neither gives away the answer early. Renders
+// nothing - not even the container - for a card with no example_sentence
+// yet, since enrichment is still rolling out across the deck.
+function SentenceContext({ exampleSentence, targetChar, isRevealed, showPinyin }) {
+  if (!exampleSentence) return null;
+  return (
+    <div className="sentence-context-card">
+      <p className="cloze-sentence-zh">{renderClozeSentence(exampleSentence.cn, targetChar, isRevealed)}</p>
+      {showPinyin && <p className="sentence-pinyin">{exampleSentence.pinyin}</p>}
+      <p className="sentence-en">{exampleSentence.en}</p>
+    </div>
+  );
+}
+
 /**
  * Two-phase pen-and-paper session: Priming (watch the still-learning
  * cards get demonstrated, no grading) then Blind Recall (test every card
@@ -171,6 +215,13 @@ export default function WritingSession({ batch, primeQueue, card, onGrade, progr
 
           <p className="writing-instruction-cue">Observe stroke order &amp; copy 1× to your notebook</p>
 
+          <SentenceContext
+            exampleSentence={primeCard.example_sentence}
+            targetChar={primeCard.character}
+            isRevealed
+            showPinyin
+          />
+
           <button type="button" className="primary-launch-btn" onClick={advancePriming}>
             Next <span className="writing-key-hint">[Space]</span>
           </button>
@@ -207,6 +258,13 @@ export default function WritingSession({ batch, primeQueue, card, onGrade, progr
               <p className="writing-reveal-hint">Write from memory in your notebook</p>
             )}
           </div>
+
+          <SentenceContext
+            exampleSentence={card.example_sentence}
+            targetChar={card.character}
+            isRevealed={revealed}
+            showPinyin={revealed}
+          />
 
           {revealed && (
             <div className="writing-grade-row">
