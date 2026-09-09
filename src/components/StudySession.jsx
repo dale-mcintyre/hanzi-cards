@@ -43,9 +43,12 @@ export default function StudySession({
   onReportMistake,
   progressPercent,
 }) {
+  // Matches the on-card buttons below (Again on the left, Good on the
+  // right) regardless of which face is showing - swipe left always means
+  // Again, swipe right always means Good.
   const { dragX, dragY, isDragging, pointerHandlers } = useSwipeGesture({
-    onSwipeLeft: () => onGrade(5),
-    onSwipeRight: () => onGrade(1),
+    onSwipeLeft: () => onGrade(1),
+    onSwipeRight: () => onGrade(5),
     onTap: onFlip,
   });
 
@@ -158,8 +161,8 @@ export default function StudySession({
         }}
         {...pointerHandlers}
       >
-        {dragX < -30 && <div className="badge badge--know">GOOD</div>}
-        {dragX > 30 && <div className="badge badge--again">AGAIN</div>}
+        {dragX < -30 && <div className="badge badge--again">AGAIN</div>}
+        {dragX > 30 && <div className="badge badge--know">GOOD</div>}
 
         <div className={`card-flip-inner ${isFlipped ? 'is-flipped' : ''}`}>
           <div className="card-face front-face">
