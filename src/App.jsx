@@ -2,7 +2,7 @@ import { useEffect, useState, useMemo, useCallback, useRef } from 'react';
 import './App.css';
 import { calculateSM2 } from './utils/sm2';
 import { getProgress, saveCardProgress, saveWritingProgress, getCardMasteryStats, getPrefs, savePrefs, getTierStats, getOfflineMode, setOfflineMode, MASTERED_INTERVAL_DAYS } from './utils/storage';
-import { getSoundEnabled, setSoundEnabled } from './utils/tts';
+import { getSoundEnabled, setSoundEnabled, cancelSpeech } from './utils/tts';
 import { playCorrectFeedback, playIncorrectFeedback, playMasteryFeedback } from './utils/feedback';
 import { getFilteredDeck, fetchUnifiedVocab } from './data/vocabLoader';
 import { buildSelfStudyQueue, getDueCount } from './utils/sessionQueue';
@@ -405,6 +405,16 @@ export default function App() {
 
   const handleNextCard = (quality) => {
     if (!card || isAdvancingRef.current) return;
+
+    // Grading means the user is done with this card's pronunciation too -
+    // if the flip's delayed auto-play timer fired right around the same
+    // moment (StudySession's AUTO_PLAY_DELAY_MS is 1.5s, well within
+    // normal read-then-grade timing), letting speechSynthesis keep
+    // talking while the grading tone below starts can make two separate
+    // OS audio pipelines open at once, which is a known source of an
+    // audible click/pop on several mobile browsers - cutting it off first
+    // avoids that overlap entirely.
+    cancelSpeech();
 
     // Writing grades (1/2/3 - Missed/Hesitated/Clean) and reading grades
     // (SM-2's 1-5 quality scale) don't share a "success" threshold -

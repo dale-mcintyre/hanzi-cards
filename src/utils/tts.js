@@ -79,3 +79,12 @@ export function speakText(text) {
     window.speechSynthesis.speak(utterance);
   }, 0);
 }
+
+/** Stops any in-flight or pending speech immediately, with no replacement
+ * utterance queued - unlike speakText's own cancel-then-speak, this is for
+ * call sites that just want speech to stop (e.g. grading a card should not
+ * let its delayed auto-pronunciation start talking over the next card's
+ * feedback tone/audio). */
+export function cancelSpeech() {
+  if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+}
