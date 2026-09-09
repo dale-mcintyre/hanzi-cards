@@ -5,15 +5,15 @@ import { getProgress, saveCardProgress, saveWritingProgress, getCardMasteryStats
 import { getSoundEnabled, setSoundEnabled } from './utils/tts';
 import { playCorrectFeedback, playIncorrectFeedback, playMasteryFeedback } from './utils/feedback';
 import { getFilteredDeck, fetchUnifiedVocab } from './data/vocabLoader';
-import { buildLearnQueue, getDueCount } from './utils/sessionQueue';
-import { buildQuizQueue } from './utils/quizQueue';
-import { buildWritingQueue } from './utils/writingQueue';
+import { buildSelfStudyQueue, getDueCount } from './utils/sessionQueue';
+import { buildWarmupQueue } from './utils/warmupQueue';
+import { buildPenAndPaperQueue } from './utils/writingQueue';
 import { calculateWritingSchedule, WRITING_MASTERED_LEVEL } from './utils/writingSchedule';
 import { getEntitlement } from './utils/entitlement';
 import { useAuth } from './context/AuthContext';
 import LaunchScreen from './components/LaunchScreen';
 import StudySession from './components/StudySession';
-import QuizSession from './components/QuizSession';
+import WarmupSession from './components/WarmupSession';
 import WritingSession from './components/WritingSession';
 import WritingBadge from './components/WritingBadge';
 import CompletionScreen from './components/CompletionScreen';
@@ -68,18 +68,23 @@ export default function App() {
   // visitor is a sub-frame of the leaner view before this flips true.
   const showMarketing = isAuthReady && !user;
 
-  const [appState, setAppState] = useState('launch');
-  const [countdownNum, setCountdownNum] = useState(3);
+  // Single source of truth for "what screen is showing": 'dashboard',
+  // 'self-study', 'pen-and-paper', 'warmup', or 'completion'. Replaces
+  // the old two-axis appState+sessionMode pair (which only ever had 4
+  // valid combinations) and the 3-2-1 countdown step entirely - clicking
+  // a launch button sets this straight to its target mode, no
+  // intermediate state, no delay.
+  const [appState, setAppState] = useState('dashboard');
 
   // The nav bar (and its sign-out control) is reachable from every screen,
-  // but the marketing/dashboard switch only lives in the 'launch' state -
+  // but the marketing/dashboard switch only lives in the 'dashboard' state -
   // without this, signing out mid-session left the studying screen up
   // indefinitely even though the user was already signed out. Only fires
   // on a real sign-out transition (user: object -> null); on initial
-  // mount user is already null and appState is already 'launch', so this
-  // is a harmless no-op then, and it doesn't fire on sign-in at all.
+  // mount user is already null and appState is already 'dashboard', so
+  // this is a harmless no-op then, and it doesn't fire on sign-in at all.
   useEffect(() => {
-    if (!user) setAppState('launch');
+    if (!user) setAppState('dashboard');
   }, [user]);
 
   // Per-card outcomes for the session currently in progress (or just
@@ -114,12 +119,10 @@ export default function App() {
   const [rawDeck, setRawDeck] = useState([]);
   const [sessionQueue, setSessionQueue] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
-  // Which dedicated session type is active - 'learn' (plain flashcards,
-  // used by the anonymous marketing page's one-time trial session),
-  // 'quiz' (the dashboard's Study Session), or 'writing' (Pen & Paper).
-  // Each is its own dedicated flow with its own queue builder now, not a
-  // per-card promptType.
-  const [sessionMode, setSessionMode] = useState('learn');
+  // Pen & Paper's Priming-phase subset, computed once by
+  // buildPenAndPaperQueue at launch time - WritingSession no longer
+  // derives this itself.
+  const [primeQueue, setPrimeQueue] = useState([]);
 
   const [isFlipped, setIsFlipped] = useState(false);
   const [streak, setStreak] = useState(1);
@@ -197,8 +200,13 @@ export default function App() {
     setIncludeNonHsk(fresh.includeNonHsk);
   }, [syncVersion]);
 
-  // Drives the LaunchScreen "Study Session (N Due)" label.
+  // Drives the LaunchScreen "Self-Study (N Due)" label.
   const dueCount = useMemo(() => getDueCount(rawDeck), [rawDeck]);
+
+  // A simple heuristic (12 seconds/card, rounded up, minimum 1) for the
+  // "~N min" sub-label - not a measured estimate, just a reasonable guess
+  // at session length.
+  const selfStudyEstMinutes = Math.max(1, Math.round((dueCount * 12) / 60));
 
   // Every card the user has graded at least once, regardless of how it's
   // currently doing on the SM-2 curve - a free-form review pool distinct
@@ -209,11 +217,11 @@ export default function App() {
     return getCardMasteryStats(rawDeck);
   }, [rawDeck]);
 
-  // Sized generously (Infinity) purely to get an accurate eligible count
-  // for the LaunchScreen "Pen & Paper (N Words)" button label/gate -
-  // launchWritingSession itself caps the actual session queue at 6 via
-  // buildWritingQueue's own count arg.
-  const writingEligibleCards = useMemo(() => buildWritingQueue(rawDeck, Infinity), [rawDeck]);
+  // Same call the actual launch will make - previewing it here (rather
+  // than an unbounded/Infinity variant) gives the dashboard's "2 new, 6
+  // review" sub-label the exact counts a real launch would produce, since
+  // the 2-new/8-review caps are already baked into the function itself.
+  const penAndPaperPreview = useMemo(() => buildPenAndPaperQueue(rawDeck), [rawDeck]);
 
   // Independent of the current HSK/non-HSK filter - rawDeck only contains
   // whatever tiers are currently selected, but the tier tiles need stats
@@ -322,70 +330,53 @@ export default function App() {
     );
   }
 
-  // Only reachable today from the anonymous marketing page's one-time
-  // trial CTA (see LaunchScreen.jsx) - the signed-in dashboard's own two
-  // dedicated actions are launchQuizSession/launchWritingSession below.
-  const launchArcadeSession = (count = 20) => {
+  // Primary dashboard action - also used by the anonymous marketing
+  // page's one-time trial CTA (see LaunchScreen.jsx), which is why it
+  // takes a count instead of always using the dashboard's own default -
+  // both land in the same 'self-study' screen, so there's no reason for
+  // two near-duplicate launch functions.
+  const launchSelfStudy = (count = 20) => {
     // Due-for-review cards first (most overdue first), then never-studied
     // cards introduced in frequency order - not a flat random shuffle.
-    const queue = buildLearnQueue(rawDeck, count);
+    const queue = buildSelfStudyQueue(rawDeck, count);
+    if (queue.length === 0) return;
+
     setSessionQueue(queue);
     setCurrentIndex(0);
     setIsFlipped(false);
     setSessionResults([]);
-    setSessionMode('learn');
-
-    setAppState('countdown');
-    setCountdownNum(3);
+    setAppState('self-study');
   };
 
-  // Dashboard's primary action: a rapid, thumb-only multiple-choice
-  // review of already-seen cards. Distractors (buildQuizQueue) come from
-  // the whole deck, not just seen cards, so pool size there isn't a
-  // constraint.
-  const launchQuizSession = () => {
-    const quizQueue = buildQuizQueue(seenCards, rawDeck, 10);
+  // Dashboard's secondary action: a dedicated pen-and-paper session -
+  // Priming walks primeQueue (up to 2 never-written cards), Recall tests
+  // the whole shuffled batch. Only ever offered on characters already
+  // read-mastered.
+  const launchPenAndPaper = () => {
+    const { primeQueue: primed, recallQueue } = buildPenAndPaperQueue(rawDeck);
+    if (recallQueue.length === 0) return;
 
-    if (quizQueue.length === 0) return;
-
-    setSessionQueue(quizQueue);
+    setSessionQueue(recallQueue);
+    setPrimeQueue(primed);
     setCurrentIndex(0);
     setIsFlipped(false);
     setSessionResults([]);
-    setSessionMode('quiz');
-
-    setAppState('countdown');
-    setCountdownNum(3);
+    setAppState('pen-and-paper');
   };
 
-  // Dashboard's secondary action: a dedicated pen-and-paper session,
-  // batched 4-6 words at a time (buildWritingQueue's own count arg) - only
-  // ever offered on characters already read-mastered.
-  const launchWritingSession = () => {
-    const writingQueue = buildWritingQueue(rawDeck, 6);
+  // Dashboard's tertiary on-ramp: a rapid, thumb-only 4-choice recognition
+  // drill over already-seen cards. Distractors come from the whole deck,
+  // not just seen cards, so pool size there isn't a constraint.
+  const launchWarmup = () => {
+    const warmupQueue = buildWarmupQueue(seenCards, rawDeck, 10);
+    if (warmupQueue.length === 0) return;
 
-    if (writingQueue.length === 0) return;
-
-    setSessionQueue(writingQueue);
+    setSessionQueue(warmupQueue);
     setCurrentIndex(0);
     setIsFlipped(false);
     setSessionResults([]);
-    setSessionMode('writing');
-
-    setAppState('countdown');
-    setCountdownNum(3);
+    setAppState('warmup');
   };
-
-  useEffect(() => {
-    if (appState !== 'countdown') return;
-
-    if (countdownNum > 0) {
-      const timer = setTimeout(() => setCountdownNum(countdownNum - 1), 600);
-      return () => clearTimeout(timer);
-    } else {
-      setAppState('studying');
-    }
-  }, [appState, countdownNum]);
 
   const card = sessionQueue[currentIndex];
 
@@ -406,7 +397,7 @@ export default function App() {
     // session recap grouping, and the soft-wall counter below regardless
     // of session type - only this threshold and the stats-calculation/
     // persistence step (right below) branch on it.
-    const isWritingCard = sessionMode === 'writing';
+    const isWritingCard = appState === 'pen-and-paper';
     const isSuccess = isWritingCard ? quality >= 3 : quality >= 4;
 
     let newStats;
@@ -479,7 +470,7 @@ export default function App() {
       // at render time, and hasCrossedSoftWall was just set above if this
       // very card is the one that crossed the threshold - so even a first
       // session that crosses 5 on its last card correctly renders gated.
-      setAppState('completed');
+      setAppState('completion');
     } else {
       setIsFlipped(false);
       setCurrentIndex((prev) => prev + 1);
@@ -510,7 +501,7 @@ export default function App() {
       {/* Top Navbar */}
       <nav className="top-nav-bar">
         <div className="nav-left">
-          <span className="streak-badge">{streak}d</span>
+          <span className="streak-badge">Day {streak}</span>
           <button
             type="button"
             className="beta-feedback-pill"
@@ -540,67 +531,65 @@ export default function App() {
       </nav>
 
       <div className="stage">
-        {/* 1. LAUNCH SCREEN - marketing pitch for logged-out visitors,
+        {/* DASHBOARD - marketing pitch for logged-out visitors,
                action-first dashboard for everyone else */}
-        {appState === 'launch' && (
+        {appState === 'dashboard' && (
           <LaunchScreen
             showMarketing={showMarketing}
             revisionLevels={revisionLevels}
             isLoadingDeck={isLoadingDeck}
             cardCount={rawDeck.length}
             dueCount={dueCount}
+            selfStudyEstMinutes={selfStudyEstMinutes}
             seenCardsCount={seenCards.length}
-            writingEligibleCount={writingEligibleCards.length}
-            launchArcadeSession={launchArcadeSession}
-            launchQuizSession={launchQuizSession}
-            launchWritingSession={launchWritingSession}
+            penAndPaperNewCount={penAndPaperPreview.primeQueue.length}
+            penAndPaperReviewCount={penAndPaperPreview.recallQueue.length - penAndPaperPreview.primeQueue.length}
+            penAndPaperTotal={penAndPaperPreview.recallQueue.length}
+            onLaunchSelfStudy={launchSelfStudy}
+            onLaunchPenAndPaper={launchPenAndPaper}
+            onLaunchWarmup={launchWarmup}
             onSignIn={() => setShowAccount(true)}
             renderTierTiles={renderTierTiles}
           />
         )}
 
-        {/* 2 & 3. COUNTDOWN + STUDYING SESSION */}
-        {(appState === 'countdown' || appState === 'studying') && (
-          sessionMode === 'quiz' ? (
-            <QuizSession
-              appState={appState}
-              countdownNum={countdownNum}
-              card={card}
-              onAnswer={handleNextCard}
-              progressPercent={progressPercent}
-            />
-          ) : sessionMode === 'writing' ? (
-            <WritingSession
-              appState={appState}
-              countdownNum={countdownNum}
-              batch={sessionQueue}
-              card={card}
-              onGrade={handleNextCard}
-              progressPercent={progressPercent}
-            />
-          ) : (
-            <StudySession
-              appState={appState}
-              countdownNum={countdownNum}
-              card={card}
-              isFlipped={isFlipped}
-              onFlip={handleFlip}
-              onGrade={handleNextCard}
-              onReportMistake={() => setShowMistakeReport(true)}
-              progressPercent={progressPercent}
-            />
-          )
+        {appState === 'self-study' && (
+          <StudySession
+            card={card}
+            isFlipped={isFlipped}
+            onFlip={handleFlip}
+            onGrade={handleNextCard}
+            onReportMistake={() => setShowMistakeReport(true)}
+            progressPercent={progressPercent}
+          />
         )}
 
-        {/* 4. COMPLETED SCREEN */}
-        {appState === 'completed' && (
+        {appState === 'pen-and-paper' && (
+          <WritingSession
+            batch={sessionQueue}
+            primeQueue={primeQueue}
+            card={card}
+            onGrade={handleNextCard}
+            progressPercent={progressPercent}
+          />
+        )}
+
+        {appState === 'warmup' && (
+          <WarmupSession
+            card={card}
+            onAnswer={handleNextCard}
+            progressPercent={progressPercent}
+          />
+        )}
+
+        {appState === 'completion' && (
           <CompletionScreen
             visitGradeCount={visitGradeCount}
             isSoftWallGated={isSoftWallGated}
             sessionResults={sessionResults}
             onInspectCard={setInspectedResult}
             onSignIn={() => setShowAccount(true)}
-            onContinue={() => setAppState('launch')}
+            onContinue={() => setAppState('dashboard')}
           />
         )}
 

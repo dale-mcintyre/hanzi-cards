@@ -15,7 +15,7 @@ function byFrequency(a, b) {
 }
 
 // Count of already-seen cards whose SM-2 interval has elapsed - drives the
-// LaunchScreen "Study Session (N Due)" label. Deliberately excludes
+// LaunchScreen "Self-Study (N Due)" label. Deliberately excludes
 // never-studied cards - those aren't "due" in the overdue-review sense,
 // they're just new material.
 export function getDueCount(deck) {
@@ -23,8 +23,8 @@ export function getDueCount(deck) {
 }
 
 /**
- * Builds a "Learn" session queue that respects spaced repetition and the
- * deck's frequency ranking, instead of a flat random shuffle:
+ * Builds the Self-Study reading queue that respects spaced repetition and
+ * the deck's frequency ranking, instead of a flat random shuffle:
  *  1. Cards due for review (already seen, SM-2 interval has elapsed) come
  *     first, most-overdue first.
  *  2. Never-studied cards fill the rest, most-frequent-word first - this is
@@ -32,9 +32,11 @@ export function getDueCount(deck) {
  *     and 我 long before rank-6000 words.
  *  3. If there aren't enough due + new cards (small deck, or everything's
  *     already comfortably scheduled), pad with the not-yet-due remainder,
- *     still frequency-ordered, so a session is never short.
+ *     still frequency-ordered, so a session is never short. A strict
+ *     due-only filter would leave a light-progress or brand new user with
+ *     nothing to click at all.
  */
-export function buildLearnQueue(deck, count = 20) {
+export function buildSelfStudyQueue(deck, count = 20) {
   const due = [];
   const fresh = [];
   const notYetDue = [];
