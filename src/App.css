@@ -1112,27 +1112,27 @@
   text-align: center;
 }
 
-/* Cloze sentence context, shown beneath the Tianzige grid in both
-   Priming and Recall - deliberately quiet (small type, low contrast)
-   so it supports the main prompt instead of competing with it. Sized
-   tight (small font, tight padding) since it's sharing a fixed-height
-   card with the grid and grade buttons - see .card's 600px/72dvh cap. */
+/* Phase 3's Cloze sentence prompt, shown beneath the Tianzige grid in
+   place of the bare pinyin/meaning prompt Recall uses - it's the primary
+   thing the user reads, so it gets real weight, not caption-sized type.
+   Still shares a fixed-height card with the grid and grade buttons (see
+   .card's 600px/72dvh cap), so padding stays tight. */
 .sentence-context-card {
   width: 100%;
   flex-shrink: 0;
   background: rgba(15, 23, 42, 0.4);
   border-radius: 12px;
-  padding: 8px 14px;
+  padding: 12px 16px;
   border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .cloze-sentence-zh {
-  font-size: 14px;
+  font-size: 18px;
   font-weight: 600;
   color: var(--ink);
   margin: 0;
   font-family: var(--font-hanzi);
-  line-height: 1.4;
+  line-height: 1.5;
 }
 
 /* min-width is set inline (per-word, in `em`) so the blank already

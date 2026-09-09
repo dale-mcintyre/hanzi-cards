@@ -10,10 +10,14 @@ import { SpeakerIcon } from './icons';
 // card), per the spec: 1 char = 180px, 2 = 120px, 3-4 = 84px.
 const WRITING_SIZE_LADDER = { 1: 180, 2: 120, 3: 84, 4: 84 };
 
-// How long the "Phase 2: Blind Recall" beat sits on screen between
-// Priming ending and Recall actually starting - just long enough to
-// register as a deliberate transition, not a delay.
+// How long a phase-transition banner sits on screen before the next
+// phase actually starts - just long enough to register as a deliberate
+// beat, not a delay. Shared by both the Prime->Recall and Recall->
+// Sentence handoffs.
 const PHASE_TRANSITION_MS = 1000;
+// Each transitional phase's fixed-length banner resolves into its real
+// phase automatically, never on user input.
+const TRANSITION_TARGETS = { transition: 'recall', 'sentence-transition': 'sentence' };
 
 const GRADE_OPTIONS = [
   { quality: 1, key: '1', label: 'Missed' },
@@ -27,10 +31,10 @@ function firstMeaning(meaning) {
 
 // Splits a Cloze sentence around the target word, the same way
 // StudySession's HighlightedSentence does, but with a fill-in-the-blank
-// state for Recall - unrevealed renders a fixed-width blank (sized to the
-// target's own character count so nothing reflows on reveal), revealed
-// renders the target itself, accented. If the target word isn't found
-// verbatim in the sentence (shouldn't happen given how these are
+// state for Phase 3 - unrevealed renders a fixed-width blank (sized to
+// the target's own character count so nothing reflows on reveal),
+// revealed renders the target itself, accented. If the target word isn't
+// found verbatim in the sentence (shouldn't happen given how these are
 // generated, but data is data), the sentence renders untouched rather
 // than silently dropping content.
 function renderClozeSentence(sentenceCn, targetChar, isRevealed) {
@@ -52,38 +56,31 @@ function renderClozeSentence(sentenceCn, targetChar, isRevealed) {
   ));
 }
 
-// Cloze sentence card shown beneath the Tianzige grid in both phases.
-// Priming always shows the target plainly and its pinyin (it's actively
-// teaching); Recall blanks the target and withholds pinyin until the
-// card is revealed, so neither gives away the answer early. Renders
-// nothing - not even the container - for a card with no example_sentence
-// yet, since enrichment is still rolling out across the deck.
-function SentenceContext({ exampleSentence, targetChar, isRevealed, showPinyin }) {
-  if (!exampleSentence) return null;
-  return (
-    <div className="sentence-context-card">
-      <p className="cloze-sentence-zh">{renderClozeSentence(exampleSentence.cn, targetChar, isRevealed)}</p>
-      {showPinyin && <p className="sentence-pinyin">{exampleSentence.pinyin}</p>}
-      <p className="sentence-en">{exampleSentence.en}</p>
-    </div>
-  );
-}
-
 /**
- * Two-phase pen-and-paper session: Priming (watch the still-learning
- * cards get demonstrated, no grading) then Blind Recall (test every card
- * in the batch from memory, graded). `batch` is the full recall queue and
- * `primeQueue` the (already-computed, by buildPenAndPaperQueue) subset
- * that needs priming - unlike the other session components, this one
- * needs whole arrays up front (not just the current `card`) so Priming
- * can walk through its own subset independently of App.jsx's
- * currentIndex/handleNextCard pipeline, which only ever advances once
- * Recall actually starts grading.
+ * Three-phase pen-and-paper session:
+ *  1. Priming - watch the still-learning cards (primeQueue) get
+ *     demonstrated, no grading.
+ *  2. Blind Recall - test every card in recallQueue from memory, graded
+ *     on the bare character (pinyin/meaning prompt only).
+ *  3. Sentence Writing - a short coda testing up to 2 already-learned
+ *     characters (sentenceQueue) in a full-sentence Cloze context: the
+ *     prompt is the sentence itself (target blanked, English for
+ *     context, pinyin withheld), not the bare word - a harder,
+ *     production-in-context test. Graded the same way as Recall, into
+ *     the same writing schedule.
+ *
+ * `primeQueue`/`recallQueue`/`sentenceQueue` are the whole
+ * already-computed (by buildPenAndPaperQueue) arrays, not just the
+ * current `card` - Priming needs to walk its own subset independently of
+ * App.jsx's currentIndex/handleNextCard pipeline (which only advances
+ * once Recall/Sentence actually start grading), and Recall/Sentence each
+ * need their own array to compute this card's position within *their*
+ * phase, not the combined batch.
  *
  * No `appState`/countdown handling here - App.jsx only ever mounts this
  * component while appState === 'pen-and-paper'.
  */
-export default function WritingSession({ batch, primeQueue, card, onGrade, progressPercent }) {
+export default function WritingSession({ primeQueue, recallQueue, sentenceQueue, card, onGrade, progressPercent }) {
   const [phase, setPhase] = useState(() => (primeQueue.length === 0 ? 'recall' : 'priming'));
   const [primeIndex, setPrimeIndex] = useState(0);
   // Which card's answer is currently revealed, by id - not a bare boolean.
@@ -97,24 +94,34 @@ export default function WritingSession({ batch, primeQueue, card, onGrade, progr
   const [revealedCardId, setRevealedCardId] = useState(null);
   const revealed = !!card && revealedCardId === card.id;
 
-  // A brand new batch (new session launch) always restarts - `batch`/
-  // `primeQueue` keep the same array references for the whole session, so
-  // this only fires on an actual new session. Starts straight in Recall
-  // if nothing in this particular batch needs priming.
+  // A brand new session (new array references from a fresh
+  // buildPenAndPaperQueue call) always restarts. Starts straight in
+  // Recall if nothing in this particular batch needs priming.
   useEffect(() => {
     setPhase(primeQueue.length === 0 ? 'recall' : 'priming');
     setPrimeIndex(0);
     setRevealedCardId(null);
-  }, [batch, primeQueue]);
+  }, [primeQueue, recallQueue, sentenceQueue]);
 
-  // The transition beat is a fixed-length, non-interactive pause between
-  // Priming ending and Recall actually starting - it always resolves on
-  // its own, never on user input.
+  // Both transitional phases resolve into their real phase on their own,
+  // after a fixed pause - never on user input.
   useEffect(() => {
-    if (phase !== 'transition') return;
-    const timer = setTimeout(() => setPhase('recall'), PHASE_TRANSITION_MS);
+    const target = TRANSITION_TARGETS[phase];
+    if (!target) return;
+    const timer = setTimeout(() => setPhase(target), PHASE_TRANSITION_MS);
     return () => clearTimeout(timer);
   }, [phase]);
+
+  // App.jsx's sessionQueue (and so `card`) walks Recall's cards first,
+  // then Sentence's - once `card` crosses into sentenceQueue, that's the
+  // signal to hand off to the Phase 3 banner. Only fires once per
+  // session: after the handoff, `phase` is never 'recall' again while
+  // still looking at a sentenceQueue card, so this can't re-trigger on
+  // every subsequent sentence card.
+  useEffect(() => {
+    if (phase !== 'recall' || !card) return;
+    if (sentenceQueue.some((c) => c.id === card.id)) setPhase('sentence-transition');
+  }, [card, phase, sentenceQueue]);
 
   const primeCard = primeQueue[primeIndex];
 
@@ -148,6 +155,10 @@ export default function WritingSession({ batch, primeQueue, card, onGrade, progr
     }
   }
 
+  // Recall and Sentence are both "testing" phases - same reveal/grade
+  // interaction, just a different prompt underneath.
+  const isTestingPhase = phase === 'recall' || phase === 'sentence';
+
   useEffect(() => {
     function handleKeydown(e) {
       if (phase === 'priming') {
@@ -157,8 +168,7 @@ export default function WritingSession({ batch, primeQueue, card, onGrade, progr
         }
         return;
       }
-      if (phase === 'transition') return;
-      if (!card) return;
+      if (!isTestingPhase || !card) return;
       if (!revealed) {
         if (e.code === 'Space' || e.code === 'Enter') {
           e.preventDefault();
@@ -173,12 +183,13 @@ export default function WritingSession({ batch, primeQueue, card, onGrade, progr
     window.addEventListener('keydown', handleKeydown);
     return () => window.removeEventListener('keydown', handleKeydown);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [phase, revealed, card, primeIndex, primeQueue, onGrade]);
+  }, [phase, isTestingPhase, revealed, card, primeIndex, primeQueue, onGrade]);
 
-  const recallPosition = card ? batch.indexOf(card) + 1 : 0;
+  const recallPosition = card ? recallQueue.indexOf(card) + 1 : 0;
+  const sentencePosition = card ? sentenceQueue.indexOf(card) + 1 : 0;
 
   if (phase === 'priming' && !primeCard) return null;
-  if (phase === 'recall' && !card) return null;
+  if (isTestingPhase && !card) return null;
 
   return (
     <>
@@ -215,13 +226,6 @@ export default function WritingSession({ batch, primeQueue, card, onGrade, progr
 
           <p className="writing-instruction-cue">Observe stroke order &amp; copy 1× to your notebook</p>
 
-          <SentenceContext
-            exampleSentence={primeCard.example_sentence}
-            targetChar={primeCard.character}
-            isRevealed
-            showPinyin
-          />
-
           <button type="button" className="primary-launch-btn" onClick={advancePriming}>
             Next <span className="writing-key-hint">[Space]</span>
           </button>
@@ -237,7 +241,7 @@ export default function WritingSession({ batch, primeQueue, card, onGrade, progr
 
       {phase === 'recall' && (
         <div className="card card--writing">
-          <span className="box-section-label">Recall · {recallPosition} of {batch.length}</span>
+          <span className="box-section-label">Recall · {recallPosition} of {recallQueue.length}</span>
 
           <div className="writing-prompt-meta">
             <h1 className="pinyin-title"><ColorPinyin pinyin={card.pinyin} /></h1>
@@ -259,12 +263,58 @@ export default function WritingSession({ batch, primeQueue, card, onGrade, progr
             )}
           </div>
 
-          <SentenceContext
-            exampleSentence={card.example_sentence}
-            targetChar={card.character}
-            isRevealed={revealed}
-            showPinyin={revealed}
-          />
+          {revealed && (
+            <div className="writing-grade-row">
+              {GRADE_OPTIONS.map((option) => (
+                <button
+                  key={option.quality}
+                  type="button"
+                  className={`writing-grade-btn writing-grade-btn--${option.quality}`}
+                  onClick={() => onGrade(option.quality)}
+                >
+                  <span className="writing-grade-key">{option.key}</span>
+                  <span className="writing-grade-label">{option.label}</span>
+                  <span className="writing-grade-interval">{gradePreview[option.quality]}d</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {phase === 'sentence-transition' && (
+        <div className="card card--writing writing-phase-transition">
+          <p className="phase-transition-title">Phase 3: Sentence Writing</p>
+          <p className="phase-transition-sub">Write the missing word in context</p>
+        </div>
+      )}
+
+      {phase === 'sentence' && (
+        <div className="card card--writing">
+          <span className="box-section-label">Sentence · {sentencePosition} of {sentenceQueue.length}</span>
+
+          <div className="sentence-context-card">
+            <p className="cloze-sentence-zh">
+              {renderClozeSentence(card.example_sentence.cn, card.character, revealed)}
+            </p>
+            {revealed && <p className="sentence-pinyin">{card.example_sentence.pinyin}</p>}
+            <p className="sentence-en">{card.example_sentence.en}</p>
+          </div>
+
+          <div
+            className="canvas-frame writing-canvas-frame"
+            onClick={() => { if (!revealed) setRevealedCardId(card.id); }}
+          >
+            <HanziCanvas
+              character={card.character}
+              mode={revealed ? 'animate' : 'hidden'}
+              sequential
+              sizeByLength={WRITING_SIZE_LADDER}
+            />
+            {!revealed && (
+              <p className="writing-reveal-hint">Write the missing word in your notebook</p>
+            )}
+          </div>
 
           {revealed && (
             <div className="writing-grade-row">

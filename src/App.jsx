@@ -133,6 +133,17 @@ export default function App() {
   // buildPenAndPaperQueue at launch time - WritingSession no longer
   // derives this itself.
   const [primeQueue, setPrimeQueue] = useState([]);
+  // Pen & Paper's Recall (Phase 2) and Sentence Writing (Phase 3)
+  // subsets - both appended together into sessionQueue itself (so
+  // currentIndex/handleNextCard need no phase awareness at all), but
+  // also kept here as their own state so WritingSession can compute each
+  // phase's own position/total rather than one spanning both segments.
+  // Deliberately real state, not a `sessionQueue.slice(...)` derived
+  // inline on every render - a fresh slice() is a new array reference
+  // each time, which would make WritingSession's session-reset effect
+  // (keyed on these arrays) think a new session started on every render.
+  const [penAndPaperRecallQueue, setPenAndPaperRecallQueue] = useState([]);
+  const [sentenceQueue, setSentenceQueue] = useState([]);
 
   const [isFlipped, setIsFlipped] = useState(false);
   const [streak, setStreak] = useState(1);
@@ -234,11 +245,17 @@ export default function App() {
   // into the function itself.
   const penAndPaperPreview = useMemo(() => buildPenAndPaperQueue(rawDeck), [rawDeck]);
   // Priming (watch + copy, only the never-written cards) runs slower than
-  // Recall (write from memory, the whole batch) - ~25s/card there vs
-  // ~15s/card here is a rough split, not a measured average.
+  // Recall (write from memory, the whole batch); Sentence Writing (read a
+  // sentence, write the missing word) runs slower still. ~25s/15s/30s per
+  // card respectively is a rough split, not a measured average.
   const penAndPaperEstMinutes = Math.max(
     1,
-    Math.round((penAndPaperPreview.primeQueue.length * 25 + penAndPaperPreview.recallQueue.length * 15) / 60)
+    Math.round(
+      (penAndPaperPreview.primeQueue.length * 25 +
+        penAndPaperPreview.recallQueue.length * 15 +
+        penAndPaperPreview.sentenceQueue.length * 30) /
+        60
+    )
   );
 
   // Independent of the current HSK/non-HSK filter - rawDeck only contains
@@ -368,14 +385,22 @@ export default function App() {
 
   // Dashboard's secondary action: a dedicated pen-and-paper session -
   // Priming walks primeQueue (up to 2 never-written cards), Recall tests
-  // the whole shuffled batch. Only ever offered on characters already
-  // read-mastered.
+  // the whole shuffled batch, then Sentence Writing tests up to 2 more
+  // already-learned cards in a full-sentence Cloze context. sentenceQueue
+  // is appended after recallQueue directly into sessionQueue - App.jsx's
+  // generic currentIndex/handleNextCard pipeline (shared with every other
+  // mode) just walks through both segments in order with no phase
+  // awareness needed; only WritingSession itself distinguishes them (via
+  // the separate recallQueue/sentenceQueue arrays passed below). Only
+  // ever offered on characters already read-mastered.
   const launchPenAndPaper = () => {
-    const { primeQueue: primed, recallQueue } = buildPenAndPaperQueue(rawDeck);
+    const { primeQueue: primed, recallQueue, sentenceQueue: sentenced } = buildPenAndPaperQueue(rawDeck);
     if (recallQueue.length === 0) return;
 
-    setSessionQueue(recallQueue);
+    setSessionQueue([...recallQueue, ...sentenced]);
     setPrimeQueue(primed);
+    setPenAndPaperRecallQueue(recallQueue);
+    setSentenceQueue(sentenced);
     setCurrentIndex(0);
     setIsFlipped(false);
     setSessionResults([]);
@@ -616,7 +641,8 @@ export default function App() {
 
         {appState === 'pen-and-paper' && (
           <WritingSession
-            batch={sessionQueue}
+            recallQueue={penAndPaperRecallQueue}
+            sentenceQueue={sentenceQueue}
             primeQueue={primeQueue}
             card={card}
             onGrade={handleNextCard}

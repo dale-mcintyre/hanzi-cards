@@ -13,6 +13,8 @@ const MAX_BATCH = 8;
 // too thin to be worth sitting down for - boost how many new characters
 // get primed instead so the batch has real substance.
 const THIN_REVIEW_THRESHOLD = 4;
+// Phase 3 (Sentence Writing) is a short coda, not a third full batch.
+const SENTENCE_QUEUE_SIZE = 2;
 
 /**
  * Builds a Pen & Paper session batch, mirroring buildSelfStudyQueue's
@@ -22,7 +24,7 @@ const THIN_REVIEW_THRESHOLD = 4;
  * reproduction of something already recognized, not a way to first learn
  * a character.
  *
- * Returns `{ primeQueue, recallQueue }`:
+ * Returns `{ primeQueue, recallQueue, sentenceQueue }`:
  *  - `primeQueue`: never-written eligible cards, frequency-ranked - these
  *    are the only ones WritingSession's Priming phase walks through (see
  *    there for why: a card that's already proven Spontaneous recall
@@ -40,6 +42,15 @@ const THIN_REVIEW_THRESHOLD = 4;
  *    tests the whole batch, new/review/padding alike, in one pass.
  *    (A deck with very few eligible cards overall may still fall below
  *    MIN_BATCH - there's only so much material to draw from.)
+ *  - `sentenceQueue`: up to SENTENCE_QUEUE_SIZE (2) cards for Phase 3
+ *    (Sentence Writing) - drawn from cards the user has already learned
+ *    to write before (has writing history) that aren't already in
+ *    `recallQueue`, so Phase 3 tests fresh material rather than
+ *    repeating what Recall just covered, while never testing production
+ *    on a character the user has genuinely never practiced writing.
+ *    Only cards with an `example_sentence` qualify; most-recently-
+ *    practiced first. Empty if none qualify - Phase 3 simply doesn't
+ *    run that session (WritingSession renders nothing extra).
  */
 export function buildPenAndPaperQueue(deck, targetBatchSize = 8) {
   const eligible = deck.filter((c) => (c.stats?.interval || 0) >= MASTERED_INTERVAL_DAYS);
@@ -67,5 +78,11 @@ export function buildPenAndPaperQueue(deck, targetBatchSize = 8) {
 
   const recallQueue = [...primeQueue, ...reviewItems].sort(() => 0.5 - Math.random());
 
-  return { primeQueue, recallQueue };
+  const recallIds = new Set(recallQueue.map((c) => c.id));
+  const sentenceCandidates = written
+    .filter((c) => c.example_sentence && !recallIds.has(c.id))
+    .sort((a, b) => (b.stats.lastWrittenAt || 0) - (a.stats.lastWrittenAt || 0));
+  const sentenceQueue = sentenceCandidates.slice(0, SENTENCE_QUEUE_SIZE);
+
+  return { primeQueue, recallQueue, sentenceQueue };
 }
