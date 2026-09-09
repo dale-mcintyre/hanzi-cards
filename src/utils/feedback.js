@@ -22,15 +22,22 @@ function getAudioContext() {
 // indefinitely, even with nothing currently scheduled - on some mobile
 // browsers this contends with (or delays) other audio on the page, most
 // relevantly StudySession's delayed auto-pronunciation (speakText, fired
-// ~1.5s after a card appears). Suspending once every scheduled tone has
-// actually finished playing releases the channel; getAudioContext()
-// above already resumes on the next feedback call. Debounced against a
-// single pending timeout (not one per call) so a fast correct/incorrect/
-// correct burst can't have an earlier call's timer suspend the context
-// out from under a later call's still-playing tones.
+// ~1.5s after a card appears). Suspending releases the channel;
+// getAudioContext() above already resumes on the next feedback call - but
+// resuming a suspended context is itself a known source of an audible
+// pop on several mobile browsers, so this waits for real inactivity
+// (SUSPEND_IDLE_MS) rather than suspending right after each tone -
+// grading is almost always faster than that gap, so a normal study
+// session's back-to-back feedback calls never actually trigger a
+// resume(). Debounced against a single pending timeout (not one per
+// call) so a fast correct/incorrect/correct burst can't have an earlier
+// call's timer suspend the context out from under a later call's still-
+// playing tones.
+const SUSPEND_IDLE_MS = 3000;
+
 function scheduleSuspend(ctx, endTime) {
   if (suspendTimeoutId) clearTimeout(suspendTimeoutId);
-  const delayMs = Math.max(0, (endTime - ctx.currentTime) * 1000) + 50;
+  const delayMs = Math.max(0, (endTime - ctx.currentTime) * 1000) + SUSPEND_IDLE_MS;
   suspendTimeoutId = setTimeout(() => {
     suspendTimeoutId = null;
     if (ctx.state === 'running') ctx.suspend();
@@ -44,10 +51,17 @@ function playTone(ctx, freq, startTime, duration, peak = 0.15) {
   osc.frequency.value = freq;
   gain.gain.setValueAtTime(0, startTime);
   gain.gain.linearRampToValueAtTime(peak, startTime + 0.02);
-  gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+  // A linear ramp all the way to true 0 (not exponentialRampToValueAtTime,
+  // which can only approach a small non-zero floor like 0.001) - stopping
+  // the oscillator on that leftover amplitude is the classic Web Audio
+  // click/pop. Ending on an exact 0 sample means osc.stop() cuts nothing
+  // audible. The stop is scheduled a hair after the ramp finishes so
+  // there's no race between the two being processed in the same audio
+  // quantum.
+  gain.gain.linearRampToValueAtTime(0, startTime + duration);
   osc.connect(gain).connect(ctx.destination);
   osc.start(startTime);
-  osc.stop(startTime + duration);
+  osc.stop(startTime + duration + 0.01);
 }
 
 // Deliberately not gated by the sound mute toggle - vibration is silent to
