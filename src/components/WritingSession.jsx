@@ -42,7 +42,16 @@ function firstMeaning(meaning) {
 export default function WritingSession({ batch, primeQueue, card, onGrade, progressPercent }) {
   const [phase, setPhase] = useState(() => (primeQueue.length === 0 ? 'recall' : 'priming'));
   const [primeIndex, setPrimeIndex] = useState(0);
-  const [revealed, setRevealed] = useState(false);
+  // Which card's answer is currently revealed, by id - not a bare boolean.
+  // A boolean reset via a useEffect keyed on `card` is one render behind:
+  // the new card's data lands on the same render its `mode` prop is
+  // computed, but the effect that would reset a boolean back to false
+  // only runs after that render commits - which briefly showed the
+  // *next* card's character/strokes in `animate` mode before the reset
+  // caught up. Deriving `revealed` from an id comparison is correct on
+  // the very first render of a new card, no effect needed.
+  const [revealedCardId, setRevealedCardId] = useState(null);
+  const revealed = !!card && revealedCardId === card.id;
 
   // A brand new batch (new session launch) always restarts - `batch`/
   // `primeQueue` keep the same array references for the whole session, so
@@ -51,13 +60,8 @@ export default function WritingSession({ batch, primeQueue, card, onGrade, progr
   useEffect(() => {
     setPhase(primeQueue.length === 0 ? 'recall' : 'priming');
     setPrimeIndex(0);
-    setRevealed(false);
+    setRevealedCardId(null);
   }, [batch, primeQueue]);
-
-  // Recall's reveal state resets per card, same as before.
-  useEffect(() => {
-    if (phase === 'recall') setRevealed(false);
-  }, [card, phase]);
 
   // The transition beat is a fixed-length, non-interactive pause between
   // Priming ending and Recall actually starting - it always resolves on
@@ -114,7 +118,7 @@ export default function WritingSession({ batch, primeQueue, card, onGrade, progr
       if (!revealed) {
         if (e.code === 'Space' || e.code === 'Enter') {
           e.preventDefault();
-          setRevealed(true);
+          setRevealedCardId(card.id);
         }
         return;
       }
@@ -191,7 +195,7 @@ export default function WritingSession({ batch, primeQueue, card, onGrade, progr
 
           <div
             className="canvas-frame writing-canvas-frame"
-            onClick={() => { if (!revealed) setRevealed(true); }}
+            onClick={() => { if (!revealed) setRevealedCardId(card.id); }}
           >
             <HanziCanvas
               character={card.character}
