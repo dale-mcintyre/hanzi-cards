@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo, useCallback } from 'react';
+import { useEffect, useState, useMemo, useCallback, useRef } from 'react';
 import './App.css';
 import { calculateSM2 } from './utils/sm2';
 import { getProgress, saveCardProgress, saveWritingProgress, getCardMasteryStats, getPrefs, savePrefs, getTierStats, getOfflineMode, setOfflineMode, MASTERED_INTERVAL_DAYS } from './utils/storage';
@@ -34,6 +34,16 @@ const ALL_HSK_LEVELS = ['1', '2', '3', '4', '5', '6'];
 // and, from that point on, before any session's completion screen gates on
 // sign-in instead of offering a "Continue" escape.
 const SOFT_WALL_THRESHOLD = 5;
+
+// Self-Study's card-flip mechanic rotates the flip-back over 0.55s
+// (App.css's `.card-flip-inner` transition) - advancing `currentIndex`
+// (and thus the back face's content) in the same tick as `setIsFlipped
+// (false)` would swap in the next card's data while that rotation is
+// still visually in flight, flashing its definition before it turns out
+// of view. Delaying the advance until just after the rotation finishes
+// keeps the content swap hidden behind the card's edge-on moment. A small
+// buffer over the CSS's 550ms guards against timer/paint jitter.
+const STUDY_FLIP_BACK_MS = 560;
 
 export default function App() {
   // Empty = no filter, learn from the full frequency-ranked deck. A
@@ -387,8 +397,14 @@ export default function App() {
     setIsFlipped((prev) => !prev);
   };
 
+  // Blocks re-entry while a graded Self-Study card's flip-back animation
+  // is still finishing - see STUDY_FLIP_BACK_MS. Without this, a fast
+  // double-tap/swipe during that window could grade the same card twice
+  // before its content actually changes.
+  const isAdvancingRef = useRef(false);
+
   const handleNextCard = (quality) => {
-    if (!card) return;
+    if (!card || isAdvancingRef.current) return;
 
     // Writing grades (1/2/3 - Missed/Hesitated/Clean) and reading grades
     // (SM-2's 1-5 quality scale) don't share a "success" threshold -
@@ -473,11 +489,26 @@ export default function App() {
       setAppState('completion');
     } else {
       setIsFlipped(false);
-      setCurrentIndex((prev) => prev + 1);
-      // Dismissible, non-interrupting: currentIndex has already advanced
-      // above, so the card behind this overlay is already the next one -
-      // dismissing just reveals it, no re-showing the card just graded.
-      if (justCrossedSoftWall) setShowSoftWallOverlay(true);
+
+      const advance = () => {
+        isAdvancingRef.current = false;
+        setCurrentIndex((prev) => prev + 1);
+        // Dismissible, non-interrupting: currentIndex has already advanced
+        // above, so the card behind this overlay is already the next one -
+        // dismissing just reveals it, no re-showing the card just graded.
+        if (justCrossedSoftWall) setShowSoftWallOverlay(true);
+      };
+
+      // Only Self-Study uses the 3D flip - delaying the content swap until
+      // its rotation finishes is what hides the flash (see
+      // STUDY_FLIP_BACK_MS). Warmup/Pen & Paper don't flip, so they advance
+      // immediately as before.
+      if (appState === 'self-study') {
+        isAdvancingRef.current = true;
+        setTimeout(advance, STUDY_FLIP_BACK_MS);
+      } else {
+        advance();
+      }
     }
   };
 
