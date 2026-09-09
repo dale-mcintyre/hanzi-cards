@@ -1144,10 +1144,31 @@
   font-weight: 700;
 }
 
-.writing-grade-hint {
+.writing-grade-interval {
   font-size: 10px;
   color: var(--ink-faint);
   line-height: 1.2;
+}
+
+/* The 1s non-interactive beat between Priming ending and Recall
+   starting - centered and quiet, just enough to register as a
+   deliberate phase change rather than an abrupt cut. */
+.writing-phase-transition {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 8px;
+}
+
+.phase-transition-title {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.phase-transition-sub {
+  font-size: 13px;
+  color: var(--ink-dim);
 }
 
 .writing-grade-btn--1 { color: var(--hard); }

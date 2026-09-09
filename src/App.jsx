@@ -230,8 +230,16 @@ export default function App() {
   // Same call the actual launch will make - previewing it here (rather
   // than an unbounded/Infinity variant) gives the dashboard's "2 new, 6
   // review" sub-label the exact counts a real launch would produce, since
-  // the 2-new/8-review caps are already baked into the function itself.
+  // the thin-review boost and batch-size floor/ceiling are already baked
+  // into the function itself.
   const penAndPaperPreview = useMemo(() => buildPenAndPaperQueue(rawDeck), [rawDeck]);
+  // Priming (watch + copy, only the never-written cards) runs slower than
+  // Recall (write from memory, the whole batch) - ~25s/card there vs
+  // ~15s/card here is a rough split, not a measured average.
+  const penAndPaperEstMinutes = Math.max(
+    1,
+    Math.round((penAndPaperPreview.primeQueue.length * 25 + penAndPaperPreview.recallQueue.length * 15) / 60)
+  );
 
   // Independent of the current HSK/non-HSK filter - rawDeck only contains
   // whatever tiers are currently selected, but the tier tiles need stats
@@ -586,6 +594,7 @@ export default function App() {
             penAndPaperNewCount={penAndPaperPreview.primeQueue.length}
             penAndPaperReviewCount={penAndPaperPreview.recallQueue.length - penAndPaperPreview.primeQueue.length}
             penAndPaperTotal={penAndPaperPreview.recallQueue.length}
+            penAndPaperEstMinutes={penAndPaperEstMinutes}
             onLaunchSelfStudy={launchSelfStudy}
             onLaunchPenAndPaper={launchPenAndPaper}
             onLaunchWarmup={launchWarmup}

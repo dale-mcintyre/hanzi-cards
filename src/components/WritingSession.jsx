@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import HanziCanvas from './HanziCanvas';
 import { ColorPinyin } from '../utils/pinyinColor';
 import { speakText } from '../utils/tts';
+import { calculateWritingSchedule } from '../utils/writingSchedule';
 import { SpeakerIcon } from './icons';
 
 // Fixed sizing ladder for Writing Recall Mode's grid boxes - independent
@@ -9,10 +10,15 @@ import { SpeakerIcon } from './icons';
 // card), per the spec: 1 char = 180px, 2 = 120px, 3-4 = 84px.
 const WRITING_SIZE_LADDER = { 1: 180, 2: 120, 3: 84, 4: 84 };
 
+// How long the "Phase 2: Blind Recall" beat sits on screen between
+// Priming ending and Recall actually starting - just long enough to
+// register as a deliberate transition, not a delay.
+const PHASE_TRANSITION_MS = 1000;
+
 const GRADE_OPTIONS = [
-  { quality: 1, key: '1', label: 'Missed', hint: "Couldn't recall it" },
-  { quality: 2, key: '2', label: 'Hesitated', hint: 'Got there, but slowly' },
-  { quality: 3, key: '3', label: 'Clean', hint: 'Wrote it instantly' },
+  { quality: 1, key: '1', label: 'Missed' },
+  { quality: 2, key: '2', label: 'Hesitated' },
+  { quality: 3, key: '3', label: 'Clean' },
 ];
 
 function firstMeaning(meaning) {
@@ -53,6 +59,15 @@ export default function WritingSession({ batch, primeQueue, card, onGrade, progr
     if (phase === 'recall') setRevealed(false);
   }, [card, phase]);
 
+  // The transition beat is a fixed-length, non-interactive pause between
+  // Priming ending and Recall actually starting - it always resolves on
+  // its own, never on user input.
+  useEffect(() => {
+    if (phase !== 'transition') return;
+    const timer = setTimeout(() => setPhase('recall'), PHASE_TRANSITION_MS);
+    return () => clearTimeout(timer);
+  }, [phase]);
+
   const primeCard = primeQueue[primeIndex];
 
   // Demonstrates pronunciation immediately (not delayed, unlike
@@ -64,9 +79,22 @@ export default function WritingSession({ batch, primeQueue, card, onGrade, progr
     }
   }, [phase, primeCard]);
 
+  // Interval transparency, same idea as StudySession's Again/Good preview
+  // - Missed/Hesitated are fixed by calculateWritingSchedule regardless of
+  // history, but Clean's interval grows with the card's own writing reps,
+  // so it's computed fresh per card rather than assumed.
+  const gradePreview = useMemo(() => {
+    if (!card) return {};
+    return {
+      1: calculateWritingSchedule(1, card.stats).writingIntervalDays,
+      2: calculateWritingSchedule(2, card.stats).writingIntervalDays,
+      3: calculateWritingSchedule(3, card.stats).writingIntervalDays,
+    };
+  }, [card]);
+
   function advancePriming() {
     if (primeIndex + 1 >= primeQueue.length) {
-      setPhase('recall');
+      setPhase('transition');
     } else {
       setPrimeIndex((i) => i + 1);
     }
@@ -81,6 +109,7 @@ export default function WritingSession({ batch, primeQueue, card, onGrade, progr
         }
         return;
       }
+      if (phase === 'transition') return;
       if (!card) return;
       if (!revealed) {
         if (e.code === 'Space' || e.code === 'Enter') {
@@ -111,7 +140,7 @@ export default function WritingSession({ batch, primeQueue, card, onGrade, progr
 
       {phase === 'priming' && (
         <div className="card card--writing">
-          <span className="box-section-label">Priming {primeIndex + 1} / {primeQueue.length}</span>
+          <span className="box-section-label">Priming · {primeIndex + 1} of {primeQueue.length}</span>
 
           <div className="writing-prompt-meta">
             <h1 className="pinyin-title"><ColorPinyin pinyin={primeCard.pinyin} /></h1>
@@ -136,17 +165,24 @@ export default function WritingSession({ batch, primeQueue, card, onGrade, progr
             />
           </div>
 
-          <p className="writing-instruction-cue">Watch stroke order &amp; copy 1× to notebook</p>
+          <p className="writing-instruction-cue">Observe stroke order &amp; copy 1× to your notebook</p>
 
           <button type="button" className="primary-launch-btn" onClick={advancePriming}>
-            Next <span className="writing-key-hint">[Space/Enter]</span>
+            Next <span className="writing-key-hint">[Space]</span>
           </button>
+        </div>
+      )}
+
+      {phase === 'transition' && (
+        <div className="card card--writing writing-phase-transition">
+          <p className="phase-transition-title">Phase 2: Blind Recall</p>
+          <p className="phase-transition-sub">Write from memory</p>
         </div>
       )}
 
       {phase === 'recall' && (
         <div className="card card--writing">
-          <span className="box-section-label">Recall {recallPosition} / {batch.length}</span>
+          <span className="box-section-label">Recall · {recallPosition} of {batch.length}</span>
 
           <div className="writing-prompt-meta">
             <h1 className="pinyin-title"><ColorPinyin pinyin={card.pinyin} /></h1>
@@ -164,7 +200,7 @@ export default function WritingSession({ batch, primeQueue, card, onGrade, progr
               sizeByLength={WRITING_SIZE_LADDER}
             />
             {!revealed && (
-              <p className="writing-reveal-hint">Write from memory in notebook · tap or press Space to reveal</p>
+              <p className="writing-reveal-hint">Write from memory in your notebook</p>
             )}
           </div>
 
@@ -179,7 +215,7 @@ export default function WritingSession({ batch, primeQueue, card, onGrade, progr
                 >
                   <span className="writing-grade-key">{option.key}</span>
                   <span className="writing-grade-label">{option.label}</span>
-                  <span className="writing-grade-hint">{option.hint}</span>
+                  <span className="writing-grade-interval">{gradePreview[option.quality]}d</span>
                 </button>
               ))}
             </div>

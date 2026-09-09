@@ -11,6 +11,7 @@ export default function LaunchScreen({
   penAndPaperNewCount,
   penAndPaperReviewCount,
   penAndPaperTotal,
+  penAndPaperEstMinutes,
   onLaunchSelfStudy,
   onLaunchPenAndPaper,
   onLaunchWarmup,
@@ -64,7 +65,7 @@ export default function LaunchScreen({
             <button className="secondary-launch-btn launch-btn--stacked" onClick={onLaunchPenAndPaper}>
               <span className="launch-btn-title">Pen &amp; Paper</span>
               <span className="launch-btn-sub">
-                [Get your notebook ready] · {penAndPaperNewCount} new, {penAndPaperReviewCount} review
+                {penAndPaperNewCount} new, {penAndPaperReviewCount} review · ~{penAndPaperEstMinutes} min
               </span>
             </button>
           )}
