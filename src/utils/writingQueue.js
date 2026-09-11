@@ -19,16 +19,23 @@ const SENTENCE_QUEUE_SIZE = 2;
 /**
  * Builds a Pen & Paper session batch, mirroring buildSelfStudyQueue's
  * due-first convention (sessionQueue.js) but keyed on writing fields
- * instead of reading ones. Only draws from cards already read-mastered
- * (SM-2 interval >= MASTERED_INTERVAL_DAYS) - writing practice is
- * reproduction of something already recognized, not a way to first learn
- * a character.
+ * instead of reading ones. Recall/Sentence still only draw from cards
+ * already read-mastered (SM-2 interval >= MASTERED_INTERVAL_DAYS) - but
+ * Priming no longer requires it (see `neverWritten` below): Pen & Paper is
+ * now one of the app's new-character intake points (alongside Warmup),
+ * teaching reading and writing together in one Priming step rather than
+ * requiring reading mastery first. Free Self-Study (sessionQueue.js) is
+ * pure review and no longer introduces new characters at all.
  *
  * Returns `{ primeQueue, recallQueue, sentenceQueue }`:
- *  - `primeQueue`: never-written eligible cards, frequency-ranked - these
- *    are the only ones WritingSession's Priming phase walks through (see
- *    there for why: a card that's already proven Spontaneous recall
- *    shouldn't be shown its own answer right before being tested on it).
+ *  - `primeQueue`: never-written cards, frequency-ranked - these are the
+ *    only ones WritingSession's Priming phase walks through (see there
+ *    for why: a card that's already proven Spontaneous recall shouldn't
+ *    be shown its own answer right before being tested on it). Prefers
+ *    read-mastered-but-unwritten cards (existing backlog) first, falling
+ *    back to genuinely brand-new characters (never read at all) once
+ *    that backlog runs out - `deck` and `eligible` are both already
+ *    frequency-ordered, so no extra sort is needed for either half.
  *    Normally just MIN_PRIME (2), but boosted up to BOOSTED_PRIME (6)
  *    when due reviews are thin, so a light-review day still yields a
  *    substantial session instead of a 2-card afterthought.
@@ -59,8 +66,12 @@ const SENTENCE_QUEUE_SIZE = 2;
  */
 export function buildPenAndPaperQueue(deck, targetBatchSize = 8) {
   const eligible = deck.filter((c) => (c.stats?.interval || 0) >= MASTERED_INTERVAL_DAYS);
+  const eligibleIds = new Set(eligible.map((c) => c.id));
   const written = eligible.filter((c) => c.stats?.lastWrittenAt);
-  const neverWritten = eligible.filter((c) => !c.stats?.lastWrittenAt);
+  const neverWritten = [
+    ...eligible.filter((c) => !c.stats?.lastWrittenAt),
+    ...deck.filter((c) => !c.stats?.lastWrittenAt && !eligibleIds.has(c.id)),
+  ];
 
   const dueReview = written.filter((c) => isWritingDue(c.stats));
   dueReview.sort((a, b) => (a.stats.writingNextDue || 0) - (b.stats.writingNextDue || 0)); // most overdue first

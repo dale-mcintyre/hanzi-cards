@@ -407,11 +407,16 @@ export default function App() {
     setAppState('pen-and-paper');
   };
 
-  // Dashboard's tertiary on-ramp: a rapid, thumb-only 4-choice recognition
-  // drill over already-seen cards. Distractors come from the whole deck,
-  // not just seen cards, so pool size there isn't a constraint.
-  const launchWarmup = () => {
-    const warmupQueue = buildWarmupQueue(seenCards, rawDeck, 10);
+  // A rapid, thumb-only 4-choice recognition drill - one of the app's two
+  // new-character intake points (alongside Pen & Paper's Priming) now
+  // that Free Self-Study is pure review: draws from already-seen cards
+  // first, then fills any remainder with never-seen ones (each getting an
+  // ungraded reveal before its quiz question - see WarmupSession). Also
+  // the anonymous marketing trial's entry point (see MarketingLanding's
+  // onStart below) - unlike Free Self-Study, it always has something to
+  // show a brand new visitor with zero history.
+  const launchWarmup = (count = 10) => {
+    const warmupQueue = buildWarmupQueue(seenCards, rawDeck, count);
     if (warmupQueue.length === 0) return;
 
     setSessionQueue(warmupQueue);
@@ -615,7 +620,6 @@ export default function App() {
             cardCount={rawDeck.length}
             dueCount={dueCount}
             selfStudyEstMinutes={selfStudyEstMinutes}
-            seenCardsCount={seenCards.length}
             penAndPaperNewCount={penAndPaperPreview.primeQueue.length}
             penAndPaperReviewCount={penAndPaperPreview.recallQueue.length - penAndPaperPreview.primeQueue.length}
             penAndPaperTotal={penAndPaperPreview.recallQueue.length}

@@ -1,16 +1,35 @@
 /**
- * Builds a rapid-recognition Warmup queue: `count` questions sampled from
- * already-studied cards (testing recognition on something never seen is
- * just guessing, no learning value), each carrying a precomputed set of 4
- * answer options (`quizOptions`, correct answer's position randomized) so
- * WarmupSession never has to recompute/reshuffle them on re-render. Each
- * option keeps its pinyin alongside the character - WarmupSession reveals
- * pinyin for all 4 after answering, not just the correct one, so a wrong
- * guess still teaches you the other 3 characters shown that round.
+ * Builds a rapid-recognition Warmup queue: up to `count` questions, each
+ * carrying a precomputed set of 4 answer options (`quizOptions`, correct
+ * answer's position randomized) so WarmupSession never has to recompute/
+ * reshuffle them on re-render. Each option keeps its pinyin alongside the
+ * character - WarmupSession reveals pinyin for all 4 after answering, not
+ * just the correct one, so a wrong guess still teaches you the other 3
+ * characters shown that round.
+ *
+ * Draws from `seenCards` first (real recognition testing on something
+ * already studied), then - if that pool is thin - fills the remainder
+ * with never-seen cards from `fullDeck`, most-frequent-word first, each
+ * flagged `isNew: true`. Warmup is now one of the app's new-character
+ * intake points (alongside Pen & Paper's Priming): WarmupSession gives an
+ * `isNew` card one ungraded reveal before its quiz question ever appears,
+ * so testing it isn't a blind guess.
  */
 export function buildWarmupQueue(seenCards, fullDeck, count = 10) {
+  const seenIds = new Set(seenCards.map((c) => c.id));
   const questions = [...seenCards].sort(() => 0.5 - Math.random()).slice(0, count);
-  return questions.map((card) => ({ ...card, quizOptions: buildDistractorOptions(card, fullDeck) }));
+
+  if (questions.length < count) {
+    const fresh = fullDeck
+      .filter((c) => !seenIds.has(c.id))
+      .sort((a, b) => (a.frequency ?? Infinity) - (b.frequency ?? Infinity))
+      .slice(0, count - questions.length)
+      .map((c) => ({ ...c, isNew: true }));
+    questions.push(...fresh);
+  }
+
+  const queue = [...questions].sort(() => 0.5 - Math.random());
+  return queue.map((card) => ({ ...card, quizOptions: buildDistractorOptions(card, fullDeck) }));
 }
 
 /**

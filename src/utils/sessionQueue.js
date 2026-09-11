@@ -23,32 +23,33 @@ export function getDueCount(deck) {
 }
 
 /**
- * Builds the Self-Study reading queue that respects spaced repetition and
- * the deck's frequency ranking, instead of a flat random shuffle:
+ * Builds the Free Self-Study reading queue: pure review over material
+ * already introduced elsewhere (Warmup/Pen & Paper now own new-character
+ * intake - see warmupQueue.js/writingQueue.js), respecting spaced
+ * repetition and the deck's frequency ranking instead of a flat random
+ * shuffle:
  *  1. Cards due for review (already seen, SM-2 interval has elapsed) come
  *     first, most-overdue first.
- *  2. Never-studied cards fill the rest, most-frequent-word first - this is
- *     the whole point of the frequency-ranked dataset: a beginner meets 的
- *     and 我 long before rank-6000 words.
- *  3. If there aren't enough due + new cards (small deck, or everything's
+ *  2. If there aren't enough due cards (small deck, or everything's
  *     already comfortably scheduled), pad with the not-yet-due remainder,
- *     still frequency-ordered, so a session is never short. A strict
- *     due-only filter would leave a light-progress or brand new user with
- *     nothing to click at all.
+ *     frequency-ordered, so a session is never short on its own -
+ *     reviewing something slightly early beats an empty session.
+ *  Never-studied cards are deliberately excluded, even as padding - a
+ *  brand new user (or one with nothing due yet) sees "Nothing due right
+ *  now" rather than Free Self-Study quietly becoming a new-card intake
+ *  path again.
  */
 export function buildSelfStudyQueue(deck, count = 20) {
   const due = [];
-  const fresh = [];
   const notYetDue = [];
 
   for (const card of deck) {
     // Keyed off lastReviewed, not repetitions: a failed card's repetitions
     // resets to 0 too, but it's still "seen before, due again soon" rather
-    // than genuinely new - it should compete on overdue-ness, not just
-    // frequency rank alongside words never studied at all.
-    if (!card.stats.lastReviewed) {
-      fresh.push(card);
-    } else if (isDue(card.stats)) {
+    // than genuinely new - it should compete on overdue-ness, not just be
+    // excluded alongside words never studied at all.
+    if (!card.stats.lastReviewed) continue;
+    if (isDue(card.stats)) {
       due.push(card);
     } else {
       notYetDue.push(card);
@@ -56,9 +57,8 @@ export function buildSelfStudyQueue(deck, count = 20) {
   }
 
   due.sort((a, b) => overdueAmount(b.stats) - overdueAmount(a.stats));
-  fresh.sort(byFrequency);
 
-  const queue = [...due, ...fresh].slice(0, count);
+  const queue = due.slice(0, count);
 
   if (queue.length < count) {
     const used = new Set(queue);

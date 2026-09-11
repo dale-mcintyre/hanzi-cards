@@ -7,7 +7,6 @@ export default function LaunchScreen({
   cardCount,
   dueCount,
   selfStudyEstMinutes,
-  seenCardsCount,
   penAndPaperNewCount,
   penAndPaperReviewCount,
   penAndPaperTotal,
@@ -24,7 +23,11 @@ export default function LaunchScreen({
         revisionLevels={revisionLevels}
         isLoadingDeck={isLoadingDeck}
         cardCount={cardCount}
-        onStart={() => onLaunchSelfStudy(20)}
+        // Free Self-Study is pure review now (see sessionQueue.js) - a
+        // brand new anonymous visitor has nothing due yet, so the trial
+        // launches Warmup instead, which always has new characters to
+        // introduce regardless of history.
+        onStart={() => onLaunchWarmup(20)}
         onSignIn={onSignIn}
       />
     );
@@ -57,7 +60,7 @@ export default function LaunchScreen({
             disabled={isLoadingDeck || cardCount === 0}
             onClick={() => onLaunchSelfStudy()}
           >
-            <span className="launch-btn-title">{isLoadingDeck ? 'Preparing Deck...' : 'Self-Study'}</span>
+            <span className="launch-btn-title">{isLoadingDeck ? 'Preparing Deck...' : 'Free Self-Study'}</span>
             {!isLoadingDeck && <span className="launch-btn-sub">{selfStudySubLabel}</span>}
           </button>
 
@@ -70,8 +73,8 @@ export default function LaunchScreen({
             </button>
           )}
 
-          {seenCardsCount > 0 && (
-            <button className="tertiary-launch-btn launch-btn--stacked" onClick={onLaunchWarmup}>
+          {cardCount > 0 && (
+            <button className="tertiary-launch-btn launch-btn--stacked" onClick={() => onLaunchWarmup()}>
               <span className="launch-btn-title">Warmup</span>
               <span className="launch-btn-sub">Rapid recognition · 4-choice drill</span>
             </button>
