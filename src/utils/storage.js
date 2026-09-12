@@ -162,7 +162,14 @@ export function saveCardProgress(cardId, newStats) {
   // half (writing fields, here) in Supabase.
   if (currentSyncUserId && !offlineModeEnabled) {
     pushCardProgress(currentSyncUserId, cardId, merged).then((result) => {
-      if (!result.ok) enqueueSync(cardId, merged);
+      if (!result.ok) {
+        // Surfaced so a persistent failure (e.g. a schema mismatch - a
+        // missing column makes every single push fail this way) is
+        // actually visible somewhere, instead of silently piling up in
+        // the retry queue forever with no clue why.
+        console.error('Supabase push failed for card', cardId, result.error);
+        enqueueSync(cardId, merged);
+      }
     });
   } else if (currentSyncUserId) {
     enqueueSync(cardId, merged);
@@ -200,7 +207,14 @@ export function saveWritingProgress(cardId, newWritingStats) {
 
   if (currentSyncUserId && !offlineModeEnabled) {
     pushCardProgress(currentSyncUserId, cardId, merged).then((result) => {
-      if (!result.ok) enqueueSync(cardId, merged);
+      if (!result.ok) {
+        // Surfaced so a persistent failure (e.g. a schema mismatch - a
+        // missing column makes every single push fail this way) is
+        // actually visible somewhere, instead of silently piling up in
+        // the retry queue forever with no clue why.
+        console.error('Supabase push failed for card', cardId, result.error);
+        enqueueSync(cardId, merged);
+      }
     });
   } else if (currentSyncUserId) {
     enqueueSync(cardId, merged);

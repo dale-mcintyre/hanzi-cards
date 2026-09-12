@@ -75,16 +75,22 @@ export async function flush(pushFn) {
 
   isFlushing = true;
   try {
-    for (const [cardId, { stats }] of entries) {
+    for (const [cardId, { stats, attempts }] of entries) {
       try {
         const result = await pushFn(cardId, stats);
         if (result?.ok) {
           dequeue(cardId);
+        } else {
+          // Surfaced so a persistently failing push (e.g. a schema
+          // mismatch) is visible somewhere instead of just growing
+          // `attempts` forever with no clue why it never clears.
+          console.error(`Supabase push retry failed for card ${cardId} (attempt ${attempts})`, result?.error);
         }
-      } catch {
+      } catch (error) {
         // Leave it queued - next flush (on reconnect, sign-in, or next
         // grade) will retry. No backoff bookkeeping beyond `attempts`;
         // this app's sync volume is small enough not to need it.
+        console.error(`Supabase push retry threw for card ${cardId} (attempt ${attempts})`, error);
       }
     }
   } finally {
