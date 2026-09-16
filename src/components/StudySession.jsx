@@ -123,12 +123,25 @@ export default function StudySession({
   // Quiet review-history indicator - nothing for a never-studied card (no
   // history to report), "Mastered" once the SM-2 interval crosses the same
   // threshold the Settings drawer's mastery matrix uses, otherwise a plain
-  // seen-count. Deliberately the unstyled `.meta-pill` (no color variant)
-  // to stay the quietest pill on the card.
+  // seen-count. Gated on lastReviewed, not repetitions - SM-2 resets
+  // repetitions to 0 on a wrong answer, which would otherwise make this
+  // pill vanish (looking exactly like a never-studied card) the moment a
+  // card gets missed, hiding the very history a struggling card most
+  // needs to show. `repetitions` still drives the count itself when it's
+  // nonzero - a genuine, currently-unbroken streak is worth stating
+  // plainly; falls back to a bare "Seen" right after a miss, when there's
+  // history but no live streak to count. Deliberately the unstyled
+  // `.meta-pill` (no color variant) to stay the quietest pill on the card.
   const repetitions = card?.stats?.repetitions || 0;
   const interval = card?.stats?.interval || 0;
-  const historyLabel =
-    repetitions === 0 ? null : interval >= MASTERED_INTERVAL_DAYS ? 'Mastered' : `Seen ${repetitions}×`;
+  const hasHistory = !!card?.stats?.lastReviewed;
+  const historyLabel = !hasHistory
+    ? null
+    : interval >= MASTERED_INTERVAL_DAYS
+      ? 'Mastered'
+      : repetitions > 0
+        ? `Seen ${repetitions}×`
+        : 'Seen';
 
   // Interval transparency: what grading Again/Good would actually do to
   // this card's schedule, computed fresh per card rather than assumed -

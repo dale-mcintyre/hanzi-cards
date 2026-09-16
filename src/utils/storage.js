@@ -310,12 +310,21 @@ export function clearLocalUserData() {
 
 /**
  * Categorizes the deck into mastery groups based on SM-2 interval stats:
- * new: never studied (no stats, or reset back to repetitions === 0).
- * learning: studied at least once but the SM-2 interval hasn't reached
+ * new: genuinely never attempted (no stats, or no lastReviewed timestamp).
+ * learning: attempted at least once but the SM-2 interval hasn't reached
  *   21 days yet.
  * mastered: interval has reached 21+ days - SM-2's interval grows
  *   multiplicatively on repeated Easy grades, so this reflects sustained
  *   recall, not a single lucky grade.
+ *
+ * Gated on `lastReviewed` (stamped on every grade, right or wrong), not
+ * `repetitions` - SM-2 resets repetitions back to 0 on every wrong answer,
+ * which isn't the same thing as "never attempted". A card graded wrong
+ * five times running is still "learning", not "new" - counting it as new
+ * made real, ongoing effort on hard cards invisible in this breakdown
+ * (and in getTierStats' seen count below) until the user finally got it
+ * right, which is exactly backwards for the cards that need the most
+ * visible progress feedback to keep going.
  */
 export function getCardMasteryStats(deck) {
   const progress = getProgress();
@@ -327,7 +336,7 @@ export function getCardMasteryStats(deck) {
   deck.forEach((card) => {
     const stat = progress[card.id];
 
-    if (!stat || stat.repetitions === 0) {
+    if (!stat || !stat.lastReviewed) {
       newCards.push(card);
     } else if (stat.interval >= MASTERED_INTERVAL_DAYS) {
       mastered.push(card);
@@ -384,7 +393,11 @@ export function getTierStats(fullVocab, progress) {
       if (level >= WRITING_MASTERED_LEVEL) tier.writingMastered += 1;
     }
 
-    if (stat.repetitions === 0) return;
+    // lastReviewed, not repetitions - see getCardMasteryStats above for
+    // why (SM-2 resets repetitions to 0 on a wrong answer, which would
+    // otherwise make the outer "seen" ring exclude cards the user has
+    // genuinely attempted but keeps missing).
+    if (!stat.lastReviewed) return;
     tier.seen += 1;
     if (stat.interval >= MASTERED_INTERVAL_DAYS) tier.mastered += 1;
   });

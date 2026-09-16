@@ -232,7 +232,12 @@ export default function App() {
   // Every card the user has graded at least once, regardless of how it's
   // currently doing on the SM-2 curve - a free-form review pool distinct
   // from "weak" (struggling specifically) or the mastery matrix tabs.
-  const seenCards = useMemo(() => rawDeck.filter((c) => c.stats.repetitions > 0), [rawDeck]);
+  // Gated on lastReviewed, not repetitions - SM-2 resets repetitions to 0
+  // on a wrong answer, which would otherwise drop a struggling card out
+  // of the seen pool entirely (and back into Warmup's "New Character"
+  // reveal treatment) the moment it's missed once, instead of actually
+  // reviewing it.
+  const seenCards = useMemo(() => rawDeck.filter((c) => c.stats.lastReviewed), [rawDeck]);
 
   const mastery = useMemo(() => {
     return getCardMasteryStats(rawDeck);
