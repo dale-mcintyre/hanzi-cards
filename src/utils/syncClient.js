@@ -13,6 +13,29 @@ function unavailable() {
   return { ok: false, error: 'Supabase not configured' };
 }
 
+// Every timestamp field in storage.js's stats objects (lastReviewed,
+// writingNextDue, lastWrittenAt) is a raw millisecond epoch number
+// (Date.now()-style) - that's what every date-arithmetic call site in the
+// app (isDue(), overdueAmount(), etc.) expects. The card_progress table's
+// columns don't agree on a wire format for that number though (confirmed
+// against the live schema, not guessed): writing_next_due/last_written_at/
+// updated_at are real timestamp columns and want an ISO 8601 string -
+// handed a bare epoch integer instead, Postgres tries to read it as
+// literal date/time components and fails once the magnitude is
+// nonsensical as a year/month/day (error 22008 "date/time field value out
+// of range"). last_reviewed, despite the name, is plain bigint - it wants
+// the raw millisecond number as-is; an ISO string there fails the other
+// way ("invalid input syntax for type bigint"). msToIso/isoToMs below are
+// only for the three timestamp-typed columns - last_reviewed passes
+// through unconverted in both functions.
+function msToIso(ms) {
+  return ms ? new Date(ms).toISOString() : null;
+}
+
+function isoToMs(iso) {
+  return iso ? new Date(iso).getTime() : null;
+}
+
 /** Upserts one card's SM-2 stats (plus Writing Recall Mode's parallel
  * stats, if present) for a user. Used both for the live push on every
  * grade and for replaying the local->remote side of a merge. Always
@@ -35,8 +58,8 @@ export async function pushCardProgress(userId, cardId, stats) {
         writing_level: stats.writingLevel ?? 0,
         writing_reps: stats.writingReps ?? 0,
         writing_interval_days: stats.writingIntervalDays ?? 0,
-        writing_next_due: stats.writingNextDue ?? null,
-        last_written_at: stats.lastWrittenAt ?? null,
+        writing_next_due: msToIso(stats.writingNextDue),
+        last_written_at: msToIso(stats.lastWrittenAt),
         updated_at: new Date().toISOString(),
       },
       { onConflict: 'user_id,card_id' }
@@ -72,8 +95,8 @@ export async function pullAllProgress(userId) {
         writingLevel: row.writing_level ?? 0,
         writingReps: row.writing_reps ?? 0,
         writingIntervalDays: row.writing_interval_days ?? 0,
-        writingNextDue: row.writing_next_due,
-        lastWrittenAt: row.last_written_at,
+        writingNextDue: isoToMs(row.writing_next_due),
+        lastWrittenAt: isoToMs(row.last_written_at),
       };
     }
     return { ok: true, data: progress };
