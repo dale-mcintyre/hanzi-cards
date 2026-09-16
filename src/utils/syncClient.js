@@ -1,4 +1,5 @@
 import { supabase } from '../lib/supabaseClient';
+import { MAX_INTERVAL_DAYS } from './sm2';
 
 /**
  * Thin wrapper around the Supabase tables backing Phase 3 (see
@@ -52,7 +53,12 @@ export async function pushCardProgress(userId, cardId, stats) {
         user_id: userId,
         card_id: cardId,
         repetitions: stats.repetitions ?? 0,
-        interval: stats.interval ?? 1,
+        // Clamped defensively, not just at the source in sm2.js - a card
+        // graded before that cap existed can still be sitting in
+        // localStorage (and the retry queue) with an interval in the
+        // billions, which overflows this column's plain int4 type
+        // (Postgres error 22003) regardless of how it got that way.
+        interval: Math.min(MAX_INTERVAL_DAYS, stats.interval ?? 1),
         ease_factor: stats.easeFactor ?? 2.5,
         last_reviewed: stats.lastReviewed ?? null,
         writing_level: stats.writingLevel ?? 0,
