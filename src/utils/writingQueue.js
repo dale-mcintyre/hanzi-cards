@@ -52,17 +52,25 @@ const SENTENCE_QUEUE_SIZE = 2;
  *  - `sentenceQueue`: up to SENTENCE_QUEUE_SIZE (2) cards for Phase 3
  *    (Sentence Writing), drawn from `eligible` cards with an
  *    `example_sentence` that aren't already in `recallQueue`, so Phase 3
- *    tests fresh material rather than repeating what Recall just
- *    covered. Prefers cards the user has already written before
- *    (most-recently-practiced first), but falls back to never-written
- *    eligible cards rather than coming up empty - `recallQueue`'s review
- *    slots draw from that same already-written pool first, and for
- *    anyone without much writing history yet (or while sentence
- *    enrichment is still rolling out across the deck) that pool alone is
- *    often fully claimed by Recall, which would otherwise starve Phase 3
- *    silently. Empty only if no eligible card with a sentence is left at
- *    all - Phase 3 simply doesn't run that session (WritingSession
- *    renders nothing extra).
+ *    tests fresh material rather than repeating what Recall just covered.
+ *    Prefers cards that are due for a writing review (most-overdue
+ *    first, same due-date convention as `dueReview` above), falling back
+ *    to never-written eligible cards rather than coming up empty -
+ *    `recallQueue`'s review slots draw from that same already-written
+ *    pool first, and for anyone without much writing history yet (or
+ *    while sentence enrichment is still rolling out across the deck)
+ *    that pool alone is often fully claimed by Recall, which would
+ *    otherwise starve Phase 3 silently. Falls back further still to
+ *    not-yet-due cards (least-recently-practiced first) only if neither
+ *    of those pools has enough left. Due-first (rather than
+ *    most-recently-written-first) matters here specifically: grading a
+ *    card in Phase 3 sets its own `lastWrittenAt` to now, so a
+ *    recency-based sort would keep re-selecting whatever just got
+ *    graded, forever - due-first lets a graded card's own
+ *    `writingNextDue` naturally rotate it out until it's due again.
+ *    Empty only if no eligible card with a sentence is left at all -
+ *    Phase 3 simply doesn't run that session (WritingSession renders
+ *    nothing extra).
  */
 export function buildPenAndPaperQueue(deck, targetBatchSize = 8) {
   const eligible = deck.filter((c) => (c.stats?.interval || 0) >= MASTERED_INTERVAL_DAYS);
@@ -95,14 +103,25 @@ export function buildPenAndPaperQueue(deck, targetBatchSize = 8) {
   const recallQueue = [...primeQueue, ...reviewItems].sort(() => 0.5 - Math.random());
 
   const recallIds = new Set(recallQueue.map((c) => c.id));
-  // Written (nonzero lastWrittenAt) sorts ahead of never-written (0) via
-  // plain numeric descending order, most-recently-practiced first among
-  // the written ones - so a never-written card only fills a slot once
-  // the already-written pool actually runs out.
-  const sentenceCandidates = eligible
-    .filter((c) => c.example_sentence && !recallIds.has(c.id))
-    .sort((a, b) => (b.stats.lastWrittenAt || 0) - (a.stats.lastWrittenAt || 0));
-  const sentenceQueue = sentenceCandidates.slice(0, SENTENCE_QUEUE_SIZE);
+  const sentencePool = eligible.filter((c) => c.example_sentence && !recallIds.has(c.id));
+
+  // Due-first, same convention as recallQueue's dueReview above - a card
+  // graded in Phase 3 pushes its own writingNextDue out, so it naturally
+  // rotates out of contention instead of (as a plain most-recently-written
+  // sort would do) being the freshest lastWrittenAt and winning the very
+  // next session's slot again.
+  const sentenceDue = sentencePool.filter((c) => c.stats?.lastWrittenAt && isWritingDue(c.stats));
+  sentenceDue.sort((a, b) => (a.stats.writingNextDue || 0) - (b.stats.writingNextDue || 0)); // most overdue first
+
+  const sentenceNeverWritten = sentencePool.filter((c) => !c.stats?.lastWrittenAt);
+
+  // Last-resort padding for when there's neither a due review nor a
+  // never-written card left to offer - least-recently-practiced first so
+  // padding still rotates rather than camping on the same pair.
+  const sentenceNotYetDue = sentencePool.filter((c) => c.stats?.lastWrittenAt && !isWritingDue(c.stats));
+  sentenceNotYetDue.sort((a, b) => (a.stats.lastWrittenAt || 0) - (b.stats.lastWrittenAt || 0));
+
+  const sentenceQueue = [...sentenceDue, ...sentenceNeverWritten, ...sentenceNotYetDue].slice(0, SENTENCE_QUEUE_SIZE);
 
   return { primeQueue, recallQueue, sentenceQueue };
 }
