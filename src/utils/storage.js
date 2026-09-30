@@ -269,8 +269,13 @@ export function savePrefs(prefs) {
     console.error('Failed to save study preferences:', e);
   }
 
+  // Carries the current commitment along too, not just these two fields -
+  // pushSettings upserts the whole row, so leaving it out here would
+  // blank out an existing goal the moment the user flips a study-tier
+  // toggle. See saveCommitment/clearCommitment's own pushCombinedSettings,
+  // which does the same thing in the other direction.
   if (currentSyncUserId && !offlineModeEnabled) {
-    pushSettings(currentSyncUserId, prefs);
+    pushSettings(currentSyncUserId, { ...prefs, commitment: getCommitment() });
   }
 
   return prefs;
@@ -485,13 +490,12 @@ const COMMITMENT_KEY = 'hz_study_commitment';
 
 /**
  * A user's own "finish HSK X in N weeks" goal, set from the Progress &
- * Pace screen. Deliberately local-only, same reasoning as
- * getOfflineMode/setOfflineMode above: there's no commitments column in
- * Supabase's user_settings table, and adding one needs a schema
- * migration this codebase can't push on its own. A goal not following
- * the user to a second device is a far smaller loss than losing actual
- * SM-2 progress would be, so this trades cross-device continuity for
- * shipping without a migration - ProgressDrawer's copy says as much.
+ * Pace screen. Synced the same way as revisionLevels/includeNonHsk above
+ * (see pushSettings/pullSettings in syncClient.js and runSettingsSync in
+ * AuthContext.jsx): it rides along in the very same user_settings row and
+ * round-trip, not a second sync mechanism, and follows the exact same
+ * "remote wins if a row already exists, otherwise seed remote from local"
+ * rule those two fields already use.
  */
 export function getCommitment() {
   try {
@@ -501,6 +505,16 @@ export function getCommitment() {
     console.error('Failed to load study commitment:', e);
     return null;
   }
+}
+
+// pushSettings always writes every settings column in one upsert (see its
+// own comment for why a partial payload would silently blank out
+// whichever half the caller didn't touch) - so every local write to
+// EITHER half (savePrefs below, or saveCommitment/clearCommitment here)
+// has to hand it the OTHER half's current value too, not just its own.
+function pushCombinedSettings(commitment) {
+  if (!currentSyncUserId || offlineModeEnabled) return;
+  pushSettings(currentSyncUserId, { ...getPrefs(), commitment });
 }
 
 /** `deadlineAt` is computed once, here, from `weeks` - a fixed point in
@@ -518,6 +532,7 @@ export function saveCommitment(tier, weeks) {
   } catch (e) {
     console.error('Failed to save study commitment:', e);
   }
+  pushCombinedSettings(commitment);
   return commitment;
 }
 
@@ -526,6 +541,22 @@ export function clearCommitment() {
     localStorage.removeItem(COMMITMENT_KEY);
   } catch (e) {
     console.error('Failed to clear study commitment:', e);
+  }
+  pushCombinedSettings(null);
+}
+
+/** Replaces local commitment with a signed-in account's remote goal (or
+ * clears it, if the account has none) - used once after sign-in, same
+ * spot hydratePrefsFromRemote runs from (see runSettingsSync). */
+export function hydrateCommitmentFromRemote(remoteCommitment) {
+  try {
+    if (remoteCommitment) {
+      localStorage.setItem(COMMITMENT_KEY, JSON.stringify(remoteCommitment));
+    } else {
+      localStorage.removeItem(COMMITMENT_KEY);
+    }
+  } catch (e) {
+    console.error('Failed to hydrate study commitment from remote:', e);
   }
 }
 

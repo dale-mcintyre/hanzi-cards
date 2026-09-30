@@ -229,7 +229,7 @@ function CommitmentStatusCard({ status, onEdit, onClear }) {
  * `pace`/`commitmentStatus` so this component never touches localStorage
  * directly.
  */
-export default function ProgressDrawer({ pace, commitment, commitmentStatus, onSetCommitment, onClearCommitment, onClose }) {
+export default function ProgressDrawer({ pace, commitment, commitmentStatus, isSignedIn, onSetCommitment, onClearCommitment, onClose }) {
   const allHsk = sumTiers(pace, ['1', '2', '3', '4', '5', '6']);
   // Only relevant once a commitment already exists - toggles the status
   // card back to the editable form without discarding the saved goal
@@ -276,7 +276,9 @@ export default function ProgressDrawer({ pace, commitment, commitmentStatus, onS
             />
           )}
           <p className="commitment-device-note">
-            Saved on this device only for now - it won't follow you to another browser or phone yet.
+            {isSignedIn
+              ? 'Synced to your account - this goal will follow you to your other signed-in devices.'
+              : 'Saved on this device only - sign in to have it follow you to another browser or phone.'}
           </p>
         </div>
 

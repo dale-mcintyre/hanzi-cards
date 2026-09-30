@@ -221,16 +221,17 @@ export default function App() {
     // includeNonHsk haven't themselves changed by reference.
   }, [revisionLevels, includeNonHsk, syncVersion]);
 
-  // revisionLevels/includeNonHsk are plain useState, read from localStorage
-  // once at mount - unlike getProgress() (read fresh every loadDeck run),
-  // they don't automatically pick up a post-sign-in remote hydration on
-  // their own, so this explicitly re-reads them whenever syncVersion bumps
-  // (either a progress sync or a settings sync). A no-op re-read after a
-  // progress-only bump is harmless.
+  // revisionLevels/includeNonHsk/commitment are plain useState, read from
+  // localStorage once at mount - unlike getProgress() (read fresh every
+  // loadDeck run), they don't automatically pick up a post-sign-in remote
+  // hydration on their own, so this explicitly re-reads them whenever
+  // syncVersion bumps (either a progress sync or a settings sync). A
+  // no-op re-read after a progress-only bump is harmless.
   useEffect(() => {
     const fresh = getPrefs();
     setRevisionLevels(fresh.revisionLevels);
     setIncludeNonHsk(fresh.includeNonHsk);
+    setCommitment(getCommitment());
   }, [syncVersion]);
 
   // Drives the LaunchScreen "Self-Study (N Due)" label.
@@ -881,6 +882,7 @@ export default function App() {
             pace={learningPace}
             commitment={commitment}
             commitmentStatus={commitmentStatus}
+            isSignedIn={!!user}
             onSetCommitment={handleSetCommitment}
             onClearCommitment={handleClearCommitment}
             onClose={() => setShowProgress(false)}

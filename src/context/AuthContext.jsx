@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { supabase } from '../lib/supabaseClient';
-import { getProgress, hydrateLocalFromRemote, setCurrentSyncUser, getPrefs, hydratePrefsFromRemote, clearLocalUserData, getOfflineMode } from '../utils/storage';
+import { getProgress, hydrateLocalFromRemote, setCurrentSyncUser, getPrefs, hydratePrefsFromRemote, getCommitment, hydrateCommitmentFromRemote, clearLocalUserData, getOfflineMode } from '../utils/storage';
 import { pullAllProgress, mergeLocalAndRemoteProgress, pushCardProgress, pullSettings, pushSettings } from '../utils/syncClient';
 import { flush as flushSyncQueue } from '../utils/syncQueue';
 
@@ -99,13 +99,22 @@ export function AuthProvider({ children }) {
   // in the same window is an accepted, unsolved edge case (last write
   // wins) - not worth the complexity progress sync's per-card merge has,
   // given how much lower-stakes a filter preference is than an SM-2 grade.
+  //
+  // Progress & Pace's commitment ("HSK X in N weeks") rides along in this
+  // exact same row/round-trip (see pullSettings/pushSettings) and gets the
+  // same all-or-nothing treatment - a remote row's commitment (present or
+  // absent) replaces local, right alongside revisionLevels/includeNonHsk.
   const runSettingsSync = useCallback(async (user) => {
-    const local = getPrefs();
+    const local = { ...getPrefs(), commitment: getCommitment() };
     const remoteResult = await pullSettings(user.id);
     if (!remoteResult.ok) return; // fail-open: try again on the next sign-in
 
     if (remoteResult.data) {
-      hydratePrefsFromRemote(remoteResult.data);
+      hydratePrefsFromRemote({
+        revisionLevels: remoteResult.data.revisionLevels,
+        includeNonHsk: remoteResult.data.includeNonHsk,
+      });
+      hydrateCommitmentFromRemote(remoteResult.data.commitment);
     } else {
       await pushSettings(user.id, local);
     }

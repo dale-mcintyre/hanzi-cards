@@ -189,13 +189,21 @@ export function mergeLocalAndRemoteProgress(local, remote) {
 
 /** Fetches this user's single study-preferences row, if any. `data: null`
  * (not an error) means the account has no row yet - callers should treat
- * that as "seed remote from local", not a failure. */
+ * that as "seed remote from local", not a failure.
+ *
+ * `commitment` (Progress & Pace's "HSK X in N weeks" goal) rides in this
+ * same row/round-trip rather than a table of its own - one settings blob,
+ * same "remote wins if it has a row" reconciliation runSettingsSync
+ * already applies to revisionLevels/includeNonHsk. `commitment_tier`
+ * being null means no goal is set, which comes back as `commitment: null`
+ * (not an object with null fields) so callers can treat it as a single
+ * present/absent value. */
 export async function pullSettings(userId) {
   if (!supabase) return unavailable();
   try {
     const { data, error } = await supabase
       .from('user_settings')
-      .select('revision_levels, include_non_hsk')
+      .select('revision_levels, include_non_hsk, commitment_tier, commitment_weeks, commitment_created_at, commitment_deadline_at')
       .eq('user_id', userId)
       .maybeSingle();
     if (error) return { ok: false, error };
@@ -205,6 +213,14 @@ export async function pullSettings(userId) {
       data: {
         revisionLevels: data.revision_levels || [],
         includeNonHsk: data.include_non_hsk ?? true,
+        commitment: data.commitment_tier
+          ? {
+              tier: data.commitment_tier,
+              weeks: data.commitment_weeks,
+              createdAt: isoToMs(data.commitment_created_at),
+              deadlineAt: isoToMs(data.commitment_deadline_at),
+            }
+          : null,
       },
     };
   } catch (error) {
@@ -213,7 +229,12 @@ export async function pullSettings(userId) {
 }
 
 /** Upserts the user's single settings row. Used both for live pushes on
- * every preference change and to seed a brand new account's first row. */
+ * every preference change (or commitment change - see storage.js's
+ * saveCommitment/clearCommitment) and to seed a brand new account's first
+ * row. Always writes every column (falling back to "no commitment" when
+ * `prefs.commitment` isn't passed), same full-row-upsert convention
+ * pushCardProgress uses - a partial payload here would silently blank out
+ * whichever half (prefs vs. commitment) the caller didn't touch this time. */
 export async function pushSettings(userId, prefs) {
   if (!supabase) return unavailable();
   try {
@@ -222,6 +243,10 @@ export async function pushSettings(userId, prefs) {
         user_id: userId,
         revision_levels: prefs.revisionLevels ?? [],
         include_non_hsk: prefs.includeNonHsk ?? true,
+        commitment_tier: prefs.commitment?.tier ?? null,
+        commitment_weeks: prefs.commitment?.weeks ?? null,
+        commitment_created_at: prefs.commitment ? msToIso(prefs.commitment.createdAt) : null,
+        commitment_deadline_at: prefs.commitment ? msToIso(prefs.commitment.deadlineAt) : null,
         updated_at: new Date().toISOString(),
       },
       { onConflict: 'user_id' }
