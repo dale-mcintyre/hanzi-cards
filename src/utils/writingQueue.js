@@ -16,8 +16,16 @@ const THIN_REVIEW_THRESHOLD = 4;
 // Phase 3 (Sentence Writing) is a short coda, not a third full batch.
 const SENTENCE_QUEUE_SIZE = 2;
 
+// Supercharge Mode (buildSuperchargeQueue below) is "Pen & Paper, but
+// double" - every one of the size knobs above scales by this factor
+// rather than Supercharge duplicating buildWritingBatch's whole
+// selection logic with its own hand-copied constants, which would let
+// the two modes silently drift apart the next time either one's tuning
+// changes.
+const SUPERCHARGE_MULTIPLIER = 2;
+
 /**
- * Builds a Pen & Paper session batch, mirroring buildSelfStudyQueue's
+ * Builds a Pen & Paper-shaped session batch, mirroring buildSelfStudyQueue's
  * due-first convention (sessionQueue.js) but keyed on writing fields
  * instead of reading ones. Recall/Sentence still only draw from cards
  * already read-mastered (SM-2 interval >= MASTERED_INTERVAL_DAYS) - but
@@ -26,6 +34,13 @@ const SENTENCE_QUEUE_SIZE = 2;
  * teaching reading and writing together in one Priming step rather than
  * requiring reading mastery first. Free Self-Study (sessionQueue.js) is
  * pure review and no longer introduces new characters at all.
+ *
+ * `sizeMultiplier` scales every one of the size knobs below by the same
+ * factor - the one difference between Pen & Paper (1x, via
+ * buildPenAndPaperQueue) and Supercharge Mode (2x, via
+ * buildSuperchargeQueue). Keeping the selection logic itself in one place
+ * means the two modes can't drift apart the way hand-copying this
+ * function with its own doubled constants would eventually invite.
  *
  * Returns `{ primeQueue, recallQueue, sentenceQueue }`:
  *  - `primeQueue`: never-written cards, frequency-ranked - these are the
@@ -72,7 +87,14 @@ const SENTENCE_QUEUE_SIZE = 2;
  *    Phase 3 simply doesn't run that session (WritingSession renders
  *    nothing extra).
  */
-export function buildPenAndPaperQueue(deck, targetBatchSize = 8) {
+function buildWritingBatch(deck, sizeMultiplier) {
+  const minPrime = MIN_PRIME * sizeMultiplier;
+  const boostedPrime = BOOSTED_PRIME * sizeMultiplier;
+  const minBatch = MIN_BATCH * sizeMultiplier;
+  const maxBatch = MAX_BATCH * sizeMultiplier;
+  const thinReviewThreshold = THIN_REVIEW_THRESHOLD * sizeMultiplier;
+  const sentenceQueueSize = SENTENCE_QUEUE_SIZE * sizeMultiplier;
+
   const eligible = deck.filter((c) => (c.stats?.interval || 0) >= MASTERED_INTERVAL_DAYS);
   const eligibleIds = new Set(eligible.map((c) => c.id));
   const written = eligible.filter((c) => c.stats?.lastWrittenAt);
@@ -87,15 +109,15 @@ export function buildPenAndPaperQueue(deck, targetBatchSize = 8) {
   const notYetDue = written.filter((c) => !isWritingDue(c.stats));
   notYetDue.sort((a, b) => (b.stats.lastWrittenAt || 0) - (a.stats.lastWrittenAt || 0)); // most-recently-practiced first
 
-  const primeCount = dueReview.length < THIN_REVIEW_THRESHOLD
-    ? Math.min(BOOSTED_PRIME, neverWritten.length)
-    : Math.min(MIN_PRIME, neverWritten.length);
+  const primeCount = dueReview.length < thinReviewThreshold
+    ? Math.min(boostedPrime, neverWritten.length)
+    : Math.min(minPrime, neverWritten.length);
   const primeQueue = neverWritten.slice(0, primeCount);
 
-  const reviewSlots = Math.max(0, Math.min(MAX_BATCH, targetBatchSize) - primeQueue.length);
+  const reviewSlots = Math.max(0, maxBatch - primeQueue.length);
   let reviewItems = dueReview.slice(0, reviewSlots);
 
-  const shortfall = MIN_BATCH - (primeQueue.length + reviewItems.length);
+  const shortfall = minBatch - (primeQueue.length + reviewItems.length);
   if (shortfall > 0) {
     reviewItems = [...reviewItems, ...notYetDue.slice(0, shortfall)];
   }
@@ -121,7 +143,21 @@ export function buildPenAndPaperQueue(deck, targetBatchSize = 8) {
   const sentenceNotYetDue = sentencePool.filter((c) => c.stats?.lastWrittenAt && !isWritingDue(c.stats));
   sentenceNotYetDue.sort((a, b) => (a.stats.lastWrittenAt || 0) - (b.stats.lastWrittenAt || 0));
 
-  const sentenceQueue = [...sentenceDue, ...sentenceNeverWritten, ...sentenceNotYetDue].slice(0, SENTENCE_QUEUE_SIZE);
+  const sentenceQueue = [...sentenceDue, ...sentenceNeverWritten, ...sentenceNotYetDue].slice(0, sentenceQueueSize);
 
   return { primeQueue, recallQueue, sentenceQueue };
+}
+
+export function buildPenAndPaperQueue(deck) {
+  return buildWritingBatch(deck, 1);
+}
+
+/**
+ * Supercharge Mode: identical Pen & Paper format (Priming -> Blind Recall
+ * -> Sentence Writing), just a bigger batch - every size knob doubled via
+ * SUPERCHARGE_MULTIPLIER, for a user who wants to push through more new
+ * material per sitting instead of Pen & Paper's steadier default pace.
+ */
+export function buildSuperchargeQueue(deck) {
+  return buildWritingBatch(deck, SUPERCHARGE_MULTIPLIER);
 }

@@ -7,7 +7,7 @@ import { playCorrectFeedback, playIncorrectFeedback, playMasteryFeedback } from 
 import { getFilteredDeck, fetchUnifiedVocab } from './data/vocabLoader';
 import { buildSelfStudyQueue, getDueCount } from './utils/sessionQueue';
 import { buildWarmupQueue } from './utils/warmupQueue';
-import { buildPenAndPaperQueue } from './utils/writingQueue';
+import { buildPenAndPaperQueue, buildSuperchargeQueue } from './utils/writingQueue';
 import { calculateWritingSchedule, WRITING_MASTERED_LEVEL } from './utils/writingSchedule';
 import { getEntitlement } from './utils/entitlement';
 import { useAuth } from './context/AuthContext';
@@ -81,11 +81,15 @@ export default function App() {
   const showMarketing = isAuthReady && !user;
 
   // Single source of truth for "what screen is showing": 'dashboard',
-  // 'self-study', 'pen-and-paper', 'warmup', or 'completion'. Replaces
-  // the old two-axis appState+sessionMode pair (which only ever had 4
-  // valid combinations) and the 3-2-1 countdown step entirely - clicking
-  // a launch button sets this straight to its target mode, no
-  // intermediate state, no delay.
+  // 'self-study', 'pen-and-paper', 'supercharge', 'warmup', or
+  // 'completion'. Replaces the old two-axis appState+sessionMode pair
+  // (which only ever had 4 valid combinations) and the 3-2-1 countdown
+  // step entirely - clicking a launch button sets this straight to its
+  // target mode, no intermediate state, no delay. 'supercharge' is
+  // otherwise identical to 'pen-and-paper' (same WritingSession UI, same
+  // grading rules) - it exists as its own state only so a mid-session
+  // reload/inspection can tell which batch size the user actually
+  // launched.
   const [appState, setAppState] = useState('dashboard');
 
   // The nav bar (and its sign-out control) is reachable from every screen,
@@ -245,25 +249,31 @@ export default function App() {
     return getCardMasteryStats(rawDeck);
   }, [rawDeck]);
 
-  // Same call the actual launch will make - previewing it here (rather
-  // than an unbounded/Infinity variant) gives the dashboard's "2 new, 6
-  // review" sub-label the exact counts a real launch would produce, since
-  // the thin-review boost and batch-size floor/ceiling are already baked
-  // into the function itself.
-  const penAndPaperPreview = useMemo(() => buildPenAndPaperQueue(rawDeck), [rawDeck]);
   // Priming (watch + copy, only the never-written cards) runs slower than
   // Recall (write from memory, the whole batch); Sentence Writing (read a
   // sentence, write the missing word) runs slower still. ~25s/15s/30s per
-  // card respectively is a rough split, not a measured average.
-  const penAndPaperEstMinutes = Math.max(
-    1,
-    Math.round(
-      (penAndPaperPreview.primeQueue.length * 25 +
-        penAndPaperPreview.recallQueue.length * 15 +
-        penAndPaperPreview.sentenceQueue.length * 30) /
-        60
-    )
-  );
+  // card respectively is a rough split, not a measured average. Shared by
+  // Pen & Paper and Supercharge - both are the same three phases at the
+  // same per-card pace, just a different batch size.
+  function estimateWritingMinutes(preview) {
+    return Math.max(
+      1,
+      Math.round(
+        (preview.primeQueue.length * 25 + preview.recallQueue.length * 15 + preview.sentenceQueue.length * 30) / 60
+      )
+    );
+  }
+
+  // Same calls the actual launches will make - previewing them here
+  // (rather than an unbounded/Infinity variant) gives the dashboard's "2
+  // new, 6 review" sub-labels the exact counts a real launch would
+  // produce, since the thin-review boost and batch-size floor/ceiling are
+  // already baked into buildWritingBatch itself.
+  const penAndPaperPreview = useMemo(() => buildPenAndPaperQueue(rawDeck), [rawDeck]);
+  const penAndPaperEstMinutes = estimateWritingMinutes(penAndPaperPreview);
+
+  const superchargePreview = useMemo(() => buildSuperchargeQueue(rawDeck), [rawDeck]);
+  const superchargeEstMinutes = estimateWritingMinutes(superchargePreview);
 
   // Independent of the current HSK/non-HSK filter - rawDeck only contains
   // whatever tiers are currently selected, but the tier tiles need stats
@@ -412,8 +422,13 @@ export default function App() {
   // awareness needed; only WritingSession itself distinguishes them (via
   // the separate recallQueue/sentenceQueue arrays passed below). Only
   // ever offered on characters already read-mastered.
-  const launchPenAndPaper = () => {
-    const { primeQueue: primed, recallQueue, sentenceQueue: sentenced } = buildPenAndPaperQueue(rawDeck);
+  //
+  // Shared with Supercharge Mode below - the only difference between the
+  // two is which queue-builder gets called (buildPenAndPaperQueue vs
+  // buildSuperchargeQueue) and which appState the batch lands in;
+  // everything about starting the session itself is identical.
+  const startWritingSession = (buildQueue, targetAppState) => {
+    const { primeQueue: primed, recallQueue, sentenceQueue: sentenced } = buildQueue(rawDeck);
     if (recallQueue.length === 0) return;
 
     setSessionQueue([...recallQueue, ...sentenced]);
@@ -423,8 +438,15 @@ export default function App() {
     setCurrentIndex(0);
     setIsFlipped(false);
     setSessionResults([]);
-    setAppState('pen-and-paper');
+    setAppState(targetAppState);
   };
+
+  const launchPenAndPaper = () => startWritingSession(buildPenAndPaperQueue, 'pen-and-paper');
+
+  // Same Priming -> Blind Recall -> Sentence Writing format as Pen & Paper,
+  // just fed buildSuperchargeQueue's doubled batch (see writingQueue.js)
+  // for a user who wants to push through more new material per sitting.
+  const launchSupercharge = () => startWritingSession(buildSuperchargeQueue, 'supercharge');
 
   // A rapid, thumb-only 4-choice recognition drill - one of the app's two
   // new-character intake points (alongside Pen & Paper's Priming) now
@@ -480,7 +502,7 @@ export default function App() {
     // session recap grouping, and the soft-wall counter below regardless
     // of session type - only this threshold and the stats-calculation/
     // persistence step (right below) branch on it.
-    const isWritingCard = appState === 'pen-and-paper';
+    const isWritingCard = appState === 'pen-and-paper' || appState === 'supercharge';
     const isSuccess = isWritingCard ? quality >= 3 : quality >= 4;
 
     let newStats;
@@ -643,8 +665,13 @@ export default function App() {
             penAndPaperReviewCount={penAndPaperPreview.recallQueue.length - penAndPaperPreview.primeQueue.length}
             penAndPaperTotal={penAndPaperPreview.recallQueue.length}
             penAndPaperEstMinutes={penAndPaperEstMinutes}
+            superchargeNewCount={superchargePreview.primeQueue.length}
+            superchargeReviewCount={superchargePreview.recallQueue.length - superchargePreview.primeQueue.length}
+            superchargeTotal={superchargePreview.recallQueue.length}
+            superchargeEstMinutes={superchargeEstMinutes}
             onLaunchSelfStudy={launchSelfStudy}
             onLaunchPenAndPaper={launchPenAndPaper}
+            onLaunchSupercharge={launchSupercharge}
             onLaunchWarmup={launchWarmup}
             onSignIn={() => setShowAccount(true)}
             renderTierTiles={renderTierTiles}
@@ -662,7 +689,7 @@ export default function App() {
           />
         )}
 
-        {appState === 'pen-and-paper' && (
+        {(appState === 'pen-and-paper' || appState === 'supercharge') && (
           <WritingSession
             recallQueue={penAndPaperRecallQueue}
             sentenceQueue={sentenceQueue}

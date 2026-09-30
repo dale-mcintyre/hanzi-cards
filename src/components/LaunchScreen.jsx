@@ -11,8 +11,13 @@ export default function LaunchScreen({
   penAndPaperReviewCount,
   penAndPaperTotal,
   penAndPaperEstMinutes,
+  superchargeNewCount,
+  superchargeReviewCount,
+  superchargeTotal,
+  superchargeEstMinutes,
   onLaunchSelfStudy,
   onLaunchPenAndPaper,
+  onLaunchSupercharge,
   onLaunchWarmup,
   onSignIn,
   renderTierTiles,
@@ -69,6 +74,19 @@ export default function LaunchScreen({
               <span className="launch-btn-title">Pen &amp; Paper</span>
               <span className="launch-btn-sub">
                 {penAndPaperNewCount} new, {penAndPaperReviewCount} review · ~{penAndPaperEstMinutes} min
+              </span>
+            </button>
+          )}
+
+          {/* Same Priming -> Recall -> Sentence format as Pen & Paper above,
+              just double the batch (see writingQueue.js's
+              buildSuperchargeQueue) - its own bold identity so it reads as
+              "the bigger version of that", not a fourth unrelated mode. */}
+          {superchargeTotal > 0 && (
+            <button className="supercharge-launch-btn launch-btn--stacked" onClick={onLaunchSupercharge}>
+              <span className="launch-btn-title">⚡ Supercharge</span>
+              <span className="launch-btn-sub">
+                {superchargeNewCount} new, {superchargeReviewCount} review · ~{superchargeEstMinutes} min
               </span>
             </button>
           )}

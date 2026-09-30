@@ -609,6 +609,32 @@
   border-color: rgba(217, 164, 65, 0.45);
 }
 
+/* Supercharge Mode - "Pen & Paper, but double" (see writingQueue.js's
+   buildSuperchargeQueue), so it gets its own bold, high-energy identity
+   distinct from Pen & Paper's restrained gold - a filled warm gradient
+   rather than another dim/outline treatment, so the dashboard visibly
+   signals "this one's more intense" before the user even reads the label. */
+.supercharge-launch-btn {
+  width: 100%;
+  padding: 15px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #f97316, #ef4444);
+  border: none;
+  color: #1a0800;
+  font-size: 15px;
+  font-weight: 700;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.25) inset;
+  transition: filter 0.2s, transform 0.2s;
+}
+
+.supercharge-launch-btn:hover {
+  filter: brightness(1.06);
+}
+
+.supercharge-launch-btn:active {
+  transform: scale(0.99);
+}
+
 /* Tertiary dashboard action (Warmup) - the quietest of the three: no
    fill, no accent color at all, just a thin ink border. Lowest emphasis
    on purpose - it's an on-ramp, not the primary study mode. */
