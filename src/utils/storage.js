@@ -405,6 +405,82 @@ export function getTierStats(fullVocab, progress) {
   return tiers;
 }
 
+// Rolling window (days) the countdown/pace feature below averages over -
+// long enough to smooth out day-to-day noise (one heavy study binge
+// shouldn't make "weeks left" swing wildly), short enough to still track
+// how the user is studying *now* rather than a stale burst from months
+// ago.
+const PACE_WINDOW_DAYS = 14;
+
+/**
+ * Per-tier "at your current pace, how long until this level is fully
+ * mastered" estimate - the data behind Settings' progress/countdown
+ * screen. Built entirely from stats storage.js already tracks; no new
+ * synced field required.
+ *
+ * There's no literal log of *when* each card first crossed the mastery
+ * threshold, only its current `interval` and the timestamp of its most
+ * recent review (`lastReviewed`). `lastReviewed` is still a reasonable
+ * stand-in for "when it became mastered" though: once a card's interval
+ * reaches MASTERED_INTERVAL_DAYS, SM-2 won't schedule it for review again
+ * until that many days out, so for most cards the most recent review IS
+ * roughly the moment it crossed into "mastered" (or a later re-mastery
+ * review, which is still a fine signal of real, recent study on that
+ * tier). Good enough for a rough "~4 weeks left" estimate - this is
+ * explicitly not meant to be exact.
+ */
+export function getLearningPace(fullVocab, progress, windowDays = PACE_WINDOW_DAYS) {
+  const now = Date.now();
+  const windowStart = now - windowDays * MS_PER_DAY;
+
+  // How long this account has actually been active, so a brand-new
+  // account doesn't have its pace diluted by averaging over the full
+  // window when only a sliver of it has actually elapsed - that would
+  // understate a fast-starting new user's true pace for their first
+  // couple of weeks.
+  let earliestActivity = null;
+  for (const stat of Object.values(progress)) {
+    if (stat.lastReviewed && (earliestActivity === null || stat.lastReviewed < earliestActivity)) {
+      earliestActivity = stat.lastReviewed;
+    }
+  }
+  const accountAgeDays = earliestActivity ? (now - earliestActivity) / MS_PER_DAY : 0;
+  const effectiveDays = Math.max(1, Math.min(windowDays, accountAgeDays));
+
+  const tiers = {};
+  for (const key of ['1', '2', '3', '4', '5', '6', 'non-hsk']) {
+    tiers[key] = { total: 0, mastered: 0, masteredRecently: 0 };
+  }
+
+  fullVocab.forEach((word) => {
+    const key = word.level === null || word.level === undefined ? 'non-hsk' : String(word.level);
+    const tier = tiers[key];
+    if (!tier) return;
+    tier.total += 1;
+
+    const stat = progress[word.character];
+    // lastReviewed gate first, same as getTierStats above - a card with
+    // only writing-side progress (lastWrittenAt but no reading review
+    // yet) has interval === undefined, and `undefined < 21` is false, not
+    // true, which would otherwise wrongly count it as read-mastered here.
+    if (!stat || !stat.lastReviewed || stat.interval < MASTERED_INTERVAL_DAYS) return;
+    tier.mastered += 1;
+    if (stat.lastReviewed >= windowStart) tier.masteredRecently += 1;
+  });
+
+  for (const tier of Object.values(tiers)) {
+    const perDay = tier.masteredRecently / effectiveDays;
+    tier.remaining = tier.total - tier.mastered;
+    tier.perWeek = perDay * 7;
+    // null (not a number, not Infinity) reads as "can't estimate yet" -
+    // distinct from a real 0-day ETA, which only happens when remaining
+    // is already 0 (tier complete).
+    tier.etaDays = perDay > 0 ? tier.remaining / perDay : null;
+  }
+
+  return tiers;
+}
+
 /**
  * Small localStorage-backed cache of { word -> {sentence, pinyin, english} | null }
  * so sentenceSource.js only has to fetch/scan the Tatoeba corpus once per word.

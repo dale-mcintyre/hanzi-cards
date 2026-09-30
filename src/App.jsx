@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo, useCallback, useRef } from 'react';
 import './App.css';
 import { calculateSM2 } from './utils/sm2';
-import { getProgress, saveCardProgress, saveWritingProgress, getCardMasteryStats, getPrefs, savePrefs, getTierStats, getOfflineMode, setOfflineMode, MASTERED_INTERVAL_DAYS } from './utils/storage';
+import { getProgress, saveCardProgress, saveWritingProgress, getCardMasteryStats, getPrefs, savePrefs, getTierStats, getLearningPace, getOfflineMode, setOfflineMode, MASTERED_INTERVAL_DAYS } from './utils/storage';
 import { getSoundEnabled, setSoundEnabled, cancelSpeech } from './utils/tts';
 import { playCorrectFeedback, playIncorrectFeedback, playMasteryFeedback } from './utils/feedback';
 import { getFilteredDeck, fetchUnifiedVocab } from './data/vocabLoader';
@@ -24,6 +24,7 @@ import AccountDrawer from './components/AccountDrawer';
 import MistakeReportDrawer from './components/MistakeReportDrawer';
 import BetaFeedbackDrawer from './components/BetaFeedbackDrawer';
 import AboutDrawer from './components/AboutDrawer';
+import ProgressDrawer from './components/ProgressDrawer';
 import TierRingTile from './components/TierRingTile';
 import { PersonIcon, GearIcon } from './components/icons';
 
@@ -67,6 +68,7 @@ export default function App() {
   const [showMistakeReport, setShowMistakeReport] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
   const [showAbout, setShowAbout] = useState(false);
+  const [showProgress, setShowProgress] = useState(false);
   const [activeMasteryTab, setActiveMasteryTab] = useState('new');
 
   const { user, isAuthReady, syncVersion } = useAuth();
@@ -280,6 +282,18 @@ export default function App() {
     // stale closure. Keeping them as deps is intentional (removing them
     // would make tierStats go stale after every grade/sync), so the
     // exhaustive-deps warning here is a false positive, not a real issue.
+    // oxlint-disable-next-line react-hooks/exhaustive-deps
+    [fullVocab, rawDeck, syncVersion]
+  );
+
+  // Feeds the Settings > Progress & Pace screen's per-level countdown -
+  // same "re-read progress fresh, treat fullVocab/rawDeck/syncVersion as
+  // cheap invalidation triggers" shape as tierStats just above, kept as a
+  // separate memo (rather than folded into getTierStats) since it answers
+  // a different question (projected time-to-completion, not current
+  // snapshot) and only Settings' progress screen needs it computed.
+  const learningPace = useMemo(
+    () => getLearningPace(fullVocab, getProgress()),
     // oxlint-disable-next-line react-hooks/exhaustive-deps
     [fullVocab, rawDeck, syncVersion]
   );
@@ -693,6 +707,13 @@ export default function App() {
                     : 'Only reviewing the highlighted tiers below. Tap to add more, or clear all HSK tiles to include every level again.'}
                 </p>
                 <div className="tier-ring-grid">{renderTierTiles(72)}</div>
+                <button
+                  type="button"
+                  className="progress-pace-trigger-btn"
+                  onClick={() => { setShowSettings(false); setShowProgress(true); }}
+                >
+                  View Progress &amp; Pace
+                </button>
               </div>
 
               <div className="card-internal-divider" />
@@ -803,6 +824,8 @@ export default function App() {
         {showFeedback && <BetaFeedbackDrawer onClose={() => setShowFeedback(false)} />}
 
         {showAbout && <AboutDrawer onClose={() => setShowAbout(false)} />}
+
+        {showProgress && <ProgressDrawer pace={learningPace} onClose={() => setShowProgress(false)} />}
 
         {inspectedResult && (
           <CardInspectDrawer result={inspectedResult} onClose={() => setInspectedResult(null)} />
