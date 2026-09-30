@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo, useCallback, useRef } from 'react';
 import './App.css';
 import { calculateSM2 } from './utils/sm2';
-import { getProgress, saveCardProgress, saveWritingProgress, getCardMasteryStats, getPrefs, savePrefs, getTierStats, getLearningPace, getOfflineMode, setOfflineMode, MASTERED_INTERVAL_DAYS } from './utils/storage';
+import { getProgress, saveCardProgress, saveWritingProgress, getCardMasteryStats, getPrefs, savePrefs, getTierStats, getLearningPace, getCommitment, saveCommitment, clearCommitment, getCommitmentStatus, getOfflineMode, setOfflineMode, MASTERED_INTERVAL_DAYS } from './utils/storage';
 import { getSoundEnabled, setSoundEnabled, cancelSpeech } from './utils/tts';
 import { playCorrectFeedback, playIncorrectFeedback, playMasteryFeedback } from './utils/feedback';
 import { getFilteredDeck, fetchUnifiedVocab } from './data/vocabLoader';
@@ -70,6 +70,12 @@ export default function App() {
   const [showAbout, setShowAbout] = useState(false);
   const [showProgress, setShowProgress] = useState(false);
   const [activeMasteryTab, setActiveMasteryTab] = useState('new');
+  // The user's own "finish HSK X in N weeks" goal, if they've set one -
+  // read once at mount (see storage.js's getCommitment for why this is
+  // local-only, unlike revisionLevels/includeNonHsk above) and updated
+  // straight from the setter/clearer handlers below rather than re-read
+  // on every render.
+  const [commitment, setCommitment] = useState(() => getCommitment());
 
   const { user, isAuthReady, syncVersion } = useAuth();
 
@@ -307,6 +313,24 @@ export default function App() {
     // oxlint-disable-next-line react-hooks/exhaustive-deps
     [fullVocab, rawDeck, syncVersion]
   );
+
+  // Recombines the saved goal (if any) with the same learningPace numbers
+  // the plain per-tier rows use, so "are you on track" always agrees with
+  // whatever pace those rows are showing right now - see
+  // getCommitmentStatus for the actual on-track math.
+  const commitmentStatus = useMemo(
+    () => getCommitmentStatus(commitment, learningPace),
+    [commitment, learningPace]
+  );
+
+  const handleSetCommitment = (tier, weeks) => {
+    setCommitment(saveCommitment(tier, weeks));
+  };
+
+  const handleClearCommitment = () => {
+    clearCommitment();
+    setCommitment(null);
+  };
 
   const toggleLevel = (lvl) => {
     // An empty revisionLevels means "every level active" (see
@@ -852,7 +876,16 @@ export default function App() {
 
         {showAbout && <AboutDrawer onClose={() => setShowAbout(false)} />}
 
-        {showProgress && <ProgressDrawer pace={learningPace} onClose={() => setShowProgress(false)} />}
+        {showProgress && (
+          <ProgressDrawer
+            pace={learningPace}
+            commitment={commitment}
+            commitmentStatus={commitmentStatus}
+            onSetCommitment={handleSetCommitment}
+            onClearCommitment={handleClearCommitment}
+            onClose={() => setShowProgress(false)}
+          />
+        )}
 
         {inspectedResult && (
           <CardInspectDrawer result={inspectedResult} onClose={() => setInspectedResult(null)} />

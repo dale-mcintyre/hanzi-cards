@@ -481,6 +481,103 @@ export function getLearningPace(fullVocab, progress, windowDays = PACE_WINDOW_DA
   return tiers;
 }
 
+const COMMITMENT_KEY = 'hz_study_commitment';
+
+/**
+ * A user's own "finish HSK X in N weeks" goal, set from the Progress &
+ * Pace screen. Deliberately local-only, same reasoning as
+ * getOfflineMode/setOfflineMode above: there's no commitments column in
+ * Supabase's user_settings table, and adding one needs a schema
+ * migration this codebase can't push on its own. A goal not following
+ * the user to a second device is a far smaller loss than losing actual
+ * SM-2 progress would be, so this trades cross-device continuity for
+ * shipping without a migration - ProgressDrawer's copy says as much.
+ */
+export function getCommitment() {
+  try {
+    const saved = localStorage.getItem(COMMITMENT_KEY);
+    return saved ? JSON.parse(saved) : null;
+  } catch (e) {
+    console.error('Failed to load study commitment:', e);
+    return null;
+  }
+}
+
+/** `deadlineAt` is computed once, here, from `weeks` - a fixed point in
+ * time rather than "N weeks from now" recomputed on every render, so the
+ * goal doesn't quietly push itself back a day every time the app reloads. */
+export function saveCommitment(tier, weeks) {
+  const commitment = {
+    tier,
+    weeks,
+    createdAt: Date.now(),
+    deadlineAt: Date.now() + weeks * 7 * MS_PER_DAY,
+  };
+  try {
+    localStorage.setItem(COMMITMENT_KEY, JSON.stringify(commitment));
+  } catch (e) {
+    console.error('Failed to save study commitment:', e);
+  }
+  return commitment;
+}
+
+export function clearCommitment() {
+  try {
+    localStorage.removeItem(COMMITMENT_KEY);
+  } catch (e) {
+    console.error('Failed to clear study commitment:', e);
+  }
+}
+
+/**
+ * Turns a saved commitment plus getLearningPace's own per-tier stats into
+ * "where do I actually stand": how many words are left in that tier,
+ * how many per day the deadline now requires (recomputed live off the
+ * *current* remaining count, not frozen at goal-creation time, so it
+ * naturally gets stricter if the user falls behind and eases off if they
+ * get ahead), and whether the last-14-day pace the plain per-tier rows
+ * already show is enough to get there.
+ */
+export function getCommitmentStatus(commitment, paceTiers) {
+  if (!commitment) return null;
+  const tier = paceTiers[commitment.tier];
+  if (!tier) return null;
+
+  const daysRemaining = (commitment.deadlineAt - Date.now()) / MS_PER_DAY;
+  const wordsRemaining = tier.remaining;
+  const isComplete = wordsRemaining <= 0;
+  const isExpired = !isComplete && daysRemaining <= 0;
+
+  // No meaningful "required pace" once either the tier's already done or
+  // the deadline's already passed - both null, not a divide-by-zero or a
+  // negative rate.
+  const requiredPerDay = !isComplete && !isExpired ? wordsRemaining / daysRemaining : null;
+  // null (not 0) reads as "no signal yet" - onTrack stays unknown rather
+  // than reading as "behind" for a goal set five minutes ago with no
+  // study session behind it yet.
+  const hasActualPaceData = tier.perWeek > 0;
+  const onTrack = isComplete
+    ? true
+    : hasActualPaceData && requiredPerDay != null
+      ? tier.perWeek / 7 >= requiredPerDay
+      : null;
+
+  return {
+    tier: commitment.tier,
+    weeks: commitment.weeks,
+    deadlineAt: commitment.deadlineAt,
+    daysRemaining: Math.max(0, Math.ceil(daysRemaining)),
+    wordsRemaining,
+    total: tier.total,
+    mastered: tier.mastered,
+    requiredPerWeek: requiredPerDay != null ? requiredPerDay * 7 : null,
+    actualPerWeek: tier.perWeek,
+    isComplete,
+    isExpired,
+    onTrack,
+  };
+}
+
 /**
  * Small localStorage-backed cache of { word -> {sentence, pinyin, english} | null }
  * so sentenceSource.js only has to fetch/scan the Tatoeba corpus once per word.
