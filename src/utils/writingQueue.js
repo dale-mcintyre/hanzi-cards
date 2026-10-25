@@ -87,6 +87,63 @@ const SUPERCHARGE_MULTIPLIER = 2;
  *    Phase 3 simply doesn't run that session (WritingSession renders
  *    nothing extra).
  */
+function isReadMastered(card) {
+  return (card.stats?.interval || 0) >= MASTERED_INTERVAL_DAYS;
+}
+
+/**
+ * Never-written cards in Priming order: read-mastered-but-unwritten
+ * (existing backlog) first, then genuinely brand-new characters - see
+ * buildWritingBatch's `primeQueue` notes. Shared with the guided lesson's
+ * Learn New step (lessonQueue.js) so both pick new material the same way.
+ */
+export function getPrimingCandidates(deck) {
+  const eligible = deck.filter(isReadMastered);
+  const eligibleIds = new Set(eligible.map((c) => c.id));
+  return [
+    ...eligible.filter((c) => !c.stats?.lastWrittenAt),
+    ...deck.filter((c) => !c.stats?.lastWrittenAt && !eligibleIds.has(c.id)),
+  ];
+}
+
+// Every already-written card whose writing review is due, most overdue
+// first - unlike buildWritingBatch's own `dueReview`, not limited to
+// read-mastered cards, since the guided lesson's writing review should
+// cover anything it has itself primed before reading mastery.
+export function getWritingDueCards(deck) {
+  return deck
+    .filter((c) => c.stats?.lastWrittenAt && isWritingDue(c.stats))
+    .sort((a, b) => (a.stats.writingNextDue || 0) - (b.stats.writingNextDue || 0));
+}
+
+/**
+ * Up to `count` read-mastered cards with an example sentence, skipping
+ * `excludeIds` - the selection behind buildWritingBatch's `sentenceQueue`
+ * (see there for why it's due-first), shared with the guided lesson's
+ * Use It step.
+ */
+export function pickSentenceCards(deck, excludeIds, count) {
+  const sentencePool = deck.filter((c) => isReadMastered(c) && c.example_sentence && !excludeIds.has(c.id));
+
+  // Due-first, same convention as buildWritingBatch's dueReview - a card
+  // graded in Phase 3 pushes its own writingNextDue out, so it naturally
+  // rotates out of contention instead of (as a plain most-recently-written
+  // sort would do) being the freshest lastWrittenAt and winning the very
+  // next session's slot again.
+  const sentenceDue = sentencePool.filter((c) => c.stats?.lastWrittenAt && isWritingDue(c.stats));
+  sentenceDue.sort((a, b) => (a.stats.writingNextDue || 0) - (b.stats.writingNextDue || 0)); // most overdue first
+
+  const sentenceNeverWritten = sentencePool.filter((c) => !c.stats?.lastWrittenAt);
+
+  // Last-resort padding for when there's neither a due review nor a
+  // never-written card left to offer - least-recently-practiced first so
+  // padding still rotates rather than camping on the same pair.
+  const sentenceNotYetDue = sentencePool.filter((c) => c.stats?.lastWrittenAt && !isWritingDue(c.stats));
+  sentenceNotYetDue.sort((a, b) => (a.stats.lastWrittenAt || 0) - (b.stats.lastWrittenAt || 0));
+
+  return [...sentenceDue, ...sentenceNeverWritten, ...sentenceNotYetDue].slice(0, count);
+}
+
 function buildWritingBatch(deck, sizeMultiplier) {
   const minPrime = MIN_PRIME * sizeMultiplier;
   const boostedPrime = BOOSTED_PRIME * sizeMultiplier;
@@ -95,13 +152,9 @@ function buildWritingBatch(deck, sizeMultiplier) {
   const thinReviewThreshold = THIN_REVIEW_THRESHOLD * sizeMultiplier;
   const sentenceQueueSize = SENTENCE_QUEUE_SIZE * sizeMultiplier;
 
-  const eligible = deck.filter((c) => (c.stats?.interval || 0) >= MASTERED_INTERVAL_DAYS);
-  const eligibleIds = new Set(eligible.map((c) => c.id));
+  const eligible = deck.filter(isReadMastered);
   const written = eligible.filter((c) => c.stats?.lastWrittenAt);
-  const neverWritten = [
-    ...eligible.filter((c) => !c.stats?.lastWrittenAt),
-    ...deck.filter((c) => !c.stats?.lastWrittenAt && !eligibleIds.has(c.id)),
-  ];
+  const neverWritten = getPrimingCandidates(deck);
 
   const dueReview = written.filter((c) => isWritingDue(c.stats));
   dueReview.sort((a, b) => (a.stats.writingNextDue || 0) - (b.stats.writingNextDue || 0)); // most overdue first
@@ -125,25 +178,7 @@ function buildWritingBatch(deck, sizeMultiplier) {
   const recallQueue = [...primeQueue, ...reviewItems].sort(() => 0.5 - Math.random());
 
   const recallIds = new Set(recallQueue.map((c) => c.id));
-  const sentencePool = eligible.filter((c) => c.example_sentence && !recallIds.has(c.id));
-
-  // Due-first, same convention as recallQueue's dueReview above - a card
-  // graded in Phase 3 pushes its own writingNextDue out, so it naturally
-  // rotates out of contention instead of (as a plain most-recently-written
-  // sort would do) being the freshest lastWrittenAt and winning the very
-  // next session's slot again.
-  const sentenceDue = sentencePool.filter((c) => c.stats?.lastWrittenAt && isWritingDue(c.stats));
-  sentenceDue.sort((a, b) => (a.stats.writingNextDue || 0) - (b.stats.writingNextDue || 0)); // most overdue first
-
-  const sentenceNeverWritten = sentencePool.filter((c) => !c.stats?.lastWrittenAt);
-
-  // Last-resort padding for when there's neither a due review nor a
-  // never-written card left to offer - least-recently-practiced first so
-  // padding still rotates rather than camping on the same pair.
-  const sentenceNotYetDue = sentencePool.filter((c) => c.stats?.lastWrittenAt && !isWritingDue(c.stats));
-  sentenceNotYetDue.sort((a, b) => (a.stats.lastWrittenAt || 0) - (b.stats.lastWrittenAt || 0));
-
-  const sentenceQueue = [...sentenceDue, ...sentenceNeverWritten, ...sentenceNotYetDue].slice(0, sentenceQueueSize);
+  const sentenceQueue = pickSentenceCards(deck, recallIds, sentenceQueueSize);
 
   return { primeQueue, recallQueue, sentenceQueue };
 }

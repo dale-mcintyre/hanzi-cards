@@ -19,7 +19,17 @@ function byFrequency(a, b) {
 // never-studied cards - those aren't "due" in the overdue-review sense,
 // they're just new material.
 export function getDueCount(deck) {
-  return deck.filter((c) => c.stats.lastReviewed && isDue(c.stats)).length;
+  return getDueCards(deck).length;
+}
+
+// The already-seen cards whose SM-2 interval has elapsed, most-overdue
+// first - the same set getDueCount counts. The guided lesson's Review step
+// (lessonQueue.js) draws from this directly, with none of
+// buildSelfStudyQueue's not-yet-due padding.
+export function getDueCards(deck) {
+  return deck
+    .filter((c) => c.stats.lastReviewed && isDue(c.stats))
+    .sort((a, b) => overdueAmount(b.stats) - overdueAmount(a.stats));
 }
 
 /**

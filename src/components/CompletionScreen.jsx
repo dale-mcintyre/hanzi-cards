@@ -1,3 +1,17 @@
+// One entry per card, recalled only if every attempt at it was - the
+// guided lesson grades a card more than once (e.g. a new character's
+// writing recall, its quiz, then Close the Loop), and a card missed once
+// along the way belongs in Missed even if it came good later. Other
+// session types grade each card once, so this changes nothing for them.
+function mergeResultsByCard(sessionResults) {
+  const byId = new Map();
+  for (const r of sessionResults) {
+    const prev = byId.get(r.id);
+    byId.set(r.id, prev ? { ...prev, isSuccess: prev.isSuccess && r.isSuccess } : r);
+  }
+  return [...byId.values()];
+}
+
 export default function CompletionScreen({
   visitGradeCount,
   isSoftWallGated,
@@ -5,21 +19,25 @@ export default function CompletionScreen({
   onInspectCard,
   onSignIn,
   onContinue,
+  title = 'Session Recap',
+  summaryLine,
 }) {
-  const nailedResults = sessionResults.filter((r) => r.isSuccess);
-  const struggledResults = sessionResults.filter((r) => !r.isSuccess);
+  const cardResults = mergeResultsByCard(sessionResults);
+  const nailedResults = cardResults.filter((r) => r.isSuccess);
+  const struggledResults = cardResults.filter((r) => !r.isSuccess);
 
   return (
     <div className="card victory-card">
       <div className="victory-content">
-        <h2>Session Recap</h2>
-        {sessionResults.length > 0 && (
+        <h2>{title}</h2>
+        {summaryLine && <p className="session-stat-line">{summaryLine}</p>}
+        {cardResults.length > 0 && (
           <p className="session-stat-line">
-            {nailedResults.length}/{sessionResults.length} recalled
+            {nailedResults.length}/{cardResults.length} recalled
           </p>
         )}
 
-        {sessionResults.length > 0 && (
+        {cardResults.length > 0 && (
           <div className="session-recap">
             {nailedResults.length > 0 && (
               <div className="session-recap-group">

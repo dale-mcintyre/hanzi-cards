@@ -1422,6 +1422,164 @@
   color: var(--ink-dim);
 }
 
+/* Priming's parts breakdown (CharacterParts): kept compact, since it
+   shares the fixed-height card with the stroke canvas. */
+.char-parts {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+.char-parts-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.char-parts-equation {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.char-parts-piece {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.char-parts-whole,
+.char-parts-part-char,
+.char-parts-whole-inline {
+  font-family: var(--font-hanzi);
+}
+
+.char-parts-whole,
+.char-parts-part-char {
+  font-size: 20px;
+  line-height: 1.2;
+}
+
+.char-parts-op {
+  font-size: 14px;
+  line-height: 24px;
+  color: var(--ink-faint);
+}
+
+.char-parts-part {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.char-parts-part-label {
+  font-size: 10px;
+  color: var(--ink-dim);
+  max-width: 88px;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.char-parts-note {
+  font-size: 12px;
+  color: var(--ink-dim);
+  text-align: center;
+  margin: 0;
+  line-height: 1.35;
+}
+
+/* Guided lesson: the intro card between steps (LessonStageIntro). */
+.lesson-intro-card {
+  gap: 20px;
+}
+
+.lesson-stepper {
+  display: flex;
+  justify-content: space-between;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: 4px;
+}
+
+.lesson-step {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  color: var(--ink-faint);
+}
+
+.lesson-step-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1.5px solid var(--surface-line);
+}
+
+.lesson-step-label {
+  font-size: 10px;
+  letter-spacing: var(--tracking-caption);
+  text-align: center;
+  line-height: 1.2;
+}
+
+.lesson-step--done .lesson-step-dot {
+  background: var(--ink-dim);
+  border-color: var(--ink-dim);
+}
+
+.lesson-step--active {
+  color: var(--ink);
+}
+
+.lesson-step--active .lesson-step-dot {
+  background: var(--accent-primary);
+  border-color: var(--accent-primary);
+}
+
+/* Fills the fixed-height card so the step text sits centered and Begin
+   lands at the bottom, rather than everything bunching at the top. */
+.lesson-intro-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+}
+
+.lesson-intro-title {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.lesson-intro-text {
+  font-size: 15px;
+  color: var(--ink-dim);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.lesson-intro-count {
+  font-family: var(--font-data);
+  font-size: 12px;
+  color: var(--ink-faint);
+  margin: 0;
+}
+
+.lesson-end-link,
+.practice-more-toggle {
+  margin-top: -4px;
+}
+
 .writing-grade-btn--1 { color: var(--hard); }
 .writing-grade-btn--1:hover { background: var(--hard-dim); border-color: var(--hard); }
 
