@@ -42,6 +42,9 @@ export default function StudySession({
   onGrade,
   onReportMistake,
   progressPercent,
+  // false for the guided lesson's practice-only steps, where a grade
+  // doesn't touch the schedule - see lessonQueue.js.
+  showIntervals = true,
 }) {
   // Matches the on-card buttons below (Again on the left, Good on the
   // right) regardless of which face is showing - swipe left always means
@@ -253,7 +256,7 @@ export default function StudySession({
               >
                 <span className="study-grade-key">1</span>
                 <span className="study-grade-label">Again</span>
-                <span className="study-grade-interval">{gradePreview.again}d</span>
+                {showIntervals && <span className="study-grade-interval">{gradePreview.again}d</span>}
               </button>
               <button
                 type="button"
@@ -262,7 +265,7 @@ export default function StudySession({
               >
                 <span className="study-grade-key">2</span>
                 <span className="study-grade-label">Good</span>
-                <span className="study-grade-interval">{gradePreview.good}d</span>
+                {showIntervals && <span className="study-grade-interval">{gradePreview.good}d</span>}
               </button>
             </div>
           </div>

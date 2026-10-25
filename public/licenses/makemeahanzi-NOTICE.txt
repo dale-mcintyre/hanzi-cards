@@ -1,0 +1,35 @@
+Character component data (char_parts.json)
+==========================================
+
+Learn Hanzi's character breakdowns (the parts and etymology notes shown
+when learning a new character, and the look-alike answers in quizzes) come
+from Make Me a Hanzi by Shaunak Kishore:
+
+    https://github.com/skishore/makemeahanzi
+
+Source file: dictionary.txt at commit
+618dbab8a8ddefb958763c8b4afbaa741a4460de
+    https://github.com/skishore/makemeahanzi/blob/618dbab8a8ddefb958763c8b4afbaa741a4460de/dictionary.txt
+
+Make Me a Hanzi's dictionary.txt is itself derived from Unihan and CJKlib.
+
+dictionary.txt is free software: you can redistribute it and/or modify it
+under the terms of the GNU Lesser General Public License as published by the
+Free Software Foundation, either version 3 of the License, or (at your
+option) any later version. It is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser
+General Public License for more details.
+
+Modifications: char_parts.json is a modified subset of dictionary.txt. It
+keeps only the characters used in Learn Hanzi's vocabulary and the
+components they are built from, keeps the decomposition, etymology, first
+pinyin reading and a shortened first definition, and renames fields to
+short keys. The script that produces it, build-char-parts.py, is in the
+Learn Hanzi repository; you can rebuild or modify char_parts.json from the
+original dictionary.txt with it.
+
+The full license texts are alongside this notice:
+    LGPL-3.0.txt  - GNU Lesser General Public License, version 3
+    GPL-3.0.txt   - GNU General Public License, version 3 (which the LGPL
+                    supplements)

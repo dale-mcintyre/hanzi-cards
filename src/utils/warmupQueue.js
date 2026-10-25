@@ -1,3 +1,5 @@
+import { pickLookalikes } from './lookalikes';
+
 /**
  * Builds a rapid-recognition Warmup queue: up to `count` questions, each
  * carrying a precomputed set of 4 answer options (`quizOptions`, correct
@@ -15,7 +17,7 @@
  * `isNew` card one ungraded reveal before its quiz question ever appears,
  * so testing it isn't a blind guess.
  */
-export function buildWarmupQueue(seenCards, fullDeck, count = 10) {
+export function buildWarmupQueue(seenCards, fullDeck, count = 10, charParts = null) {
   const seenIds = new Set(seenCards.map((c) => c.id));
   const questions = [...seenCards].sort(() => 0.5 - Math.random()).slice(0, count);
 
@@ -29,23 +31,30 @@ export function buildWarmupQueue(seenCards, fullDeck, count = 10) {
   }
 
   const queue = [...questions].sort(() => 0.5 - Math.random());
-  return queue.map((card) => ({ ...card, quizOptions: buildDistractorOptions(card, fullDeck) }));
+  return queue.map((card) => ({ ...card, quizOptions: buildDistractorOptions(card, fullDeck, charParts) }));
 }
 
 /**
  * 3 distractors + the correct answer (4 total, a 2x2 grid), shuffled.
- * Distractors are pulled from the same HSK tier as the correct answer
- * where possible, so the wrong options are actually plausible instead of
- * trivially different - falls back to the whole deck if that tier doesn't
- * have enough entries.
+ * With `charParts` loaded, distractors are look-alikes first - words
+ * sharing characters or components with the answer (see lookalikes.js),
+ * so the quiz trains telling similar characters apart. Any slots left are
+ * pulled from the same HSK tier as the correct answer where possible, so
+ * the wrong options are still plausible instead of trivially different -
+ * falling back to the whole deck if that tier doesn't have enough
+ * entries. Also used by the guided lesson's quiz steps (lessonQueue.js).
  */
-function buildDistractorOptions(correctCard, fullDeck) {
-  let pool = fullDeck.filter((c) => c.character !== correctCard.character && c.level === correctCard.level);
+export function buildDistractorOptions(correctCard, fullDeck, charParts = null) {
+  const lookalikes = pickLookalikes(correctCard, fullDeck, charParts);
+  const taken = new Set([correctCard.character, ...lookalikes.map((c) => c.character)]);
+
+  let pool = fullDeck.filter((c) => !taken.has(c.character) && c.level === correctCard.level);
   if (pool.length < 3) {
-    pool = fullDeck.filter((c) => c.character !== correctCard.character);
+    pool = fullDeck.filter((c) => !taken.has(c.character));
   }
 
-  const distractors = [...pool].sort(() => 0.5 - Math.random()).slice(0, 3);
+  const fillers = [...pool].sort(() => 0.5 - Math.random()).slice(0, 3 - lookalikes.length);
+  const distractors = [...lookalikes, ...fillers];
   return [...distractors, correctCard]
     .sort(() => 0.5 - Math.random())
     .map((c) => ({ character: c.character, pinyin: c.pinyin }));

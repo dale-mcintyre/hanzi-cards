@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import HanziCanvas from './HanziCanvas';
+import CharacterParts from './CharacterParts';
 import { ColorPinyin } from '../utils/pinyinColor';
 import { speakText } from '../utils/tts';
 import { calculateWritingSchedule } from '../utils/writingSchedule';
@@ -56,6 +57,12 @@ function renderClozeSentence(sentenceCn, targetChar, isRevealed) {
   ));
 }
 
+// A lesson step can be Priming + Recall, Recall alone, or sentences alone.
+function initialPhase(primeQueue, recallQueue) {
+  if (primeQueue.length > 0) return 'priming';
+  return recallQueue.length > 0 ? 'recall' : 'sentence';
+}
+
 /**
  * Three-phase pen-and-paper session:
  *  1. Priming - watch the still-learning cards (primeQueue) get
@@ -79,28 +86,47 @@ function renderClozeSentence(sentenceCn, targetChar, isRevealed) {
  *
  * No `appState`/countdown handling here - App.jsx only ever mounts this
  * component while appState === 'pen-and-paper'.
+ *
+ * `phaseBanners={false}` (the guided lesson, which runs each phase as its
+ * own step with its own intro - see LessonStageIntro) skips the "Phase 2"/
+ * "Phase 3" banners and goes straight from one phase to the next.
+ * `showIntervals={false}` hides the per-grade interval preview, for the
+ * lesson's practice-only steps where grading doesn't touch the schedule.
+ * `charParts` (see data/charParts.js) adds each new character's parts to
+ * the Priming card; without it, Priming looks as it always did.
  */
-export default function WritingSession({ primeQueue, recallQueue, sentenceQueue, card, onGrade, progressPercent }) {
-  const [phase, setPhase] = useState(() => (primeQueue.length === 0 ? 'recall' : 'priming'));
+export default function WritingSession({
+  primeQueue,
+  recallQueue,
+  sentenceQueue,
+  card,
+  onGrade,
+  progressPercent,
+  phaseBanners = true,
+  showIntervals = true,
+  charParts = null,
+}) {
+  const [phase, setPhase] = useState(() => initialPhase(primeQueue, recallQueue));
   const [primeIndex, setPrimeIndex] = useState(0);
-  // Which card's answer is currently revealed, by id - not a bare boolean.
-  // A boolean reset via a useEffect keyed on `card` is one render behind:
-  // the new card's data lands on the same render its `mode` prop is
-  // computed, but the effect that would reset a boolean back to false
-  // only runs after that render commits - which briefly showed the
-  // *next* card's character/strokes in `animate` mode before the reset
-  // caught up. Deriving `revealed` from an id comparison is correct on
-  // the very first render of a new card, no effect needed.
-  const [revealedCardId, setRevealedCardId] = useState(null);
-  const revealed = !!card && revealedCardId === card.id;
+  // Which queue entry's answer is currently revealed - by object identity,
+  // not a bare boolean. A boolean reset via a useEffect keyed on `card` is
+  // one render behind: the new card's data lands on the same render its
+  // `mode` prop is computed, but the effect that would reset a boolean
+  // back to false only runs after that render commits - which briefly
+  // showed the *next* card's character/strokes in `animate` mode before
+  // the reset caught up. Not by id either: the lesson's Close the Loop
+  // step re-queues a missed card as a fresh copy with the same id, which
+  // would otherwise arrive already revealed.
+  const [revealedCard, setRevealedCard] = useState(null);
+  const revealed = !!card && revealedCard === card;
 
   // A brand new session (new array references from a fresh
   // buildPenAndPaperQueue call) always restarts. Starts straight in
   // Recall if nothing in this particular batch needs priming.
   useEffect(() => {
-    setPhase(primeQueue.length === 0 ? 'recall' : 'priming');
+    setPhase(initialPhase(primeQueue, recallQueue));
     setPrimeIndex(0);
-    setRevealedCardId(null);
+    setRevealedCard(null);
   }, [primeQueue, recallQueue, sentenceQueue]);
 
   // Both transitional phases resolve into their real phase on their own,
@@ -120,8 +146,8 @@ export default function WritingSession({ primeQueue, recallQueue, sentenceQueue,
   // every subsequent sentence card.
   useEffect(() => {
     if (phase !== 'recall' || !card) return;
-    if (sentenceQueue.some((c) => c.id === card.id)) setPhase('sentence-transition');
-  }, [card, phase, sentenceQueue]);
+    if (sentenceQueue.some((c) => c.id === card.id)) setPhase(phaseBanners ? 'sentence-transition' : 'sentence');
+  }, [card, phase, sentenceQueue, phaseBanners]);
 
   const primeCard = primeQueue[primeIndex];
 
@@ -149,7 +175,7 @@ export default function WritingSession({ primeQueue, recallQueue, sentenceQueue,
 
   function advancePriming() {
     if (primeIndex + 1 >= primeQueue.length) {
-      setPhase('transition');
+      setPhase(phaseBanners ? 'transition' : 'recall');
     } else {
       setPrimeIndex((i) => i + 1);
     }
@@ -172,7 +198,7 @@ export default function WritingSession({ primeQueue, recallQueue, sentenceQueue,
       if (!revealed) {
         if (e.code === 'Space' || e.code === 'Enter') {
           e.preventDefault();
-          setRevealedCardId(card.id);
+          setRevealedCard(card);
         }
         return;
       }
@@ -224,6 +250,8 @@ export default function WritingSession({ primeQueue, recallQueue, sentenceQueue,
             />
           </div>
 
+          <CharacterParts word={primeCard.character} charParts={charParts} />
+
           <p className="writing-instruction-cue">Observe stroke order &amp; copy 1× to your notebook</p>
 
           <button type="button" className="primary-launch-btn" onClick={advancePriming}>
@@ -250,7 +278,7 @@ export default function WritingSession({ primeQueue, recallQueue, sentenceQueue,
 
           <div
             className="canvas-frame writing-canvas-frame"
-            onClick={() => { if (!revealed) setRevealedCardId(card.id); }}
+            onClick={() => { if (!revealed) setRevealedCard(card); }}
           >
             <HanziCanvas
               character={card.character}
@@ -274,7 +302,7 @@ export default function WritingSession({ primeQueue, recallQueue, sentenceQueue,
                 >
                   <span className="writing-grade-key">{option.key}</span>
                   <span className="writing-grade-label">{option.label}</span>
-                  <span className="writing-grade-interval">{gradePreview[option.quality]}d</span>
+                  {showIntervals && <span className="writing-grade-interval">{gradePreview[option.quality]}d</span>}
                 </button>
               ))}
             </div>
@@ -303,7 +331,7 @@ export default function WritingSession({ primeQueue, recallQueue, sentenceQueue,
 
           <div
             className="canvas-frame writing-canvas-frame"
-            onClick={() => { if (!revealed) setRevealedCardId(card.id); }}
+            onClick={() => { if (!revealed) setRevealedCard(card); }}
           >
             <HanziCanvas
               character={card.character}
@@ -327,7 +355,7 @@ export default function WritingSession({ primeQueue, recallQueue, sentenceQueue,
                 >
                   <span className="writing-grade-key">{option.key}</span>
                   <span className="writing-grade-label">{option.label}</span>
-                  <span className="writing-grade-interval">{gradePreview[option.quality]}d</span>
+                  {showIntervals && <span className="writing-grade-interval">{gradePreview[option.quality]}d</span>}
                 </button>
               ))}
             </div>

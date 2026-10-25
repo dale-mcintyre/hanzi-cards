@@ -5,9 +5,11 @@ import { getProgress, saveCardProgress, saveWritingProgress, getCardMasteryStats
 import { getSoundEnabled, setSoundEnabled, cancelSpeech } from './utils/tts';
 import { playCorrectFeedback, playIncorrectFeedback, playMasteryFeedback } from './utils/feedback';
 import { getFilteredDeck, fetchUnifiedVocab } from './data/vocabLoader';
+import { fetchCharParts } from './data/charParts';
 import { buildSelfStudyQueue, getDueCount } from './utils/sessionQueue';
 import { buildWarmupQueue } from './utils/warmupQueue';
 import { buildPenAndPaperQueue, buildSuperchargeQueue } from './utils/writingQueue';
+import { buildLessonPlan, resolveStageCards, estimateLessonMinutes, MAX_RECHECK_ATTEMPTS } from './utils/lessonQueue';
 import { calculateWritingSchedule, WRITING_MASTERED_LEVEL } from './utils/writingSchedule';
 import { getEntitlement } from './utils/entitlement';
 import { useAuth } from './context/AuthContext';
@@ -17,6 +19,7 @@ import WarmupSession from './components/WarmupSession';
 import WritingSession from './components/WritingSession';
 import WritingBadge from './components/WritingBadge';
 import CompletionScreen from './components/CompletionScreen';
+import LessonStageIntro from './components/LessonStageIntro';
 import CardInspectDrawer from './components/CardInspectDrawer';
 import MasteryCelebration from './components/MasteryCelebration';
 import SyncStatusDot from './components/SyncStatusDot';
@@ -45,6 +48,21 @@ const SOFT_WALL_THRESHOLD = 5;
 // keeps the content swap hidden behind the card's edge-on moment. A small
 // buffer over the CSS's 550ms guards against timer/paint jitter.
 const STUDY_FLIP_BACK_MS = 560;
+
+// Which screen each non-lesson appState runs on - the guided lesson
+// instead takes it from its current stage's `kind` (see lessonQueue.js),
+// since one lesson moves through all three.
+const SESSION_KIND_BY_APP_STATE = {
+  'self-study': 'flashcard',
+  'pen-and-paper': 'writing',
+  supercharge: 'writing',
+  warmup: 'quiz',
+};
+
+// A stable empty array for WritingSession's queue props during the
+// lesson - a fresh `[]` each render would look like a new session to its
+// reset effect (see the penAndPaperRecallQueue note below).
+const EMPTY_QUEUE = [];
 
 export default function App() {
   // Empty = no filter, learn from the full frequency-ranked deck. A
@@ -87,7 +105,7 @@ export default function App() {
   const showMarketing = isAuthReady && !user;
 
   // Single source of truth for "what screen is showing": 'dashboard',
-  // 'self-study', 'pen-and-paper', 'supercharge', 'warmup', or
+  // 'lesson', 'self-study', 'pen-and-paper', 'supercharge', 'warmup', or
   // 'completion'. Replaces the old two-axis appState+sessionMode pair
   // (which only ever had 4 valid combinations) and the 3-2-1 countdown
   // step entirely - clicking a launch button sets this straight to its
@@ -139,6 +157,14 @@ export default function App() {
   const [showSoftWallOverlay, setShowSoftWallOverlay] = useState(false);
 
   const [rawDeck, setRawDeck] = useState([]);
+
+  // How each character is built (see data/charParts.js) - feeds Priming's
+  // parts breakdown and the quizzes' look-alike wrong answers. Null until
+  // loaded; everything that uses it works without it in the meantime.
+  const [charParts, setCharParts] = useState(null);
+  useEffect(() => {
+    fetchCharParts().then(setCharParts);
+  }, []);
   const [sessionQueue, setSessionQueue] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   // Pen & Paper's Priming-phase subset, computed once by
@@ -156,6 +182,28 @@ export default function App() {
   // (keyed on these arrays) think a new session started on every render.
   const [penAndPaperRecallQueue, setPenAndPaperRecallQueue] = useState([]);
   const [sentenceQueue, setSentenceQueue] = useState([]);
+
+  // The guided lesson (see lessonQueue.js): its stages, which one is
+  // running, and whether that stage's intro card is showing.
+  // sessionQueue/currentIndex/handleNextCard run each stage's cards exactly
+  // as they run any other session - these only decide what comes next.
+  const [lessonStages, setLessonStages] = useState([]);
+  const [lessonStageIndex, setLessonStageIndex] = useState(0);
+  const [isLessonIntro, setIsLessonIntro] = useState(false);
+  const [lessonElapsedMinutes, setLessonElapsedMinutes] = useState(0);
+  // Set when a lesson finishes, for CompletionScreen's lesson title and
+  // summary line; cleared by every other kind of launch.
+  const [lessonSummary, setLessonSummary] = useState(null);
+  // Refs, not state: written and read within the same handleNextCard
+  // call, where a state update wouldn't be visible yet.
+  const lessonStartedAtRef = useRef(0);
+  const stageStartedAtRef = useRef(0);
+  const lessonNewTaughtRef = useRef(0);
+  // Cards graded wrong in the lesson's graded stages, by id - what Close
+  // the Loop re-tests (see resolveStageCards).
+  const lessonMissesRef = useRef({ reading: new Map(), writing: new Map() });
+  // Misses per card within Close the Loop, capped at MAX_RECHECK_ATTEMPTS.
+  const recheckAttemptsRef = useRef(new Map());
 
   const [isFlipped, setIsFlipped] = useState(false);
   const [streak, setStreak] = useState(1);
@@ -281,6 +329,19 @@ export default function App() {
 
   const superchargePreview = useMemo(() => buildSuperchargeQueue(rawDeck), [rawDeck]);
   const superchargeEstMinutes = estimateWritingMinutes(superchargePreview);
+
+  // Same call launchLesson makes, for the dashboard's "N review, M new"
+  // label - the shuffles inside differ run to run, but the counts don't.
+  const lessonPreview = useMemo(() => {
+    const stages = buildLessonPlan(rawDeck, charParts);
+    const countFor = (key) => stages.find((s) => s.key === key)?.cards.length || 0;
+    return {
+      reviewCount: countFor('review-reading') + countFor('review-writing'),
+      newCount: countFor('learn-new'),
+      estMinutes: estimateLessonMinutes(stages),
+      hasContent: stages.some((s) => !s.dynamic),
+    };
+  }, [rawDeck, charParts]);
 
   // Independent of the current HSK/non-HSK filter - rawDeck only contains
   // whatever tiers are currently selected, but the tier tiles need stats
@@ -434,6 +495,7 @@ export default function App() {
     setCurrentIndex(0);
     setIsFlipped(false);
     setSessionResults([]);
+    setLessonSummary(null);
     setAppState('self-study');
   };
 
@@ -463,6 +525,7 @@ export default function App() {
     setCurrentIndex(0);
     setIsFlipped(false);
     setSessionResults([]);
+    setLessonSummary(null);
     setAppState(targetAppState);
   };
 
@@ -482,17 +545,79 @@ export default function App() {
   // onStart below) - unlike Free Self-Study, it always has something to
   // show a brand new visitor with zero history.
   const launchWarmup = (count = 10) => {
-    const warmupQueue = buildWarmupQueue(seenCards, rawDeck, count);
+    const warmupQueue = buildWarmupQueue(seenCards, rawDeck, count, charParts);
     if (warmupQueue.length === 0) return;
 
     setSessionQueue(warmupQueue);
     setCurrentIndex(0);
     setIsFlipped(false);
     setSessionResults([]);
+    setLessonSummary(null);
     setAppState('warmup');
   };
 
+  const finishLesson = () => {
+    setLessonSummary({
+      minutes: Math.max(1, Math.round((Date.now() - lessonStartedAtRef.current) / 60000)),
+      newCount: lessonNewTaughtRef.current,
+    });
+    setAppState('completion');
+  };
+
+  // Moves to the first stage at or after `fromIndex` that has anything to
+  // show, resolving its cards against what the lesson has seen so far
+  // (`results` passed in explicitly - when called from handleNextCard,
+  // sessionResults state doesn't include the grade just made yet), and
+  // shows that stage's intro. Ends the lesson once no stage is left.
+  const enterLessonStage = (stages, fromIndex, results) => {
+    for (let i = fromIndex; i < stages.length; i++) {
+      const cards = resolveStageCards(stages[i], stages, lessonMissesRef.current, results);
+      if (cards.length === 0) continue;
+
+      const resolved = { ...stages[i], cards };
+      if (resolved.primeQueue) {
+        const ids = new Set(cards.map((c) => c.id));
+        resolved.primeQueue = resolved.primeQueue.filter((c) => ids.has(c.id));
+      }
+      setLessonStages(stages.map((s, j) => (j === i ? resolved : s)));
+      setLessonStageIndex(i);
+      setLessonElapsedMinutes(Math.floor((Date.now() - lessonStartedAtRef.current) / 60000));
+      setIsLessonIntro(true);
+      return;
+    }
+    finishLesson();
+  };
+
+  // The dashboard's primary action: one guided ~20 minute lesson that runs
+  // the quiz, flashcard and writing screens in a tutor's order - see
+  // buildLessonPlan for the steps and why.
+  const launchLesson = () => {
+    const stages = buildLessonPlan(rawDeck, charParts);
+    if (!stages.some((s) => !s.dynamic)) return;
+
+    lessonMissesRef.current = { reading: new Map(), writing: new Map() };
+    recheckAttemptsRef.current = new Map();
+    lessonNewTaughtRef.current = 0;
+    lessonStartedAtRef.current = Date.now();
+    setSessionResults([]);
+    setLessonSummary(null);
+    setAppState('lesson');
+    enterLessonStage(stages, 0, []);
+  };
+
+  const beginLessonStage = () => {
+    const stage = lessonStages[lessonStageIndex];
+    if (stage.key === 'learn-new') lessonNewTaughtRef.current = stage.cards.length;
+    setSessionQueue(stage.cards);
+    setCurrentIndex(0);
+    setIsFlipped(false);
+    stageStartedAtRef.current = Date.now();
+    setIsLessonIntro(false);
+  };
+
   const card = sessionQueue[currentIndex];
+  const lessonStage = appState === 'lesson' ? lessonStages[lessonStageIndex] : null;
+  const sessionKind = lessonStage ? lessonStage.kind : SESSION_KIND_BY_APP_STATE[appState];
 
   // Speaking on flip is StudySession's job now (it also owns the delayed
   // auto-play timer and needs to dedupe against it - see its
@@ -527,14 +652,20 @@ export default function App() {
     // session recap grouping, and the soft-wall counter below regardless
     // of session type - only this threshold and the stats-calculation/
     // persistence step (right below) branch on it.
-    const isWritingCard = appState === 'pen-and-paper' || appState === 'supercharge';
+    const isWritingCard = sessionKind === 'writing';
     const isSuccess = isWritingCard ? quality >= 3 : quality >= 4;
+    // The lesson's Close the Loop steps re-test cards already graded once
+    // this lesson - that first grade is what the schedule keeps (see
+    // buildLessonPlan), so these only give feedback.
+    const isPracticeOnly = !!lessonStage?.practiceOnly;
 
-    let newStats;
-    let justMastered;
+    let newStats = null;
+    let justMastered = false;
     let masteryLabel;
 
-    if (isWritingCard) {
+    if (isPracticeOnly) {
+      // Feedback chime only - no schedule change.
+    } else if (isWritingCard) {
       const wasReflexive = (card.stats?.writingLevel || 0) >= WRITING_MASTERED_LEVEL;
       const newWritingStats = calculateWritingSchedule(quality, card.stats);
       justMastered = !wasReflexive && newWritingStats.writingLevel >= WRITING_MASTERED_LEVEL;
@@ -575,15 +706,42 @@ export default function App() {
     // saveWritingProgress already return the full merged-with-localStorage
     // object, but rawDeck's copy of this card may be a render or two
     // behind that, so merging here too keeps it correct regardless.
-    setRawDeck((prev) => prev.map((c) => (c.id === card.id ? { ...c, stats: { ...c.stats, ...newStats } } : c)));
+    if (newStats) {
+      setRawDeck((prev) => prev.map((c) => (c.id === card.id ? { ...c, stats: { ...c.stats, ...newStats } } : c)));
+    }
 
     // Feeds the post-session recap on CompletionScreen - a lightweight
     // per-card log distinct from rawDeck (which only ever holds each
     // card's latest stats, not a history of this session's grades).
-    setSessionResults((prev) => [
-      ...prev,
+    // Built locally too, so a lesson stage ending on this grade can pass
+    // it straight to enterLessonStage below.
+    const nextResults = [
+      ...sessionResults,
       { id: card.id, character: card.character, pinyin: card.pinyin, meaning: card.meaning, isSuccess },
-    ]);
+    ];
+    setSessionResults(nextResults);
+
+    if (lessonStage && !isPracticeOnly && !isSuccess) {
+      lessonMissesRef.current[isWritingCard ? 'writing' : 'reading'].set(card.id, card);
+    }
+
+    // Close the Loop: a miss goes back on the end of the queue as a fresh
+    // copy (WritingSession tracks its reveal by object, so a same-id copy
+    // starts hidden), until MAX_RECHECK_ATTEMPTS misses.
+    let queueLength = sessionQueue.length;
+    if (lessonStage?.retryMisses && !isSuccess) {
+      const attemptKey = `${lessonStage.key}:${card.id}`;
+      const misses = (recheckAttemptsRef.current.get(attemptKey) || 0) + 1;
+      recheckAttemptsRef.current.set(attemptKey, misses);
+      if (misses < MAX_RECHECK_ATTEMPTS) {
+        setSessionQueue((prev) => [...prev, { ...card }]);
+        queueLength += 1;
+      }
+    }
+
+    // A lesson stage's time box only ever cuts it short between cards,
+    // never mid-card.
+    const isStageOutOfTime = !!lessonStage?.budgetMs && Date.now() - stageStartedAtRef.current >= lessonStage.budgetMs;
 
     // Computed as local values, not read back from state this same tick -
     // the setters below wouldn't be visible yet if we read the state
@@ -594,13 +752,17 @@ export default function App() {
     const justCrossedSoftWall = !user && !hasCrossedSoftWall && newVisitGradeCount >= SOFT_WALL_THRESHOLD;
     if (justCrossedSoftWall) setHasCrossedSoftWall(true);
 
-    if (currentIndex + 1 >= sessionQueue.length) {
+    if (currentIndex + 1 >= queueLength || isStageOutOfTime) {
       // No separate action needed for gating here - the completed screen
       // derives its gated/ungated variant from (!user && hasCrossedSoftWall)
       // at render time, and hasCrossedSoftWall was just set above if this
       // very card is the one that crossed the threshold - so even a first
       // session that crosses 5 on its last card correctly renders gated.
-      setAppState('completion');
+      if (lessonStage) {
+        enterLessonStage(lessonStages, lessonStageIndex + 1, nextResults);
+      } else {
+        setAppState('completion');
+      }
     } else {
       setIsFlipped(false);
 
@@ -617,7 +779,7 @@ export default function App() {
       // its rotation finishes is what hides the flash (see
       // STUDY_FLIP_BACK_MS). Warmup/Pen & Paper don't flip, so they advance
       // immediately as before.
-      if (appState === 'self-study') {
+      if (sessionKind === 'flashcard') {
         isAdvancingRef.current = true;
         setTimeout(advance, STUDY_FLIP_BACK_MS);
       } else {
@@ -634,6 +796,22 @@ export default function App() {
   // where hasCrossedSoftWall flips true and the accompanying dismissible
   // mid-session overlay (that one never blocks the current session).
   const isSoftWallGated = !user && hasCrossedSoftWall;
+
+  // During a lesson, the stage's intro card replaces the session screen
+  // until Begin.
+  const isSessionScreenShowing = appState !== 'lesson' || !isLessonIntro;
+
+  // Pen & Paper/Supercharge keep their own queue state; a lesson writing
+  // stage is either recall (its cards, plus Priming for Learn New) or
+  // sentences, never both - sessionQueue itself is the live list, so Close
+  // the Loop's re-queued copies show up in WritingSession's "N of M".
+  const writingQueues = lessonStage
+    ? {
+        primeQueue: lessonStage.primeQueue || EMPTY_QUEUE,
+        recallQueue: lessonStage.isSentence ? EMPTY_QUEUE : sessionQueue,
+        sentenceQueue: lessonStage.isSentence ? sessionQueue : EMPTY_QUEUE,
+      }
+    : { primeQueue, recallQueue: penAndPaperRecallQueue, sentenceQueue };
 
   return (
     <div className="app-container">
@@ -694,6 +872,11 @@ export default function App() {
             superchargeReviewCount={superchargePreview.recallQueue.length - superchargePreview.primeQueue.length}
             superchargeTotal={superchargePreview.recallQueue.length}
             superchargeEstMinutes={superchargeEstMinutes}
+            lessonReviewCount={lessonPreview.reviewCount}
+            lessonNewCount={lessonPreview.newCount}
+            lessonEstMinutes={lessonPreview.estMinutes}
+            hasLessonContent={lessonPreview.hasContent}
+            onLaunchLesson={launchLesson}
             onLaunchSelfStudy={launchSelfStudy}
             onLaunchPenAndPaper={launchPenAndPaper}
             onLaunchSupercharge={launchSupercharge}
@@ -703,7 +886,17 @@ export default function App() {
           />
         )}
 
-        {appState === 'self-study' && (
+        {appState === 'lesson' && isLessonIntro && lessonStage && (
+          <LessonStageIntro
+            stage={lessonStage}
+            cardCount={lessonStage.cards.length}
+            elapsedMinutes={lessonElapsedMinutes}
+            onBegin={beginLessonStage}
+            onEnd={finishLesson}
+          />
+        )}
+
+        {isSessionScreenShowing && sessionKind === 'flashcard' && (
           <StudySession
             card={card}
             isFlipped={isFlipped}
@@ -711,21 +904,23 @@ export default function App() {
             onGrade={handleNextCard}
             onReportMistake={() => setShowMistakeReport(true)}
             progressPercent={progressPercent}
+            showIntervals={!lessonStage?.practiceOnly}
           />
         )}
 
-        {(appState === 'pen-and-paper' || appState === 'supercharge') && (
+        {isSessionScreenShowing && sessionKind === 'writing' && (
           <WritingSession
-            recallQueue={penAndPaperRecallQueue}
-            sentenceQueue={sentenceQueue}
-            primeQueue={primeQueue}
+            {...writingQueues}
             card={card}
             onGrade={handleNextCard}
             progressPercent={progressPercent}
+            phaseBanners={!lessonStage}
+            showIntervals={!lessonStage?.practiceOnly}
+            charParts={charParts}
           />
         )}
 
-        {appState === 'warmup' && (
+        {isSessionScreenShowing && sessionKind === 'quiz' && (
           <WarmupSession
             card={card}
             onAnswer={handleNextCard}
@@ -741,6 +936,10 @@ export default function App() {
             onInspectCard={setInspectedResult}
             onSignIn={() => setShowAccount(true)}
             onContinue={() => setAppState('dashboard')}
+            title={lessonSummary ? 'Lesson complete' : undefined}
+            summaryLine={lessonSummary
+              ? `${lessonSummary.minutes} min · ${lessonSummary.newCount} new ${lessonSummary.newCount === 1 ? 'character' : 'characters'}`
+              : undefined}
           />
         )}
 

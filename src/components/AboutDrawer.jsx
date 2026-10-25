@@ -43,6 +43,17 @@ export default function AboutDrawer({ onClose }) {
             end, character rendering powered by HanziWriter, and Supabase for accounts
             and cross-device sync.
           </p>
+          <p>
+            Character breakdowns and look-alike quiz answers use data from{' '}
+            <a href="https://github.com/skishore/makemeahanzi" target="_blank" rel="noopener noreferrer">
+              Make Me a Hanzi
+            </a>{' '}
+            by Shaunak Kishore, used and modified under the GNU LGPL v3 or later.{' '}
+            <a href="/licenses/makemeahanzi-NOTICE.txt" target="_blank" rel="noopener noreferrer">
+              License and source details
+            </a>
+            .
+          </p>
           <a
             className="about-coffee-link"
             href="https://buymeacoffee.com/dalemcintyre"
