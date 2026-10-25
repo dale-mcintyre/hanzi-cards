@@ -66,6 +66,10 @@ export async function pushCardProgress(userId, cardId, stats) {
         writing_interval_days: stats.writingIntervalDays ?? 0,
         writing_next_due: msToIso(stats.writingNextDue),
         last_written_at: msToIso(stats.lastWrittenAt),
+        // Plain bigint millisecond epochs, like last_reviewed - when this
+        // card last became Known / Can Write (see utils/charProgress.js).
+        known_at: stats.knownAt ?? null,
+        can_write_at: stats.canWriteAt ?? null,
         updated_at: new Date().toISOString(),
       },
       { onConflict: 'user_id,card_id' }
@@ -87,7 +91,7 @@ export async function pullAllProgress(userId) {
   try {
     const { data, error } = await supabase
       .from('card_progress')
-      .select('card_id, repetitions, interval, ease_factor, last_reviewed, writing_level, writing_reps, writing_interval_days, writing_next_due, last_written_at')
+      .select('card_id, repetitions, interval, ease_factor, last_reviewed, writing_level, writing_reps, writing_interval_days, writing_next_due, last_written_at, known_at, can_write_at')
       .eq('user_id', userId);
     if (error) return { ok: false, error };
 
@@ -103,6 +107,8 @@ export async function pullAllProgress(userId) {
         writingIntervalDays: row.writing_interval_days ?? 0,
         writingNextDue: isoToMs(row.writing_next_due),
         lastWrittenAt: isoToMs(row.last_written_at),
+        knownAt: row.known_at,
+        canWriteAt: row.can_write_at,
       };
     }
     return { ok: true, data: progress };
@@ -111,8 +117,8 @@ export async function pullAllProgress(userId) {
   }
 }
 
-const READING_FIELDS = ['repetitions', 'interval', 'easeFactor', 'lastReviewed'];
-const WRITING_FIELDS = ['writingLevel', 'writingReps', 'writingIntervalDays', 'writingNextDue', 'lastWrittenAt'];
+const READING_FIELDS = ['repetitions', 'interval', 'easeFactor', 'lastReviewed', 'knownAt'];
+const WRITING_FIELDS = ['writingLevel', 'writingReps', 'writingIntervalDays', 'writingNextDue', 'lastWrittenAt', 'canWriteAt'];
 
 function pick(stat, fields) {
   const picked = {};
@@ -253,6 +259,41 @@ export async function pushSettings(userId, prefs) {
     );
     if (error) return { ok: false, error };
     return { ok: true };
+  } catch (error) {
+    return { ok: false, error };
+  }
+}
+
+/** Adds one day's study counts to the user's study_days row for that
+ * day, via the add_study_activity function - an increment on the server
+ * rather than an upsert of a total, so two devices studying the same day
+ * add up instead of overwriting each other. `day` is the device's local
+ * calendar date ('YYYY-MM-DD'). See utils/studyDays.js. */
+export async function pushStudyActivity(day, reviews, passed) {
+  if (!supabase) return unavailable();
+  try {
+    const { error } = await supabase.rpc('add_study_activity', { p_day: day, p_reviews: reviews, p_passed: passed });
+    if (error) return { ok: false, error };
+    return { ok: true };
+  } catch (error) {
+    return { ok: false, error };
+  }
+}
+
+/** Fetches the user's study_days rows from `sinceDay` on, as
+ * { 'YYYY-MM-DD': { reviews, passed } }. */
+export async function pullStudyDays(userId, sinceDay) {
+  if (!supabase) return unavailable();
+  try {
+    const { data, error } = await supabase
+      .from('study_days')
+      .select('day, reviews, passed')
+      .eq('user_id', userId)
+      .gte('day', sinceDay);
+    if (error) return { ok: false, error };
+    const days = {};
+    for (const row of data) days[row.day] = { reviews: row.reviews, passed: row.passed };
+    return { ok: true, data: days };
   } catch (error) {
     return { ok: false, error };
   }

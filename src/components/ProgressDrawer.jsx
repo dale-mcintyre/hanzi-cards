@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { CHART_WEEKS } from '../utils/charProgress';
 
 const TIER_ROWS = [
   { key: '1', label: 'HSK 1' },
@@ -20,7 +21,7 @@ function pct(part, total) {
   return total > 0 ? Math.round((part / total) * 100) : 0;
 }
 
-// Mirrors storage.js's getLearningPace formula, applied to a summed-up
+// Mirrors charProgress.js's getCharacterPace formula, applied to a summed-up
 // tier so the drawer can show one combined "all of HSK" countdown above
 // the per-level breakdown, without storage.js needing to know this
 // specific aggregate exists.
@@ -46,8 +47,7 @@ function sumTiers(tiers, keys) {
 
 // Turns a day count into the coarsest unit that still reads as "roughly
 // right" - nobody needs "127 days" precision for an estimate this fuzzy
-// to begin with (see getLearningPace's own caveat about lastReviewed
-// being an approximation, not a true mastery-timestamp log).
+// to begin with.
 function formatEta(days) {
   if (days == null || days <= 0) return null;
   if (days < 1) return 'less than a day';
@@ -62,18 +62,28 @@ function formatEta(days) {
 function formatPace(perWeek) {
   if (perWeek <= 0) return null;
   const rounded = perWeek >= 10 ? Math.round(perWeek) : Math.round(perWeek * 10) / 10;
-  return `~${rounded} word${rounded === 1 ? '' : 's'}/week`;
+  return `~${rounded} character${rounded === 1 ? '' : 's'}/week`;
 }
 
 // Same rounding as formatPace, but never bails out to null - used inside
-// commitment status sentences where "0 words/week" is itself the
+// commitment status sentences where "0 characters/week" is itself the
 // meaningful (if discouraging) answer, not a "can't estimate" case.
 function paceLabel(perWeek) {
-  return formatPace(perWeek) || '0 words/week';
+  return formatPace(perWeek) || '0 characters/week';
 }
 
 function formatDate(ms) {
   return new Date(ms).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+}
+
+// Past this, a projected date is more noise than information - "over 3
+// years" says the same thing without a falsely precise day.
+const MAX_ETA_DAYS = 3 * 365;
+
+// A projected finish date - month and year, since a day-level date for an
+// estimate this rough would overstate it.
+function formatEtaDate(ms) {
+  return new Date(ms).toLocaleDateString(undefined, { month: 'short', year: 'numeric' });
 }
 
 function TierProgressRow({ label, stats }) {
@@ -87,17 +97,19 @@ function TierProgressRow({ label, stats }) {
     <div className="progress-tier-row">
       <div className="progress-tier-row-top">
         <span className="progress-tier-label">{label}</span>
-        <span className="progress-tier-count">{mastered}/{total} mastered</span>
+        <span className="progress-tier-count">{mastered}/{total} known</span>
       </div>
       <div className="progress-tier-bar-track">
         <div className="progress-tier-bar-fill" style={{ width: `${masteredPct}%` }} />
       </div>
       <p className={`progress-tier-eta ${isComplete ? 'progress-tier-eta--complete' : ''}`}>
         {isComplete
-          ? `Complete - all ${total} words mastered`
+          ? `Complete - all ${total} characters known`
           : eta
-            ? `${eta} left at your current pace (${pace})`
-            : 'Not enough recent activity to estimate yet - keep studying to see a countdown here.'}
+            ? stats.etaDays > MAX_ETA_DAYS
+              ? `Over 3 years away at ${pace}`
+              : `On course for ${formatEtaDate(Date.now() + stats.etaDays * 86400000)} at ${pace}`
+            : 'Needs two weeks of study history to estimate.'}
       </p>
     </div>
   );
@@ -108,7 +120,7 @@ function TierProgressRow({ label, stats }) {
  * (pre-filled from the existing commitment, `onCancel` returns to the
  * status card without saving). Pure pill pickers, no free-typed number -
  * this is a rough weekly-granularity estimate either way (see
- * getLearningPace's own caveats), so there's nothing a exact day count
+ * getCharacterPace's own caveats), so there's nothing a exact day count
  * would buy the user that 1/2/3/4/6/8/12-week presets don't already cover. */
 function CommitmentForm({ pace, defaultTier, defaultWeeks, onSet, onCancel }) {
   const [tier, setTier] = useState(defaultTier || '1');
@@ -148,8 +160,8 @@ function CommitmentForm({ pace, defaultTier, defaultWeeks, onSet, onCancel }) {
       {tierStats && (
         <p className="commitment-form-hint">
           {tierStats.remaining > 0
-            ? `${tierStats.remaining} of ${tierStats.total} HSK ${tier} words still to master.`
-            : `All ${tierStats.total} HSK ${tier} words are already mastered!`}
+            ? `${tierStats.remaining} of ${tierStats.total} HSK ${tier} characters still to learn.`
+            : `All ${tierStats.total} HSK ${tier} characters are already known!`}
         </p>
       )}
 
@@ -178,10 +190,10 @@ function CommitmentStatusCard({ status, onEdit, onClear }) {
   let statusLine;
   let statusClass;
   if (isComplete) {
-    statusLine = `Goal complete - all ${total} HSK ${tier} words mastered!`;
+    statusLine = `Goal complete - all ${total} HSK ${tier} characters known!`;
     statusClass = 'commitment-status--complete';
   } else if (isExpired) {
-    statusLine = `Deadline passed with ${status.wordsRemaining} word${status.wordsRemaining === 1 ? '' : 's'} still to go.`;
+    statusLine = `Deadline passed with ${status.wordsRemaining} character${status.wordsRemaining === 1 ? '' : 's'} still to go.`;
     statusClass = 'commitment-status--behind';
   } else if (onTrack === null) {
     statusLine = "Just getting started - keep studying to see if you're on track.";
@@ -198,7 +210,7 @@ function CommitmentStatusCard({ status, onEdit, onClear }) {
     <div className="progress-tier-row">
       <div className="progress-tier-row-top">
         <span className="progress-tier-label">HSK {tier} in {weeks} week{weeks === 1 ? '' : 's'}</span>
-        <span className="progress-tier-count">{mastered}/{total} mastered</span>
+        <span className="progress-tier-count">{mastered}/{total} known</span>
       </div>
       <div className="progress-tier-bar-track">
         <div className="progress-tier-bar-fill" style={{ width: `${masteredPct}%` }} />
@@ -219,17 +231,39 @@ function CommitmentStatusCard({ status, onEdit, onClear }) {
   );
 }
 
+// Characters that became Known each week, last CHART_WEEKS weeks - a
+// picture of steady effort rather than one big remaining number.
+function WeeklyChart({ weekly }) {
+  const max = Math.max(1, ...weekly);
+  return (
+    <>
+      <div className="weekly-chart" role="img" aria-label={`Characters newly known per week, oldest first: ${weekly.join(', ')}`}>
+        {weekly.map((count, i) => (
+          <div key={i} className={`weekly-chart-col ${i === CHART_WEEKS - 1 ? 'weekly-chart-col--current' : ''}`}>
+            <span className="weekly-chart-value">{count > 0 ? count : ''}</span>
+            <div className="weekly-chart-bar" style={{ height: `${(count / max) * 72}px` }} />
+          </div>
+        ))}
+      </div>
+      <div className="weekly-chart-axis" aria-hidden="true">
+        {weekly.map((_, i) => (
+          <span key={i}>{i === CHART_WEEKS - 1 ? 'Now' : `${CHART_WEEKS - 1 - i}w`}</span>
+        ))}
+      </div>
+    </>
+  );
+}
+
 /**
- * Settings' "how long until I finish this level" screen - a personal
- * commitment (e.g. "HSK 2 in 3 weeks") with a live on-track/behind
- * verdict, above the same per-tier countdown rows as before (plus a
- * combined "all of HSK" total). Pure presentation: all the actual pace
- * and commitment math lives in storage.js's getLearningPace/
- * getCommitmentStatus, memoized once in App.jsx and passed down as
- * `pace`/`commitmentStatus` so this component never touches localStorage
- * directly.
+ * Settings' detailed progress screen: characters newly Known per week,
+ * study consistency and review accuracy (from utils/studyDays.js), a
+ * personal commitment (e.g. "HSK 2 in 3 weeks") with a live on-track/
+ * behind verdict, then per-level rows. Counted in Known characters - see
+ * utils/charProgress.js's getCharacterPace for the pace and why it waits
+ * for two weeks of history. Pure presentation: App.jsx computes
+ * everything and passes it down.
  */
-export default function ProgressDrawer({ pace, commitment, commitmentStatus, isSignedIn, onSetCommitment, onClearCommitment, onClose }) {
+export default function ProgressDrawer({ pace, weekly, studySummary, commitment, commitmentStatus, isSignedIn, onSetCommitment, onClearCommitment, onClose }) {
   const allHsk = sumTiers(pace, ['1', '2', '3', '4', '5', '6']);
   // Only relevant once a commitment already exists - toggles the status
   // card back to the editable form without discarding the saved goal
@@ -253,10 +287,40 @@ export default function ProgressDrawer({ pace, commitment, commitmentStatus, isS
         </div>
 
         <p className="progress-drawer-intro">
-          Based on how many words you've mastered (a 21-day+ review interval) in
-          the last two weeks. A rough estimate, not a promise - it moves with
-          your actual study habits.
+          A character counts as known once you've recognized it again after a gap
+          of about a week - and stops counting if you later forget it. Pace and
+          dates are estimates from your last two weeks, not promises.
         </p>
+
+        <div className="about-section">
+          <h4>Newly known, by week</h4>
+          <WeeklyChart weekly={weekly} />
+        </div>
+
+        <div className="about-section">
+          <h4>Habit</h4>
+          <div className="progress-stat-row">
+            <div className="progress-stat">
+              <div className="progress-stat-value">{studySummary.daysThisWeek} of 7</div>
+              <div className="progress-stat-label">days studied this week · {studySummary.daysLast30} of the last 30</div>
+            </div>
+            <div className="progress-stat">
+              <div className="progress-stat-value">
+                {studySummary.retention === null ? '–' : `${Math.round(studySummary.retention * 100)}%`}
+              </div>
+              <div className="progress-stat-label">
+                {studySummary.retention === null
+                  ? 'of reviews remembered - shows after 20 reviews'
+                  : `of ${studySummary.reviewsLast30} reviews remembered, last 30 days`}
+              </div>
+            </div>
+          </div>
+          {studySummary.retention !== null && studySummary.retention < 0.8 && (
+            <p className="progress-subline">
+              Below 80% usually means new characters are coming in faster than reviews can keep up - lessons add fewer automatically.
+            </p>
+          )}
+        </div>
 
         <div className="about-section">
           <h4>Your Commitment</h4>

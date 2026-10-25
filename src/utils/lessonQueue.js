@@ -68,10 +68,12 @@ function newCountForBacklog(dueTotal) {
  * `charParts` (data/charParts.js), when loaded, makes the quiz steps use
  * look-alike wrong answers - see buildDistractorOptions.
  *
- * Close the Loop is `practiceOnly`: every card in it was already graded
- * once earlier in the same lesson, and that first grade is what the
- * schedule should reflect - re-grading here would let a missed card turn
- * "correct" for the schedule just because it was seen a minute ago.
+ * Warm Up and Close the Loop are `practiceOnly` - neither touches the
+ * schedule. Warm Up's cards aren't due (grading them would be an early
+ * review). Every card in Close the Loop was already graded once earlier in
+ * the same lesson, and that first grade is what the schedule should
+ * reflect - re-grading here would let a missed card turn "correct" for the
+ * schedule just because it was seen a minute ago.
  */
 export function buildLessonPlan(deck, charParts = null) {
   const readingDue = getDueCards(deck);
@@ -99,6 +101,10 @@ export function buildLessonPlan(deck, charParts = null) {
       title: 'Warm up',
       intro: 'A few quick ones you already know, to get your head into Chinese.',
       kind: 'quiz',
+      // These cards aren't due - grading them would review them early
+      // and nudge them toward Known without a real gap (see
+      // utils/charProgress.js). Misses still come back in Close the Loop.
+      practiceOnly: true,
       cards: warmupCards.map(withQuizOptions),
       budgetMs: 2 * MINUTE_MS,
     },
