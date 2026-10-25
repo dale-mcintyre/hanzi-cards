@@ -1,11 +1,14 @@
 import { useEffect, useState, useMemo, useCallback, useRef } from 'react';
 import './App.css';
 import { calculateSM2 } from './utils/sm2';
-import { getProgress, saveCardProgress, saveWritingProgress, getCardMasteryStats, getPrefs, savePrefs, getTierStats, getLearningPace, getCommitment, saveCommitment, clearCommitment, getCommitmentStatus, getOfflineMode, setOfflineMode, MASTERED_INTERVAL_DAYS } from './utils/storage';
+import { getProgress, saveCardProgress, saveWritingProgress, getCardMasteryStats, getPrefs, savePrefs, getCommitment, saveCommitment, clearCommitment, getCommitmentStatus, getOfflineMode, setOfflineMode, getActiveSyncUser, MASTERED_INTERVAL_DAYS } from './utils/storage';
 import { getSoundEnabled, setSoundEnabled, cancelSpeech } from './utils/tts';
 import { playCorrectFeedback, playIncorrectFeedback, playMasteryFeedback } from './utils/feedback';
 import { getFilteredDeck, fetchUnifiedVocab } from './data/vocabLoader';
 import { fetchCharParts } from './data/charParts';
+import { fetchCharFrequency } from './data/charFrequency';
+import { getCharacterProgress, getCharacterPace, textCoverage, diffCharacterProgress, isReadKnown, canWrite } from './utils/charProgress';
+import { recordStudy, getStudyDays, summarizeStudyDays, syncStudyDays } from './utils/studyDays';
 import { buildSelfStudyQueue, getDueCount } from './utils/sessionQueue';
 import { buildWarmupQueue } from './utils/warmupQueue';
 import { buildPenAndPaperQueue, buildSuperchargeQueue } from './utils/writingQueue';
@@ -28,6 +31,7 @@ import MistakeReportDrawer from './components/MistakeReportDrawer';
 import BetaFeedbackDrawer from './components/BetaFeedbackDrawer';
 import AboutDrawer from './components/AboutDrawer';
 import ProgressDrawer from './components/ProgressDrawer';
+import ProgressSummary from './components/ProgressSummary';
 import TierRingTile from './components/TierRingTile';
 import { PersonIcon, GearIcon } from './components/icons';
 
@@ -206,7 +210,6 @@ export default function App() {
   const recheckAttemptsRef = useRef(new Map());
 
   const [isFlipped, setIsFlipped] = useState(false);
-  const [streak, setStreak] = useState(1);
   const [isLoadingDeck, setIsLoadingDeck] = useState(true);
 
   // Everything is free today - this just establishes the check-in so a
@@ -255,13 +258,6 @@ export default function App() {
     }
 
     loadDeck();
-
-    try {
-      const savedCount = parseInt(localStorage.getItem('hz_streak_count') || '1', 10);
-      setStreak(savedCount);
-    } catch {
-      setStreak(1);
-    }
     // syncVersion isn't read above - it's a signal, not data. It bumps
     // after AuthContext hydrates localStorage from a signed-in account's
     // remote progress OR remote settings, so this effect re-runs and
@@ -352,38 +348,62 @@ export default function App() {
     fetchUnifiedVocab().then(setFullVocab);
   }, []);
 
-  const tierStats = useMemo(
-    () => getTierStats(fullVocab, getProgress()),
-    // rawDeck/syncVersion are cheap "something changed" triggers, not the
-    // data source - getProgress() is re-read fresh each time, matching how
-    // getCardMasteryStats already re-reads progress rather than trusting a
-    // stale closure. Keeping them as deps is intentional (removing them
-    // would make tierStats go stale after every grade/sync), so the
-    // exhaustive-deps warning here is a false positive, not a real issue.
+  // Character-level progress (see utils/charProgress.js) - behind the
+  // home screen's progress line, the Settings rings, the Progress drawer
+  // and the session recap. rawDeck/syncVersion are cheap "something
+  // changed" triggers, not the data source - getProgress() is re-read
+  // fresh each time, matching how getCardMasteryStats already re-reads
+  // progress rather than trusting a stale closure. Keeping them as deps
+  // is intentional (removing them would make this go stale after every
+  // grade/sync), so the exhaustive-deps warning is a false positive.
+  const charProgress = useMemo(
+    () => getCharacterProgress(fullVocab, getProgress()),
     // oxlint-disable-next-line react-hooks/exhaustive-deps
     [fullVocab, rawDeck, syncVersion]
   );
 
-  // Feeds the Settings > Progress & Pace screen's per-level countdown -
-  // same "re-read progress fresh, treat fullVocab/rawDeck/syncVersion as
-  // cheap invalidation triggers" shape as tierStats just above, kept as a
-  // separate memo (rather than folded into getTierStats) since it answers
-  // a different question (projected time-to-completion, not current
-  // snapshot) and only Settings' progress screen needs it computed.
-  const learningPace = useMemo(
-    () => getLearningPace(fullVocab, getProgress()),
+  // Per-tier pace in Known characters, for the Progress drawer's level
+  // rows and the HSK goal.
+  const charPace = useMemo(() => getCharacterPace(charProgress), [charProgress]);
+
+  // How often each character shows up in real text (see
+  // build-char-frequency.py) - for "these make up ~N% of everyday text".
+  const [charFreq, setCharFreq] = useState(null);
+  useEffect(() => {
+    fetchCharFrequency().then(setCharFreq);
+  }, []);
+  const coverage = useMemo(() => textCoverage(charProgress.knownChars, charFreq), [charProgress, charFreq]);
+
+  // Days studied and review accuracy (see utils/studyDays.js) - re-read
+  // after every grade (rawDeck) and every sync (syncVersion), same
+  // invalidation-trigger convention as charProgress above.
+  const studySummary = useMemo(
+    () => summarizeStudyDays(getStudyDays()),
     // oxlint-disable-next-line react-hooks/exhaustive-deps
-    [fullVocab, rawDeck, syncVersion]
+    [rawDeck, syncVersion]
   );
 
-  // Recombines the saved goal (if any) with the same learningPace numbers
-  // the plain per-tier rows use, so "are you on track" always agrees with
+  // Recombines the saved goal (if any) with the same pace numbers the
+  // plain per-tier rows use, so "are you on track" always agrees with
   // whatever pace those rows are showing right now - see
   // getCommitmentStatus for the actual on-track math.
   const commitmentStatus = useMemo(
-    () => getCommitmentStatus(commitment, learningPace),
-    [commitment, learningPace]
+    () => getCommitmentStatus(commitment, charPace),
+    [commitment, charPace]
   );
+
+  // The Known/Can Write/Introduced picture when the current session
+  // started, so its recap can say what actually changed (see
+  // diffCharacterProgress). Set by every launch.
+  const [sessionStartProgress, setSessionStartProgress] = useState(null);
+
+  // Push this device's study-day counts once a session ends, so another
+  // signed-in device sees today as studied.
+  useEffect(() => {
+    if (appState !== 'completion') return;
+    const userId = getActiveSyncUser();
+    if (userId) syncStudyDays(userId);
+  }, [appState]);
 
   const handleSetCommitment = (tier, weeks) => {
     setCommitment(saveCommitment(tier, weeks));
@@ -450,11 +470,7 @@ export default function App() {
             key={lvl}
             tierKey={lvl}
             label={`HSK ${lvl}`}
-            total={tierStats[lvl].total}
-            seen={tierStats[lvl].seen}
-            mastered={tierStats[lvl].mastered}
-            writingProgress={tierStats[lvl].writingProgress}
-            writingMastered={tierStats[lvl].writingMastered}
+            {...charProgress.tiers[lvl]}
             // An empty revisionLevels means "no filter - every level
             // included" (see loadDeck/getFilteredDeck), not "nothing
             // selected" - so every HSK tile should read as active then,
@@ -467,11 +483,7 @@ export default function App() {
         <TierRingTile
           tierKey="non-hsk"
           label="Non-HSK"
-          total={tierStats['non-hsk'].total}
-          seen={tierStats['non-hsk'].seen}
-          mastered={tierStats['non-hsk'].mastered}
-          writingProgress={tierStats['non-hsk'].writingProgress}
-          writingMastered={tierStats['non-hsk'].writingMastered}
+          {...charProgress.tiers['non-hsk']}
           active={includeNonHsk}
           size={size}
           onClick={toggleNonHsk}
@@ -496,6 +508,7 @@ export default function App() {
     setIsFlipped(false);
     setSessionResults([]);
     setLessonSummary(null);
+    setSessionStartProgress(charProgress);
     setAppState('self-study');
   };
 
@@ -526,6 +539,7 @@ export default function App() {
     setIsFlipped(false);
     setSessionResults([]);
     setLessonSummary(null);
+    setSessionStartProgress(charProgress);
     setAppState(targetAppState);
   };
 
@@ -553,6 +567,7 @@ export default function App() {
     setIsFlipped(false);
     setSessionResults([]);
     setLessonSummary(null);
+    setSessionStartProgress(charProgress);
     setAppState('warmup');
   };
 
@@ -601,6 +616,7 @@ export default function App() {
     lessonStartedAtRef.current = Date.now();
     setSessionResults([]);
     setLessonSummary(null);
+    setSessionStartProgress(charProgress);
     setAppState('lesson');
     enterLessonStage(stages, 0, []);
   };
@@ -668,6 +684,11 @@ export default function App() {
     } else if (isWritingCard) {
       const wasReflexive = (card.stats?.writingLevel || 0) >= WRITING_MASTERED_LEVEL;
       const newWritingStats = calculateWritingSchedule(quality, card.stats);
+      // When this grade first makes the card Can Write - see
+      // utils/charProgress.js, which counts "this week" from it.
+      if (!canWrite(card.stats) && canWrite({ ...card.stats, ...newWritingStats, lastWrittenAt: Date.now() })) {
+        newWritingStats.canWriteAt = Date.now();
+      }
       justMastered = !wasReflexive && newWritingStats.writingLevel >= WRITING_MASTERED_LEVEL;
       masteryLabel = 'Reflexive';
       newStats = saveWritingProgress(card.id, newWritingStats);
@@ -680,6 +701,10 @@ export default function App() {
         card.stats?.easeFactor || 2.5
       );
       justMastered = !wasAlreadyMastered && computedStats.interval >= MASTERED_INTERVAL_DAYS;
+      // Same for becoming Known.
+      if (!isReadKnown(card.stats) && isReadKnown({ ...card.stats, ...computedStats, lastReviewed: Date.now() })) {
+        computedStats.knownAt = Date.now();
+      }
       masteryLabel = 'Mastered';
       newStats = saveCardProgress(card.id, computedStats);
     }
@@ -721,7 +746,15 @@ export default function App() {
     ];
     setSessionResults(nextResults);
 
-    if (lessonStage && !isPracticeOnly && !isSuccess) {
+    // Every grade marks today as studied; only a real review (a card
+    // already studied in this skill, graded for the schedule) counts
+    // toward the "remembered N% of reviews" figure.
+    const wasStudiedBefore = isWritingCard ? !!card.stats?.lastWrittenAt : !!card.stats?.lastReviewed;
+    recordStudy({ isReview: !isPracticeOnly && wasStudiedBefore, isSuccess });
+
+    // Warm Up is practice-only but still feeds Close the Loop's misses -
+    // only Close the Loop's own re-tests are excluded.
+    if (lessonStage && !lessonStage.retryMisses && !isSuccess) {
       lessonMissesRef.current[isWritingCard ? 'writing' : 'reading'].set(card.id, card);
     }
 
@@ -824,7 +857,11 @@ export default function App() {
       {/* Top Navbar */}
       <nav className="top-nav-bar">
         <div className="nav-left">
-          <span className="streak-badge">Day {streak}</span>
+          {/* Days studied in the last 7, not an all-or-nothing streak -
+              one missed day doesn't wipe it back to zero. */}
+          <span className="streak-badge" title={`${studySummary.daysLast30} of the last 30 days`}>
+            {studySummary.daysThisWeek} of 7 days
+          </span>
           <button
             type="button"
             className="beta-feedback-pill"
@@ -882,7 +919,9 @@ export default function App() {
             onLaunchSupercharge={launchSupercharge}
             onLaunchWarmup={launchWarmup}
             onSignIn={() => setShowAccount(true)}
-            renderTierTiles={renderTierTiles}
+            knownCount={charProgress.totals.known}
+            knownThisWeek={charProgress.knownThisWeek}
+            daysThisWeek={studySummary.daysThisWeek}
           />
         )}
 
@@ -936,6 +975,8 @@ export default function App() {
             onInspectCard={setInspectedResult}
             onSignIn={() => setShowAccount(true)}
             onContinue={() => setAppState('dashboard')}
+            progressChange={sessionStartProgress ? diffCharacterProgress(sessionStartProgress, charProgress) : null}
+            knownCount={charProgress.totals.known}
             title={lessonSummary ? 'Lesson complete' : undefined}
             summaryLine={lessonSummary
               ? `${lessonSummary.minutes} min · ${lessonSummary.newCount} new ${lessonSummary.newCount === 1 ? 'character' : 'characters'}`
@@ -951,20 +992,15 @@ export default function App() {
               <h3>Settings & Character Mastery</h3>
 
               <div style={{ marginTop: '12px' }}>
-                <label className="box-section-label">Study Tiers: tap to include/exclude</label>
-                <p style={{ fontSize: '12px', color: 'var(--ink-faint)', margin: '4px 0 0' }}>
-                  {revisionLevels.length === 0 && includeNonHsk
-                    ? 'Learning from every tier. Tap a tile to focus on specific ones.'
-                    : 'Only reviewing the highlighted tiers below. Tap to add more, or clear all HSK tiles to include every level again.'}
-                </p>
-                <div className="tier-ring-grid">{renderTierTiles(72)}</div>
-                <button
-                  type="button"
-                  className="progress-pace-trigger-btn"
-                  onClick={() => { setShowSettings(false); setShowProgress(true); }}
-                >
-                  View Progress &amp; Pace
-                </button>
+                <ProgressSummary
+                  charProgress={charProgress}
+                  coverage={coverage}
+                  filterHint={revisionLevels.length === 0 && includeNonHsk
+                    ? 'Tap a level to study only some levels.'
+                    : 'Studying only the highlighted levels. Tap to add more, or clear all HSK levels to include every level again.'}
+                  renderTierTiles={renderTierTiles}
+                  onOpenDetails={() => { setShowSettings(false); setShowProgress(true); }}
+                />
               </div>
 
               <div className="card-internal-divider" />
@@ -1078,7 +1114,9 @@ export default function App() {
 
         {showProgress && (
           <ProgressDrawer
-            pace={learningPace}
+            pace={charPace}
+            weekly={charProgress.weekly}
+            studySummary={studySummary}
             commitment={commitment}
             commitmentStatus={commitmentStatus}
             isSignedIn={!!user}

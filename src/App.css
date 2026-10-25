@@ -784,6 +784,14 @@
   margin: 0;
 }
 
+.session-milestone-line {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--accent-secondary);
+  margin: 0;
+}
+
 .soft-wall-gate {
   display: flex;
   flex-direction: column;
@@ -1709,9 +1717,7 @@
 }
 
 .tier-ring-center-text {
-  /* Sized down from the original two-ring version's 26px - a third
-     (writing-mastery) ring narrowed the available center disk. */
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 800;
   fill: var(--ink-dim);
 }
@@ -1733,32 +1739,181 @@
   color: var(--ink);
 }
 
-/* Settings drawer: 7 tiles, 4 columns (last row: 3) */
+.tier-ring-count {
+  font-family: var(--font-data);
+  font-size: 12px;
+  color: var(--ink);
+}
+
+.tier-ring-gain {
+  font-size: 10px;
+  color: var(--accent-secondary);
+  min-height: 12px;
+  line-height: 12px;
+}
+
+/* Settings drawer: 7 tiles, 3 columns (last row: 1) - three across leaves
+   room for the bigger rings and the numbers printed under them. */
 .tier-ring-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 10px;
   margin-top: 14px;
 }
 
-/* Dashboard: compact horizontal-scroll strip, no wrapping */
-.dashboard-tier-strip {
-  width: 100%;
-  max-width: 380px;
-  flex-shrink: 0;
-}
-
-.tier-ring-strip-scroll {
+.tier-ring-legend {
   display: flex;
-  gap: 8px;
-  overflow-x: auto;
-  overflow-y: hidden;
-  padding: 4px 2px 8px;
-  scrollbar-width: none;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin-top: 10px;
+  font-size: 11px;
+  color: var(--ink-dim);
 }
 
-.tier-ring-strip-scroll::-webkit-scrollbar {
-  display: none;
+.tier-ring-legend-swatch {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 5px;
+}
+
+/* Settings > Progress: the character headline and its supporting lines. */
+.progress-headline {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.progress-headline-number {
+  font-family: var(--font-display);
+  font-size: 40px;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--ink);
+}
+
+.progress-headline-label {
+  font-size: 14px;
+  color: var(--ink-dim);
+}
+
+.progress-subline {
+  font-size: 13px;
+  color: var(--ink-dim);
+  margin: 6px 0 0;
+  line-height: 1.45;
+}
+
+.progress-subline strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.progress-gain {
+  color: var(--accent-secondary);
+}
+
+.milestone-track {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--surface-line);
+  margin-top: 10px;
+  overflow: hidden;
+}
+
+.milestone-fill {
+  height: 100%;
+  background: var(--accent-primary);
+  border-radius: 3px;
+}
+
+/* Weekly "became Known" bars, last 8 weeks. */
+.weekly-chart {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  align-items: end;
+  gap: 6px;
+  height: 96px;
+  margin-top: 12px;
+}
+
+.weekly-chart-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  height: 100%;
+}
+
+.weekly-chart-bar {
+  width: 100%;
+  min-height: 2px;
+  border-radius: 4px 4px 0 0;
+  background: var(--accent-primary);
+}
+
+.weekly-chart-col--current .weekly-chart-bar {
+  background: var(--accent-secondary);
+}
+
+.weekly-chart-value {
+  font-family: var(--font-data);
+  font-size: 10px;
+  color: var(--ink-dim);
+}
+
+.weekly-chart-axis {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 6px;
+  margin-top: 4px;
+  font-size: 10px;
+  color: var(--ink-faint);
+  text-align: center;
+}
+
+.progress-stat-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.progress-stat {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--surface-border);
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+
+.progress-stat-value {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.progress-stat-label {
+  font-size: 11px;
+  color: var(--ink-dim);
+  margin-top: 2px;
+  line-height: 1.35;
+}
+
+/* Home screen's one-line progress summary under Start. */
+.launch-progress-line {
+  font-size: 12px;
+  color: var(--ink-dim);
+  text-align: center;
+  margin: 0;
+}
+
+.launch-progress-line strong {
+  color: var(--ink);
+  font-weight: 600;
 }
 
 .mastery-list-box {

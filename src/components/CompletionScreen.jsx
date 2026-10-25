@@ -1,3 +1,5 @@
+import { MILESTONES } from '../utils/charProgress';
+
 // One entry per card, recalled only if every attempt at it was - the
 // guided lesson grades a card more than once (e.g. a new character's
 // writing recall, its quiz, then Close the Loop), and a card missed once
@@ -12,6 +14,30 @@ function mergeResultsByCard(sessionResults) {
   return [...byId.values()];
 }
 
+// What this session actually moved, in characters (see
+// utils/charProgress.js's diffCharacterProgress) - "slipped back" is shown
+// too, since a recap that only ever counts up isn't one to trust. Crossing
+// a milestone gets its own line.
+function ProgressChangeLine({ change, knownCount }) {
+  if (!change) return null;
+  const parts = [];
+  if (change.introduced > 0) parts.push(`+${change.introduced} introduced`);
+  if (change.becameKnown > 0) parts.push(`${change.becameKnown} became known`);
+  if (change.canNowWrite > 0) parts.push(`${change.canNowWrite} can now write`);
+  if (change.slippedBack > 0) parts.push(`${change.slippedBack} slipped back`);
+  if (parts.length === 0) return null;
+
+  const before = knownCount - change.becameKnown + change.slippedBack;
+  const milestone = MILESTONES.find((m) => before < m && knownCount >= m);
+
+  return (
+    <>
+      <p className="session-stat-line">{parts.join(' · ')}</p>
+      {milestone && <p className="session-milestone-line">{milestone} characters known</p>}
+    </>
+  );
+}
+
 export default function CompletionScreen({
   visitGradeCount,
   isSoftWallGated,
@@ -21,6 +47,8 @@ export default function CompletionScreen({
   onContinue,
   title = 'Session Recap',
   summaryLine,
+  progressChange,
+  knownCount,
 }) {
   const cardResults = mergeResultsByCard(sessionResults);
   const nailedResults = cardResults.filter((r) => r.isSuccess);
@@ -31,6 +59,7 @@ export default function CompletionScreen({
       <div className="victory-content">
         <h2>{title}</h2>
         {summaryLine && <p className="session-stat-line">{summaryLine}</p>}
+        <ProgressChangeLine change={progressChange} knownCount={knownCount} />
         {cardResults.length > 0 && (
           <p className="session-stat-line">
             {nailedResults.length}/{cardResults.length} recalled

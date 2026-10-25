@@ -26,7 +26,9 @@ export default function LaunchScreen({
   onLaunchSupercharge,
   onLaunchWarmup,
   onSignIn,
-  renderTierTiles,
+  knownCount,
+  knownThisWeek,
+  daysThisWeek,
 }) {
   // The single-purpose modes are still here, just one tap further away -
   // the guided lesson is the default way to study now.
@@ -79,6 +81,16 @@ export default function LaunchScreen({
             <span className="launch-btn-title">{isLoadingDeck ? 'Preparing Deck...' : "Start today's lesson"}</span>
             {!isLoadingDeck && <span className="launch-btn-sub">{lessonSubLabel}</span>}
           </button>
+
+          {/* The one progress line the home screen keeps - the full picture
+              (HSK rings, pace, goal) lives in Settings. */}
+          {!isLoadingDeck && (
+            <p className="launch-progress-line">
+              <strong>{knownCount}</strong> known
+              {knownThisWeek > 0 && <> · <strong>+{knownThisWeek}</strong> this week</>}
+              {' '}· <strong>{daysThisWeek}</strong> of 7 days
+            </p>
+          )}
 
           <button
             type="button"
@@ -133,9 +145,6 @@ export default function LaunchScreen({
         </div>
       </div>
 
-      <div className="dashboard-tier-strip">
-        <div className="tier-ring-strip-scroll">{renderTierTiles(48)}</div>
-      </div>
     </>
   );
 }

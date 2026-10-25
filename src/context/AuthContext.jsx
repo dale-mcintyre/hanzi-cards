@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabaseClient';
 import { getProgress, hydrateLocalFromRemote, setCurrentSyncUser, getPrefs, hydratePrefsFromRemote, getCommitment, hydrateCommitmentFromRemote, clearLocalUserData, getOfflineMode } from '../utils/storage';
 import { pullAllProgress, mergeLocalAndRemoteProgress, pushCardProgress, pullSettings, pushSettings } from '../utils/syncClient';
 import { flush as flushSyncQueue } from '../utils/syncQueue';
+import { syncStudyDays } from '../utils/studyDays';
 
 const AuthContext = createContext(null);
 
@@ -72,7 +73,7 @@ export function AuthProvider({ children }) {
   // reaches this one through this pull, since saveCardProgress's live push
   // is one-directional (device -> remote). Without re-running this every
   // load, two devices on the same account silently drift apart: each one's
-  // seen/learning/mastered counts (getCardMasteryStats/getTierStats) read
+  // progress counts (getCardMasteryStats/getCharacterProgress) read
   // straight off the local cache, which would otherwise be frozen at
   // whatever it looked like the one time this ran. Idempotent either way -
   // see PLAN.md's "Anonymous -> account migration" section for the
@@ -121,6 +122,14 @@ export function AuthProvider({ children }) {
     setSyncVersion((v) => v + 1);
   }, []);
 
+  // Study-day log (see utils/studyDays.js): sends this device's unsent
+  // counts, then pulls the account's days. Bumps syncVersion like the two
+  // syncs above, so the progress numbers re-read the merged log.
+  const runStudyDaysSync = useCallback(async (user) => {
+    await syncStudyDays(user.id);
+    setSyncVersion((v) => v + 1);
+  }, []);
+
   useEffect(() => {
     if (!supabase) {
       setIsAuthReady(true);
@@ -141,6 +150,7 @@ export function AuthProvider({ children }) {
         runCardIdMigration(user).then(() => {
           runMigration(user);
           runSettingsSync(user);
+          runStudyDaysSync(user);
         });
         flushSyncQueue(pushFnFor(user.id));
       }
@@ -154,6 +164,7 @@ export function AuthProvider({ children }) {
         runCardIdMigration(user).then(() => {
           runMigration(user);
           runSettingsSync(user);
+          runStudyDaysSync(user);
         });
         flushSyncQueue(pushFnFor(user.id));
       }
@@ -163,14 +174,17 @@ export function AuthProvider({ children }) {
       unsubscribed = true;
       subscription.unsubscribe();
     };
-  }, [runCardIdMigration, runMigration, runSettingsSync]);
+  }, [runCardIdMigration, runMigration, runSettingsSync, runStudyDaysSync]);
 
   // Retry queued pushes whenever the device comes back online.
   useEffect(() => {
     const userId = session?.user?.id;
     if (!userId) return;
     function handleOnline() {
-      if (!getOfflineMode()) flushSyncQueue(pushFnFor(userId));
+      if (!getOfflineMode()) {
+        flushSyncQueue(pushFnFor(userId));
+        syncStudyDays(userId);
+      }
     }
     window.addEventListener('online', handleOnline);
     return () => window.removeEventListener('online', handleOnline);

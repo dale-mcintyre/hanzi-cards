@@ -1,6 +1,6 @@
 import { pushCardProgress, pushSettings } from './syncClient';
 import { enqueue as enqueueSync, clear as clearSyncQueue, QUEUE_KEY as SYNC_QUEUE_KEY } from './syncQueue';
-import { WRITING_MASTERED_LEVEL } from './writingSchedule';
+import { clearStudyDays } from './studyDays';
 
 const STORAGE_KEY = 'hanzi_deck_progress';
 const SENTENCE_CACHE_KEY = 'hz_sentence_cache';
@@ -117,6 +117,13 @@ let currentSyncUserId = null;
 
 export function setCurrentSyncUser(userId) {
   currentSyncUserId = userId || null;
+}
+
+// For syncs that live outside this file (utils/studyDays.js, called from
+// App.jsx after a session) - same "signed in and not in Offline Mode"
+// gate every push here uses.
+export function getActiveSyncUser() {
+  return offlineModeEnabled ? null : currentSyncUserId;
 }
 
 export function getProgress() {
@@ -311,6 +318,7 @@ export function clearLocalUserData() {
     console.error('Failed to clear local user data:', e);
   }
   clearSyncQueue();
+  clearStudyDays();
 }
 
 /**
@@ -351,139 +359,6 @@ export function getCardMasteryStats(deck) {
   });
 
   return { new: newCards, learning, mastered };
-}
-
-/**
- * Per-tier (HSK 1-6 + 'non-hsk') seen/mastered/writing breakdown,
- * independent of whatever HSK/non-HSK filter is currently active - takes
- * the FULL, unfiltered vocab list (see data/vocabLoader.js's
- * fetchUnifiedVocab) so a tier that's currently deselected still reports
- * accurate stats. Uses the same MASTERED_INTERVAL_DAYS threshold as
- * getCardMasteryStats above - one classification rule, two different
- * aggregations, so they can't drift.
- *
- * writingMastered counts cards that have reached Writing Recall Mode's
- * "Reflexive" level - independent of reading mastery, since a card can be
- * read-mastered long before (or without ever) reaching Reflexive on the
- * writing side.
- *
- * writingProgress is a separate, smoothed score for the tier ring's fill
- * amount: each attempted card contributes (writingLevel + 1) / 4 - so
- * merely attempting a character at all (even a Missed grade) registers
- * 25% instantly, climbing in even steps to a full 1.0 only once it
- * reaches Reflexive. This gives visible, encouraging motion after every
- * writing session instead of the ring sitting at 0% until the very first
- * character is fully mastered - while still guaranteeing the ring can
- * only ever reach 100% once literally every card in the tier has reached
- * Reflexive (each card's own ceiling is 1.0, reached only there).
- */
-export function getTierStats(fullVocab, progress) {
-  const tiers = {};
-  for (const key of ['1', '2', '3', '4', '5', '6', 'non-hsk']) {
-    tiers[key] = { total: 0, seen: 0, mastered: 0, writingMastered: 0, writingProgress: 0 };
-  }
-
-  fullVocab.forEach((word) => {
-    const key = word.level === null || word.level === undefined ? 'non-hsk' : String(word.level);
-    const tier = tiers[key];
-    if (!tier) return; // defensive: unexpected level value, skip rather than throw
-    tier.total += 1;
-
-    const stat = progress[word.character];
-    if (!stat) return;
-
-    if (stat.lastWrittenAt) {
-      const level = stat.writingLevel || 0;
-      tier.writingProgress += (level + 1) / (WRITING_MASTERED_LEVEL + 1);
-      if (level >= WRITING_MASTERED_LEVEL) tier.writingMastered += 1;
-    }
-
-    // lastReviewed, not repetitions - see getCardMasteryStats above for
-    // why (SM-2 resets repetitions to 0 on a wrong answer, which would
-    // otherwise make the outer "seen" ring exclude cards the user has
-    // genuinely attempted but keeps missing).
-    if (!stat.lastReviewed) return;
-    tier.seen += 1;
-    if (stat.interval >= MASTERED_INTERVAL_DAYS) tier.mastered += 1;
-  });
-
-  return tiers;
-}
-
-// Rolling window (days) the countdown/pace feature below averages over -
-// long enough to smooth out day-to-day noise (one heavy study binge
-// shouldn't make "weeks left" swing wildly), short enough to still track
-// how the user is studying *now* rather than a stale burst from months
-// ago.
-const PACE_WINDOW_DAYS = 14;
-
-/**
- * Per-tier "at your current pace, how long until this level is fully
- * mastered" estimate - the data behind Settings' progress/countdown
- * screen. Built entirely from stats storage.js already tracks; no new
- * synced field required.
- *
- * There's no literal log of *when* each card first crossed the mastery
- * threshold, only its current `interval` and the timestamp of its most
- * recent review (`lastReviewed`). `lastReviewed` is still a reasonable
- * stand-in for "when it became mastered" though: once a card's interval
- * reaches MASTERED_INTERVAL_DAYS, SM-2 won't schedule it for review again
- * until that many days out, so for most cards the most recent review IS
- * roughly the moment it crossed into "mastered" (or a later re-mastery
- * review, which is still a fine signal of real, recent study on that
- * tier). Good enough for a rough "~4 weeks left" estimate - this is
- * explicitly not meant to be exact.
- */
-export function getLearningPace(fullVocab, progress, windowDays = PACE_WINDOW_DAYS) {
-  const now = Date.now();
-  const windowStart = now - windowDays * MS_PER_DAY;
-
-  // How long this account has actually been active, so a brand-new
-  // account doesn't have its pace diluted by averaging over the full
-  // window when only a sliver of it has actually elapsed - that would
-  // understate a fast-starting new user's true pace for their first
-  // couple of weeks.
-  let earliestActivity = null;
-  for (const stat of Object.values(progress)) {
-    if (stat.lastReviewed && (earliestActivity === null || stat.lastReviewed < earliestActivity)) {
-      earliestActivity = stat.lastReviewed;
-    }
-  }
-  const accountAgeDays = earliestActivity ? (now - earliestActivity) / MS_PER_DAY : 0;
-  const effectiveDays = Math.max(1, Math.min(windowDays, accountAgeDays));
-
-  const tiers = {};
-  for (const key of ['1', '2', '3', '4', '5', '6', 'non-hsk']) {
-    tiers[key] = { total: 0, mastered: 0, masteredRecently: 0 };
-  }
-
-  fullVocab.forEach((word) => {
-    const key = word.level === null || word.level === undefined ? 'non-hsk' : String(word.level);
-    const tier = tiers[key];
-    if (!tier) return;
-    tier.total += 1;
-
-    const stat = progress[word.character];
-    // lastReviewed gate first, same as getTierStats above - a card with
-    // only writing-side progress (lastWrittenAt but no reading review
-    // yet) has interval === undefined, and `undefined < 21` is false, not
-    // true, which would otherwise wrongly count it as read-mastered here.
-    if (!stat || !stat.lastReviewed || stat.interval < MASTERED_INTERVAL_DAYS) return;
-    tier.mastered += 1;
-    if (stat.lastReviewed >= windowStart) tier.masteredRecently += 1;
-  });
-
-  for (const tier of Object.values(tiers)) {
-    const perDay = tier.masteredRecently / effectiveDays;
-    tier.remaining = tier.total - tier.mastered;
-    tier.perWeek = perDay * 7;
-    // null (not a number, not Infinity) reads as "can't estimate yet" -
-    // distinct from a real 0-day ETA, which only happens when remaining
-    // is already 0 (tier complete).
-    tier.etaDays = perDay > 0 ? tier.remaining / perDay : null;
-  }
-
-  return tiers;
 }
 
 const COMMITMENT_KEY = 'hz_study_commitment';
