@@ -1,4 +1,5 @@
 import { MILESTONES } from '../utils/charProgress';
+import LongPressHanzi from './LongPressHanzi';
 
 // One entry per card, recalled only if every attempt at it was - the
 // guided lesson grades a card more than once (e.g. a new character's
@@ -33,7 +34,12 @@ function ProgressChangeLine({ change, knownCount }) {
   return (
     <>
       <p className="session-stat-line">{parts.join(' · ')}</p>
-      {milestone && <p className="session-milestone-line">{milestone} characters known</p>}
+      {milestone && (
+        <p className="session-milestone-line">
+          <img src="/seals/seal-xue.png" alt="" className="session-milestone-seal" />
+          {milestone} characters known
+        </p>
+      )}
     </>
   );
 }
@@ -47,6 +53,9 @@ export default function CompletionScreen({
   onContinue,
   title = 'Session Recap',
   summaryLine,
+  // A finished lesson gets the 好 ("well done") seal pressed above its
+  // title - a teacher's mark, kept for the lesson, not every session.
+  showSeal = false,
   progressChange,
   knownCount,
 }) {
@@ -57,6 +66,7 @@ export default function CompletionScreen({
   return (
     <div className="card victory-card">
       <div className="victory-content">
+        {showSeal && <img src="/seals/seal-hao.png" alt="好 - well done" className="completion-seal" />}
         <h2>{title}</h2>
         {summaryLine && <p className="session-stat-line">{summaryLine}</p>}
         <ProgressChangeLine change={progressChange} knownCount={knownCount} />
@@ -73,15 +83,17 @@ export default function CompletionScreen({
                 <span className="box-section-label">Recalled · {nailedResults.length}</span>
                 <div className="mastery-grid-chips">
                   {nailedResults.map((r) => (
-                    <button
+                    <LongPressHanzi
+                      as="button"
                       key={r.id}
                       type="button"
                       className="mastery-chip mastery-chip--know"
+                      entry={r}
                       onClick={() => onInspectCard(r)}
                     >
                       <span className="chip-char">{r.character}</span>
                       <span className="chip-py">{r.pinyin}</span>
-                    </button>
+                    </LongPressHanzi>
                   ))}
                 </div>
               </div>
@@ -92,15 +104,17 @@ export default function CompletionScreen({
                 <span className="box-section-label">Missed · {struggledResults.length}</span>
                 <div className="mastery-grid-chips">
                   {struggledResults.map((r) => (
-                    <button
+                    <LongPressHanzi
+                      as="button"
                       key={r.id}
                       type="button"
                       className="mastery-chip mastery-chip--again"
+                      entry={r}
                       onClick={() => onInspectCard(r)}
                     >
                       <span className="chip-char">{r.character}</span>
                       <span className="chip-py">{r.pinyin}</span>
-                    </button>
+                    </LongPressHanzi>
                   ))}
                 </div>
               </div>

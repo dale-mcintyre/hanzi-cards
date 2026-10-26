@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import HanziCanvas from './HanziCanvas';
+import LongPressHanzi from './LongPressHanzi';
 import { speakText } from '../utils/tts';
 import { ColorPinyin } from '../utils/pinyinColor';
 import { fitScaleForLength } from '../utils/textFit';
@@ -117,9 +118,9 @@ export default function WarmupSession({ card, onAnswer, progressPercent }) {
         <div className="card quiz-card warmup-reveal-card">
           <span className="box-section-label">New Character</span>
 
-          <div className="canvas-frame">
+          <LongPressHanzi as="div" className="canvas-frame" entry={{ character: card.character, pinyin: card.pinyin, meaning: card.meaning }}>
             <HanziCanvas character={card.character} mode="view" />
-          </div>
+          </LongPressHanzi>
 
           <h1 className="pinyin-title"><ColorPinyin pinyin={card.pinyin} /></h1>
           <p className="meaning-primary">{primaryMeaning}</p>
@@ -152,12 +153,17 @@ export default function WarmupSession({ card, onAnswer, progressPercent }) {
             if (showResult && isCorrectOption) className += ' quiz-option-btn--correct';
             else if (isWrongPick) className += ' quiz-option-btn--incorrect';
 
+            // Long-press only once answered - before that, watching the
+            // strokes of each option would be a hint.
             return (
-              <button
+              <LongPressHanzi
+                as="button"
                 key={option.character}
                 type="button"
                 className={className}
-                disabled={selected !== null}
+                aria-disabled={selected !== null}
+                disabled={!showResult}
+                entry={{ character: option.character, pinyin: option.pinyin }}
                 onClick={() => handleSelect(option.character)}
               >
                 <span className="quiz-option-char">{option.character}</span>
@@ -169,7 +175,7 @@ export default function WarmupSession({ card, onAnswer, progressPercent }) {
                 <span className={`quiz-option-pinyin ${showResult ? '' : 'quiz-option-pinyin--hidden'}`}>
                   <ColorPinyin pinyin={option.pinyin} />
                 </span>
-              </button>
+              </LongPressHanzi>
             );
           })}
         </div>

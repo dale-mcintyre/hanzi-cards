@@ -54,6 +54,17 @@ export default function AboutDrawer({ onClose }) {
             </a>
             .
           </p>
+          <p>
+            Chinese is set in{' '}
+            <a href="https://github.com/lxgw/LxgwWenKai" target="_blank" rel="noopener noreferrer">
+              LXGW WenKai
+            </a>
+            , used under the{' '}
+            <a href="/licenses/LXGW-WenKai-OFL.txt" target="_blank" rel="noopener noreferrer">
+              SIL Open Font License
+            </a>
+            .
+          </p>
           <a
             className="about-coffee-link"
             href="https://buymeacoffee.com/dalemcintyre"

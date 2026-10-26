@@ -1,14 +1,19 @@
 import React, { useEffect, useRef, useState } from 'react';
 import HanziWriter from 'hanzi-writer';
+import { cssVar, useResolvedTheme } from '../utils/theme';
 
-// Single Character Tianzige Cell
+// One character on 米字格 (mizige) practice paper - the outer square, the
+// centre cross and both diagonals, as printed in Chinese copybooks.
 function SingleHanziBox({ char, mode, size, shouldAnimate, onComplete }) {
   const containerRef = useRef(null);
   const writerRef = useRef(null);
   const [writerLoaded, setWriterLoaded] = useState(false);
+  // HanziWriter takes literal colours, not CSS variables, so it's rebuilt
+  // with the new palette whenever the theme changes.
+  const theme = useResolvedTheme();
 
   // 'hidden' mode (Writing Recall Mode's prompt state) never creates a
-  // HanziWriter instance at all - just the tianzige grid lines below, no
+  // HanziWriter instance at all - just the mizige grid lines below, no
   // glyph, no fallback span. Skipping instance creation entirely (rather
   // than creating one and hiding it) avoids wasted stroke-data fetches for
   // a card that might get graded before it's ever revealed.
@@ -32,9 +37,9 @@ function SingleHanziBox({ char, mode, size, shouldAnimate, onComplete }) {
           width: size,
           height: size,
           padding: Math.max(6, Math.floor(size * 0.08)),
-          strokeColor: '#f8fafc',
-          radicalColor: '#38bdf8',
-          outlineColor: '#334155',
+          strokeColor: cssVar('--hanzi-stroke'),
+          radicalColor: cssVar('--hanzi-radical'),
+          outlineColor: cssVar('--hanzi-outline'),
           showOutline: true,
           showCharacter: true,
           delayBetweenStrokes: 50,
@@ -51,7 +56,7 @@ function SingleHanziBox({ char, mode, size, shouldAnimate, onComplete }) {
 
     return () => cancelAnimationFrame(rafId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [char, mode, size]);
+  }, [char, mode, size, theme]);
 
   // Triggers this box's animation exactly once per "turn": fires when
   // either the writer finishes loading (single-box / already-active box)
@@ -85,16 +90,14 @@ function SingleHanziBox({ char, mode, size, shouldAnimate, onComplete }) {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#090d16',
-        borderRadius: size > 150 ? '20px' : '14px',
-        border: '1px solid #1e293b',
-        boxShadow: 'inset 0 2px 6px rgba(0,0,0,0.6)',
+        backgroundColor: 'var(--mizige-bg)',
+        border: '1.5px solid var(--mizige-border)',
         overflow: 'hidden',
         flexShrink: 0,
         cursor: mode === 'animate' && writerLoaded ? 'pointer' : 'default',
       }}
     >
-      {/* Tianzige SVG Grid */}
+      {/* Mizige grid - inner lines only; the box's own border is the outer square */}
       <svg
         className="tianzige-grid"
         viewBox="0 0 100 100"
@@ -105,15 +108,15 @@ function SingleHanziBox({ char, mode, size, shouldAnimate, onComplete }) {
           width: '100%',
           height: '100%',
           pointerEvents: 'none',
-          opacity: 0.35,
           zIndex: 1,
+          stroke: 'var(--mizige-line)',
         }}
+        aria-hidden="true"
       >
-        <rect x="1" y="1" width="98" height="98" fill="none" stroke="#334155" strokeWidth="1.5" />
-        <line x1="50" y1="0" x2="50" y2="100" stroke="#334155" strokeWidth="1" strokeDasharray="3,3" />
-        <line x1="0" y1="50" x2="100" y2="50" stroke="#334155" strokeWidth="1" strokeDasharray="3,3" />
-        <line x1="0" y1="0" x2="100" y2="100" stroke="#1e293b" strokeWidth="0.75" strokeDasharray="2,4" />
-        <line x1="100" y1="0" x2="0" y2="100" stroke="#1e293b" strokeWidth="0.75" strokeDasharray="2,4" />
+        <line x1="50" y1="0" x2="50" y2="100" vectorEffect="non-scaling-stroke" strokeDasharray="4 4" />
+        <line x1="0" y1="50" x2="100" y2="50" vectorEffect="non-scaling-stroke" strokeDasharray="4 4" />
+        <line x1="0" y1="0" x2="100" y2="100" vectorEffect="non-scaling-stroke" strokeDasharray="4 4" />
+        <line x1="100" y1="0" x2="0" y2="100" vectorEffect="non-scaling-stroke" strokeDasharray="4 4" />
       </svg>
 
       {mode !== 'hidden' && (
@@ -123,11 +126,11 @@ function SingleHanziBox({ char, mode, size, shouldAnimate, onComplete }) {
             style={{
               position: 'absolute',
               fontSize: `${size * 0.58}px`,
-              color: '#f8fafc',
+              color: 'var(--hanzi-stroke)',
               zIndex: writerLoaded ? 1 : 2,
               opacity: writerLoaded ? 0 : 1,
               transition: 'opacity 0.2s ease',
-              fontFamily: '"Songti SC", "STSong", "SimSun", "Noto Serif SC", serif',
+              fontFamily: 'var(--font-hanzi)',
               lineHeight: 1,
               userSelect: 'none',
             }}
@@ -165,7 +168,7 @@ export default function HanziCanvas({ character, mode = 'view', sequential = fal
   if (!character) {
     return (
       <div className="card-canvas-stage" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%' }}>
-        <div style={{ color: '#64748b', fontSize: '14px' }}>Loading character...</div>
+        <div style={{ color: 'var(--ink-faint)', fontSize: '14px' }}>Loading character...</div>
       </div>
     );
   }

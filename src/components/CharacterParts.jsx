@@ -1,4 +1,5 @@
 import { describeCharacter } from '../data/charParts';
+import LongPressHanzi from './LongPressHanzi';
 
 /**
  * The parts each character of a word is built from, plus a one-line note
@@ -18,13 +19,13 @@ export default function CharacterParts({ word, charParts }) {
         <div key={b.char} className="char-parts-row">
           {b.components.length > 0 && (
             <div className="char-parts-equation">
-              <span className="char-parts-whole">{b.char}</span>
+              <LongPressHanzi className="char-parts-whole" entry={b.char}>{b.char}</LongPressHanzi>
               <span className="char-parts-op">=</span>
               {b.components.map((p, i) => (
                 <span key={`${p.char}-${i}`} className="char-parts-piece">
                   {i > 0 && <span className="char-parts-op">+</span>}
                   <span className="char-parts-part">
-                    <span className="char-parts-part-char">{p.char}</span>
+                    <LongPressHanzi className="char-parts-part-char" entry={p.char}>{p.char}</LongPressHanzi>
                     {(p.meaning || p.role) && (
                       <span className="char-parts-part-label">
                         {p.role === 'sound' ? `sound ${p.pinyin || ''}`.trim() : p.meaning}
