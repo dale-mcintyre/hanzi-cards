@@ -661,9 +661,9 @@ export default function App() {
   const lessonStage = appState === 'lesson' ? lessonStages[lessonStageIndex] : null;
   const sessionKind = lessonStage ? lessonStage.kind : SESSION_KIND_BY_APP_STATE[appState];
 
-  // Speaking on flip is StudySession's job now (it also owns the delayed
-  // auto-play timer and needs to dedupe against it - see its
-  // card/isFlipped effect) - this just toggles the visual state.
+  // Speaking on flip is StudySession's job (it dedupes repeat flips of the
+  // same card - see its card/isFlipped effect) - this just toggles the
+  // visual state.
   const handleFlip = () => {
     setIsFlipped((prev) => !prev);
   };
@@ -678,9 +678,9 @@ export default function App() {
     if (!card || isAdvancingRef.current) return;
 
     // Grading means the user is done with this card's pronunciation too -
-    // if the flip's delayed auto-play timer fired right around the same
-    // moment (StudySession's AUTO_PLAY_DELAY_MS is 1.5s, well within
-    // normal read-then-grade timing), letting speechSynthesis keep
+    // if it's still being spoken (StudySession speaks it on flip, and a
+    // quick grade right after flipping lands well within it), letting
+    // speechSynthesis keep
     // talking while the grading tone below starts can make two separate
     // OS audio pipelines open at once, which is a known source of an
     // audible click/pop on several mobile browsers - cutting it off first

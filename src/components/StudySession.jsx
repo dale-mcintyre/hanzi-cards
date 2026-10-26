@@ -9,7 +9,6 @@ import { calculateSM2 } from '../utils/sm2';
 import { fitScaleForLength } from '../utils/textFit';
 import { SpeakerIcon, FlagIcon } from './icons';
 
-const AUTO_PLAY_DELAY_MS = 1500;
 const MEANING_BASE_FONT_PX = 19;
 
 function HighlightedSentence({ sentence, targetChar, muted = false }) {
@@ -59,39 +58,22 @@ export default function StudySession({
     onLongPress: () => card && showStrokeOrder({ character: card.character, pinyin: card.pinyin, meaning: card.meaning }),
   });
 
-  // Tracks which card.id has already had its pronunciation resolved (either
-  // the delayed auto-play fired, or the user flipped before it did) so
-  // neither path double-speaks and flipping back and forth on the same card
-  // doesn't replay it. Reset implicitly whenever `card` changes - a stale
-  // id just never matches the new card.
+  // Tracks which card.id has already been spoken on flip, so flipping back
+  // and forth on the same card doesn't replay it. Reset implicitly whenever
+  // `card` changes - a stale id just never matches the new card.
   const autoPlayedRef = useRef(null);
 
+  // Pronunciation plays on the flip, never before it: the front is a recall
+  // test - say the reading yourself, then hear it as the check. (It used to
+  // auto-play 1.5s after the card appeared, which gave the reading away to
+  // anyone not instant.) The front's speaker button still plays it on
+  // request.
   useEffect(() => {
-    if (!card) return;
-
-    if (isFlipped) {
-      // Flipped (tap, swipe-tap, or the flip-hint button) before the delay
-      // elapsed - speak immediately instead of waiting out the timer.
-      if (autoPlayedRef.current !== card.id) {
-        // Only mark resolved if sound was actually on - otherwise a card
-        // whose auto-play window passed while muted would stay silently
-        // "resolved" forever, even after the user unmutes.
-        if (getSoundEnabled()) autoPlayedRef.current = card.id;
-        speakText(card.character);
-      }
-      return;
-    }
-
-    if (autoPlayedRef.current === card.id) return;
-
-    const timer = setTimeout(() => {
-      if (getSoundEnabled()) autoPlayedRef.current = card.id;
-      speakText(card.character);
-    }, AUTO_PLAY_DELAY_MS);
-    // Cleared whenever `card`/`isFlipped` change before the delay elapses -
-    // a new card or an early flip both cancel the pending auto-play so it
-    // can't fire out of sequence.
-    return () => clearTimeout(timer);
+    if (!card || !isFlipped || autoPlayedRef.current === card.id) return;
+    // Only mark spoken if sound was actually on - otherwise a card flipped
+    // while muted would stay silently "spoken", even after unmuting.
+    if (getSoundEnabled()) autoPlayedRef.current = card.id;
+    speakText(card.character);
   }, [card, isFlipped]);
 
   // Space flips (matches tap), 1/2 grade (matches swipe left/right) once
