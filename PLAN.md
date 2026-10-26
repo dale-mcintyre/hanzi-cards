@@ -70,7 +70,7 @@ LLM-audited definition pipeline (`build-vocab.py`).
   streak instead of leaving them visible to the next person on a shared
   device; also closed a latent bug where a stale sync queue could have
   flushed one account's grades onto whichever account signs in next.
-- Delayed auto-pronunciation (1.5s after a card appears, unless flipped
+- ~~Delayed auto-pronunciation~~ (later removed: flashcards now speak only on flip, so the front stays a recall test). Originally: 1.5s after a card appears, unless flipped
   first) with a worded "Sound"/"Muted" toggle in the nav bar (moved off the
   study card itself after it visually collided with the existing per-card
   play button).

@@ -49,7 +49,7 @@ function pickVoice(voices) {
 
 /** Safe, cross-browser Web Speech API wrapper for Mandarin (zh-CN).
  * Gated on the mute flag here, not at each call site, so every caller
- * (auto-play, flip, the manual replay buttons) automatically respects it -
+ * (flip, priming, quiz answers, the manual replay buttons) automatically respects it -
  * no risk of a call site forgetting to check. */
 export function speakText(text) {
   if (!soundEnabled) return;
@@ -60,8 +60,8 @@ export function speakText(text) {
   }
 
   // Cancel any in-flight utterance first, so rapid successive calls (flip
-  // then immediately tap the replay button, or swiping past a card whose
-  // delayed auto-play just fired) never stack. On several mobile browsers,
+  // then immediately tap the replay button, or grading a card right after
+  // flipping it) never stack. On several mobile browsers,
   // calling speak() in the very same tick as cancel() can silently drop
   // the new utterance instead of replacing the old one (a known
   // speechSynthesis race, not specific to this app) - deferring the
