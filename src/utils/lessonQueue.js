@@ -27,7 +27,7 @@ const MIN_GRADES_FOR_ACCURACY = 5;
 
 // Rough per-card pace, for the dashboard's "~N min" label only - same
 // spirit as App.jsx's estimateWritingMinutes, not a measured average.
-const SECONDS_PER_CARD = { quiz: 6, flashcard: 10, writing: 20 };
+const SECONDS_PER_CARD = { quiz: 6, flashcard: 10, writing: 20, writeout: 40 };
 const PRIMING_SECONDS = 30;
 const SENTENCE_SECONDS = 30;
 
@@ -54,14 +54,17 @@ function newCountForBacklog(dueTotal) {
  *  4. Use It: Cloze sentence writing.
  *  5. Close the Loop: everything missed earlier, then all of today's new
  *     characters again, each repeated until it's right (up to
- *     MAX_RECHECK_ATTEMPTS).
+ *     MAX_RECHECK_ATTEMPTS). Then Write Them Out: every miss from the
+ *     whole lesson shown once more, to be copied out 5 or 10 times by
+ *     hand - repetition for the motor memory, ungraded.
  *
  * Returns an array of stages, each `{ key, section, title, intro, kind,
  * cards, budgetMs, ... }`. `kind` picks the screen ('quiz' = WarmupSession,
- * 'flashcard' = StudySession, 'writing' = WritingSession) and `budgetMs`
+ * 'flashcard' = StudySession, 'writing' = WritingSession, 'writeout' =
+ * WriteOutSession) and `budgetMs`
  * is that step's time box - App.jsx ends a step early once it's spent,
  * leaving whatever wasn't reached for the next lesson. Close the Loop's
- * two stages are `dynamic`: their cards only exist once the earlier steps
+ * three stages are `dynamic`: their cards only exist once the earlier steps
  * have run, so resolveStageCards fills them in on the way in. Static
  * stages with nothing to show are left out entirely.
  *
@@ -179,6 +182,20 @@ export function buildLessonPlan(deck, charParts = null) {
       cards: [],
       budgetMs: 4 * MINUTE_MS,
     },
+    {
+      key: 'write-out',
+      section: 'Close the loop',
+      title: 'Write them out',
+      intro: 'Everything you missed or hesitated on today. Write each one out in your notebook, again and again.',
+      kind: 'writeout',
+      dynamic: true,
+      practiceOnly: true,
+      // The learner picks how many times on the intro card - see
+      // LessonStageIntro.
+      repsOptions: [5, 10],
+      cards: [],
+      budgetMs: null,
+    },
   ];
 
   return stages.filter((s) => s.dynamic || s.cards.length > 0);
@@ -206,6 +223,13 @@ export function resolveStageCards(stage, stages, misses, results) {
     const byId = new Map(misses.writing);
     for (const c of learnNew?.cards || []) byId.set(c.id, c);
     return shuffle([...byId.values()]);
+  }
+
+  // Every card missed (or, for writing, hesitated on) anywhere in the
+  // lesson, reading or writing, once each in the order they went wrong.
+  if (stage.key === 'write-out') {
+    const byId = new Map([...misses.reading, ...misses.writing]);
+    return [...byId.values()];
   }
 
   if (stage.key === 'learn-new') {

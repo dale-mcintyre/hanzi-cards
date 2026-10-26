@@ -2133,3 +2133,8 @@
   color: var(--ink-dim);
   margin: 0 0 14px;
 }
+
+/* Write Them Out's 5x / 10x choice on its intro card. */
+.lesson-reps-row {
+  margin-top: 6px;
+}

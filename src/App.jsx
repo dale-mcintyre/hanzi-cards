@@ -23,6 +23,7 @@ import WritingSession from './components/WritingSession';
 import WritingBadge from './components/WritingBadge';
 import CompletionScreen from './components/CompletionScreen';
 import LessonStageIntro from './components/LessonStageIntro';
+import WriteOutSession from './components/WriteOutSession';
 import CardInspectDrawer from './components/CardInspectDrawer';
 import MasteryCelebration from './components/MasteryCelebration';
 import SyncStatusDot from './components/SyncStatusDot';
@@ -195,6 +196,9 @@ export default function App() {
   const [lessonStageIndex, setLessonStageIndex] = useState(0);
   const [isLessonIntro, setIsLessonIntro] = useState(false);
   const [lessonElapsedMinutes, setLessonElapsedMinutes] = useState(0);
+  // How many times to write each card in Write Them Out, picked on its
+  // intro card.
+  const [writeOutReps, setWriteOutReps] = useState(10);
   // Set when a lesson finishes, for CompletionScreen's lesson title and
   // summary line; cleared by every other kind of launch.
   const [lessonSummary, setLessonSummary] = useState(null);
@@ -621,8 +625,9 @@ export default function App() {
     enterLessonStage(stages, 0, []);
   };
 
-  const beginLessonStage = () => {
+  const beginLessonStage = (reps) => {
     const stage = lessonStages[lessonStageIndex];
+    if (reps) setWriteOutReps(reps);
     if (stage.key === 'learn-new') lessonNewTaughtRef.current = stage.cards.length;
     setSessionQueue(stage.cards);
     setCurrentIndex(0);
@@ -956,6 +961,17 @@ export default function App() {
             phaseBanners={!lessonStage}
             showIntervals={!lessonStage?.practiceOnly}
             charParts={charParts}
+          />
+        )}
+
+        {/* Ungraded, so it never goes through handleNextCard - it just
+            hands back to the lesson when it's walked its cards. */}
+        {isSessionScreenShowing && sessionKind === 'writeout' && (
+          <WriteOutSession
+            cards={sessionQueue}
+            reps={writeOutReps}
+            charParts={charParts}
+            onDone={() => enterLessonStage(lessonStages, lessonStageIndex + 1, sessionResults)}
           />
         )}
 
