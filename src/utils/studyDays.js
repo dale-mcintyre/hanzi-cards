@@ -109,6 +109,26 @@ export function clearStudyDays() {
 }
 
 /**
+ * The last 7 days, oldest first and ending today, for the home screen's
+ * stamped study log: [{ day, label, studied, isToday }].
+ */
+export function lastSevenDays(days, now = Date.now()) {
+  const DAY_MS = 24 * 60 * 60 * 1000;
+  const out = [];
+  for (let i = 6; i >= 0; i--) {
+    const ts = now - i * DAY_MS;
+    const day = localDay(ts);
+    out.push({
+      day,
+      label: i === 0 ? 'Today' : new Date(ts).toLocaleDateString(undefined, { weekday: 'short' }),
+      studied: !!days[day],
+      isToday: i === 0,
+    });
+  }
+  return out;
+}
+
+/**
  * { daysThisWeek, daysLast30, retention } from the log - "this week" is
  * the last 7 days including today. retention is passed/reviews over the
  * last 30 days, or null with too few reviews to mean anything.

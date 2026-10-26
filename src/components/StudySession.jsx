@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef } from 'react';
 import HanziCanvas from './HanziCanvas';
 import useSwipeGesture from '../hooks/useSwipeGesture';
+import { useStrokeOrder } from '../context/StrokeOrderContext';
 import { speakText, getSoundEnabled } from '../utils/tts';
 import { ColorPinyin } from '../utils/pinyinColor';
 import { MASTERED_INTERVAL_DAYS } from '../utils/storage';
@@ -49,10 +50,13 @@ export default function StudySession({
   // Matches the on-card buttons below (Again on the left, Good on the
   // right) regardless of which face is showing - swipe left always means
   // Again, swipe right always means Good.
+  // Holding the card (rather than tapping to flip) shows its stroke order.
+  const showStrokeOrder = useStrokeOrder();
   const { dragX, dragY, isDragging, pointerHandlers } = useSwipeGesture({
     onSwipeLeft: () => onGrade(1),
     onSwipeRight: () => onGrade(5),
     onTap: onFlip,
+    onLongPress: () => card && showStrokeOrder({ character: card.character, pinyin: card.pinyin, meaning: card.meaning }),
   });
 
   // Tracks which card.id has already had its pronunciation resolved (either

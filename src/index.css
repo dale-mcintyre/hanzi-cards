@@ -1,60 +1,148 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap');
 
+/* LXGW WenKai, a Kaiti (楷体) face - the handwriting style learners copy
+   into their notebooks - subsetted to the app's own characters by
+   build-hanzi-font.py. SIL OFL 1.1: public/licenses/LXGW-WenKai-OFL.txt. */
+@font-face {
+  font-family: 'LXGW WenKai';
+  src: url('/fonts/lxgw-wenkai-subset.woff2') format('woff2');
+  font-display: swap;
+}
+
+/* Ink & Paper: warm paper, near-black ink, one vermilion accent (the
+   colour of a seal) used for meaning rather than decoration. The night
+   palette below is the same idea inverted - set by utils/theme.js on
+   <html data-theme>, from the Appearance setting or the device's light/
+   dark preference. */
 :root {
-  /* Warm obsidian palette - jade accent */
-  --bg-canvas: #0d0e11;
-  /* Nudged up a shade from the flat page background so the card reads as
-     a distinct elevated surface rather than nearly flush with the canvas. */
-  --surface-card: #16171c;
-  --surface-card-raised: #1e1f25;
-  --surface-line: #2a2b31;
-  --surface-border: rgba(255, 255, 255, 0.07);
-  --accent-primary: #2dd4bf;
-  --accent-primary-dim: rgba(45, 212, 191, 0.14);
-  --accent-primary-ink: #04211d;
+  --bg-canvas: #EDE6D8;
+  /* The sheet everything sits on - a shade lighter than the desk behind
+     it, like a page on a table. */
+  --surface-card: #F6F1E6;
+  --surface-card-raised: #FBF8F1;
+  --surface-line: #DCD2C0;
+  --surface-border: #DCD2C0;
 
-  /* Restrained "craft" accent, reserved for secondary/writing actions -
-     jade stays the ONE color for the single primary action, so it still
-     means something rather than being reused at lower opacity everywhere. */
-  --accent-secondary: #d9a441;
-  --accent-secondary-dim: rgba(217, 164, 65, 0.12);
-  --accent-secondary-border: rgba(217, 164, 65, 0.3);
+  /* Ink is the one colour for primary actions; vermilion marks meaning
+     (this week's gain, milestones, things to practise). */
+  --accent-primary: #1F1B16;
+  --accent-primary-dim: rgba(31, 27, 22, 0.1);
+  --accent-primary-ink: #F6F1E6;
+  --accent-line: rgba(31, 27, 22, 0.35);
 
-  --canvas-bg: #030712;
-  --outline-slate: #64748b;
-  --stroke-white: #ffffff;
+  --accent-secondary: #B5352A;
+  --accent-secondary-dim: rgba(181, 53, 42, 0.08);
+  --accent-secondary-border: rgba(181, 53, 42, 0.35);
 
-  --ink: #f5f7fa;
-  --ink-dim: #9a9c9f;
-  --ink-faint: #5c5e63;
+  --ink: #1F1B16;
+  --ink-dim: #5A5249;
+  --ink-faint: #6E655A;
 
-  --easy: #34d399;
-  --easy-dim: rgba(52, 211, 153, 0.14);
-  --hard: #fb7185;
-  --hard-dim: rgba(251, 113, 133, 0.14);
-  --pending: #fbbf24;
+  --easy: #3D7550;
+  --easy-dim: rgba(61, 117, 80, 0.1);
+  --easy-line: rgba(61, 117, 80, 0.4);
+  --hard: #B5352A;
+  --hard-dim: rgba(181, 53, 42, 0.08);
+  --hard-line: rgba(181, 53, 42, 0.4);
+  --pending: #9A5F14;
+  --pending-dim: rgba(154, 95, 20, 0.1);
+  --pending-line: rgba(154, 95, 20, 0.35);
 
-  /* Legacy aliases - most of App.css was written against these names
-     against the previous cold slate/navy + cyan palette. Pointing them at
-     the new warm-obsidian tokens above applies the redesign app-wide from
-     one place instead of a risky mechanical rename across every call site;
-     any new CSS should reach for the tokens above directly. */
+  /* Quiet fills and rules for controls, replacing the old white-alpha
+     glass on dark. */
+  --tint-1: rgba(31, 27, 22, 0.04);
+  --tint-2: rgba(31, 27, 22, 0.08);
+  --line-soft: #DCD2C0;
+  --line-strong: #C4B8A2;
+  --overlay: rgba(31, 27, 22, 0.35);
+  --shadow-card: 0 1px 2px rgba(31, 27, 22, 0.06), 0 12px 32px -18px rgba(31, 27, 22, 0.25);
+  --shadow-pop: 0 16px 40px -18px rgba(31, 27, 22, 0.35);
+
+  /* 米字格 practice-paper grid and the character drawn on it. */
+  --mizige-bg: #FBF8F1;
+  --mizige-border: rgba(181, 53, 42, 0.6);
+  --mizige-line: rgba(181, 53, 42, 0.32);
+  --hanzi-stroke: #1F1B16;
+  --hanzi-radical: #1F1B16;
+  --hanzi-outline: #E3DACA;
+
+  /* Tone colours, muted to sit on paper: vermilion, ochre, jade, indigo. */
+  --tone-1: #B5352A;
+  --tone-2: #9A5F14;
+  --tone-3: #3D7550;
+  --tone-4: #2F5A8C;
+
+  --radius: 2px;
+  --radius-sheet: 4px;
+
+  /* Legacy aliases - most of App.css was written against these names.
+     Pointing them at the tokens above applies a palette app-wide from one
+     place; new CSS should reach for the tokens above directly. */
   --bg: var(--bg-canvas);
   --surface: var(--surface-card);
   --surface-raised: var(--surface-card-raised);
   --accent-cyan: var(--accent-primary);
   --draw-cyan: var(--accent-primary);
 
-  --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --font-data: 'JetBrains Mono', ui-monospace, 'SF Mono', monospace;
-  /* Serif (Song/Ming style) rather than sans (gothic/PingFang style) -
-     the serif stroke terminals make character structure easier to read,
-     especially for characters with many strokes. */
-  --font-hanzi: 'Songti SC', 'STSong', 'SimSun', 'Noto Serif SC', serif;
-  /* Editorial display face for headline moments only (e.g. .launch-title) -
-     an OS-native serif stack, no web font, matching --font-hanzi's approach. */
-  --font-display: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
-  --tracking-caption: 0.07em;
+  --font-ui: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+  /* Numbers stay in the text face, with tabular figures (see body). */
+  --font-data: var(--font-ui);
+  --font-hanzi: 'LXGW WenKai', KaiTi, STKaiti, 'Kaiti SC', serif;
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --tracking-caption: 0.08em;
+
+  color-scheme: light;
+}
+
+:root[data-theme="night"] {
+  --bg-canvas: #100E0B;
+  --surface-card: #17140F;
+  --surface-card-raised: #1D1A14;
+  --surface-line: #3A342B;
+  --surface-border: #3A342B;
+
+  --accent-primary: #ECE4D6;
+  --accent-primary-dim: rgba(236, 228, 214, 0.12);
+  --accent-primary-ink: #15130F;
+  --accent-line: rgba(236, 228, 214, 0.4);
+
+  --accent-secondary: #E0705A;
+  --accent-secondary-dim: rgba(224, 112, 90, 0.12);
+  --accent-secondary-border: rgba(224, 112, 90, 0.4);
+
+  --ink: #ECE4D6;
+  --ink-dim: #B3A895;
+  --ink-faint: #8C8272;
+
+  --easy: #7FB08A;
+  --easy-dim: rgba(127, 176, 138, 0.12);
+  --easy-line: rgba(127, 176, 138, 0.4);
+  --hard: #E0705A;
+  --hard-dim: rgba(224, 112, 90, 0.12);
+  --hard-line: rgba(224, 112, 90, 0.4);
+  --pending: #D9A441;
+  --pending-dim: rgba(217, 164, 65, 0.12);
+  --pending-line: rgba(217, 164, 65, 0.35);
+
+  --tint-1: rgba(236, 228, 214, 0.05);
+  --tint-2: rgba(236, 228, 214, 0.1);
+  --line-soft: #3A342B;
+  --line-strong: #554D41;
+  --overlay: rgba(0, 0, 0, 0.55);
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.4), 0 16px 40px -20px rgba(0, 0, 0, 0.7);
+  --shadow-pop: 0 20px 50px -20px rgba(0, 0, 0, 0.7);
+
+  --mizige-bg: #1C1914;
+  --mizige-border: rgba(224, 112, 90, 0.55);
+  --mizige-line: rgba(224, 112, 90, 0.26);
+  --hanzi-stroke: #F1EADD;
+  --hanzi-radical: #F1EADD;
+  --hanzi-outline: #2E2A23;
+
+  --tone-1: #E0705A;
+  --tone-2: #D9A441;
+  --tone-3: #7FB08A;
+  --tone-4: #8FB0DA;
 
   color-scheme: dark;
 }
@@ -71,13 +159,10 @@ html, body, #root {
 }
 
 body {
-  /* A faint top vignette instead of flat black - just enough to give the
-     canvas some depth without reading as an obvious gradient. */
-  background:
-    radial-gradient(ellipse 120% 55% at 50% -10%, #1a1b20 0%, transparent 60%),
-    var(--bg);
+  background: var(--bg);
   color: var(--ink);
   font-family: var(--font-ui);
+  font-variant-numeric: tabular-nums;
   -webkit-font-smoothing: antialiased;
   -webkit-tap-highlight-color: transparent;
 }
@@ -106,7 +191,7 @@ button {
 }
 
 ::selection {
-  background: rgba(56, 189, 248, 0.2);
+  background: var(--accent-secondary-dim);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -117,7 +202,7 @@ button {
 }
 
 :focus-visible {
-  outline: 2px solid var(--accent-cyan);
+  outline: 2px solid var(--accent-secondary);
   outline-offset: 2px;
-  border-radius: 4px;
+  border-radius: var(--radius);
 }

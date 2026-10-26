@@ -35,14 +35,20 @@ export default function ProgressSummary({ charProgress, coverage, filterHint, re
       </p>
 
       {next && (
-        <>
-          <div className="milestone-track" aria-hidden="true">
-            <div className="milestone-fill" style={{ width: `${Math.round(milestoneFill * 100)}%` }} />
+        <div className="progress-milestone">
+          {/* 學 ("learning") marks a milestone reached - shown once there
+              is one behind you. */}
+          {previous > 0 && <img src="/seals/seal-xue.png" alt={`學 seal - ${previous} characters`} className="progress-milestone-seal" />}
+          <div className="progress-milestone-body">
+            <p className="progress-subline">
+              {previous > 0 && <><strong>{previous}</strong> reached · </>}
+              <strong>{next - totals.known}</strong> to go until {next}
+            </p>
+            <div className="milestone-track" aria-hidden="true">
+              <div className="milestone-fill" style={{ width: `${Math.round(milestoneFill * 100)}%` }} />
+            </div>
           </div>
-          <p className="progress-subline">
-            <strong>{next - totals.known}</strong> to go until {next}
-          </p>
-        </>
+        </div>
       )}
 
       {coverage !== null && totals.known > 0 && (
@@ -51,13 +57,11 @@ export default function ProgressSummary({ charProgress, coverage, filterHint, re
         </p>
       )}
 
-      <div className="tier-ring-grid">{renderTierTiles(84)}</div>
+      <div className="tier-tile-grid-layout">{renderTierTiles(64)}</div>
 
-      <div className="tier-ring-legend">
-        <span><span className="tier-ring-legend-swatch" style={{ background: 'var(--accent-primary)' }} />Known</span>
-        <span><span className="tier-ring-legend-swatch" style={{ background: 'var(--easy)' }} />Can write</span>
-        <span><span className="tier-ring-legend-swatch" style={{ background: 'var(--accent-secondary)' }} />This week</span>
-        <span><span className="tier-ring-legend-swatch" style={{ background: 'var(--accent-primary-dim)' }} />Introduced</span>
+      <div className="tier-tile-legend">
+        <span><span className="tier-tile-legend-swatch" style={{ background: 'var(--accent-primary)' }} />Known</span>
+        <span><span className="tier-tile-legend-swatch" style={{ background: 'var(--accent-secondary)' }} />This week</span>
       </div>
 
       <p className="progress-subline">{filterHint}</p>

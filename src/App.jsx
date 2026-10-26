@@ -3,12 +3,13 @@ import './App.css';
 import { calculateSM2 } from './utils/sm2';
 import { getProgress, saveCardProgress, saveWritingProgress, getCardMasteryStats, getPrefs, savePrefs, getCommitment, saveCommitment, clearCommitment, getCommitmentStatus, getOfflineMode, setOfflineMode, getActiveSyncUser, MASTERED_INTERVAL_DAYS } from './utils/storage';
 import { getSoundEnabled, setSoundEnabled, cancelSpeech } from './utils/tts';
+import { getThemePref, setThemePref } from './utils/theme';
 import { playCorrectFeedback, playIncorrectFeedback, playMasteryFeedback } from './utils/feedback';
 import { getFilteredDeck, fetchUnifiedVocab } from './data/vocabLoader';
 import { fetchCharParts } from './data/charParts';
 import { fetchCharFrequency } from './data/charFrequency';
 import { getCharacterProgress, getCharacterPace, textCoverage, diffCharacterProgress, isReadKnown, canWrite } from './utils/charProgress';
-import { recordStudy, getStudyDays, summarizeStudyDays, syncStudyDays } from './utils/studyDays';
+import { recordStudy, getStudyDays, summarizeStudyDays, syncStudyDays, lastSevenDays } from './utils/studyDays';
 import { buildSelfStudyQueue, getDueCount } from './utils/sessionQueue';
 import { buildWarmupQueue } from './utils/warmupQueue';
 import { buildPenAndPaperQueue, buildSuperchargeQueue } from './utils/writingQueue';
@@ -21,6 +22,7 @@ import StudySession from './components/StudySession';
 import WarmupSession from './components/WarmupSession';
 import WritingSession from './components/WritingSession';
 import WritingBadge from './components/WritingBadge';
+import LongPressHanzi from './components/LongPressHanzi';
 import CompletionScreen from './components/CompletionScreen';
 import LessonStageIntro from './components/LessonStageIntro';
 import WriteOutSession from './components/WriteOutSession';
@@ -86,6 +88,8 @@ export default function App() {
   // itself gates on this internally, so nothing downstream needs to know
   // about it beyond rendering the toggle's own icon/label.
   const [soundEnabled, setSoundEnabledState] = useState(() => getSoundEnabled());
+  // Paper / night ink / match device - see utils/theme.js.
+  const [themePref, setThemePrefState] = useState(() => getThemePref());
   const [showSettings, setShowSettings] = useState(false);
   const [showAccount, setShowAccount] = useState(false);
   const [showMistakeReport, setShowMistakeReport] = useState(false);
@@ -340,6 +344,15 @@ export default function App() {
       newCount: countFor('learn-new'),
       estMinutes: estimateLessonMinutes(stages),
       hasContent: stages.some((s) => !s.dynamic),
+      // The home screen's contents list. Close the Loop has no count up
+      // front - it's built from the lesson's own misses.
+      sections: [
+        { numeral: '一', label: 'Warm up', count: countFor('warmup') },
+        { numeral: '二', label: 'Review', count: countFor('review-reading') + countFor('review-writing') },
+        { numeral: '三', label: 'Learn new', count: countFor('learn-new') },
+        { numeral: '四', label: 'Use it in a sentence', count: countFor('sentence') },
+        { numeral: '五', label: 'Close the loop', count: null },
+      ],
     };
   }, [rawDeck, charParts]);
 
@@ -383,6 +396,11 @@ export default function App() {
   // invalidation-trigger convention as charProgress above.
   const studySummary = useMemo(
     () => summarizeStudyDays(getStudyDays()),
+    // oxlint-disable-next-line react-hooks/exhaustive-deps
+    [rawDeck, syncVersion]
+  );
+  const studyWeek = useMemo(
+    () => lastSevenDays(getStudyDays()),
     // oxlint-disable-next-line react-hooks/exhaustive-deps
     [rawDeck, syncVersion]
   );
@@ -460,6 +478,11 @@ export default function App() {
     window.location.reload();
   };
 
+  const chooseTheme = (pref) => {
+    setThemePrefState(pref);
+    setThemePref(pref);
+  };
+
   const toggleSound = () => {
     const next = !soundEnabled;
     setSoundEnabledState(next);
@@ -472,7 +495,6 @@ export default function App() {
         {ALL_HSK_LEVELS.map((lvl) => (
           <TierRingTile
             key={lvl}
-            tierKey={lvl}
             label={`HSK ${lvl}`}
             {...charProgress.tiers[lvl]}
             // An empty revisionLevels means "no filter - every level
@@ -485,7 +507,6 @@ export default function App() {
           />
         ))}
         <TierRingTile
-          tierKey="non-hsk"
           label="Non-HSK"
           {...charProgress.tiers['non-hsk']}
           active={includeNonHsk}
@@ -917,6 +938,7 @@ export default function App() {
             lessonReviewCount={lessonPreview.reviewCount}
             lessonNewCount={lessonPreview.newCount}
             lessonEstMinutes={lessonPreview.estMinutes}
+            lessonSections={lessonPreview.sections}
             hasLessonContent={lessonPreview.hasContent}
             onLaunchLesson={launchLesson}
             onLaunchSelfStudy={launchSelfStudy}
@@ -927,6 +949,7 @@ export default function App() {
             knownCount={charProgress.totals.known}
             knownThisWeek={charProgress.knownThisWeek}
             daysThisWeek={studySummary.daysThisWeek}
+            studyWeek={studyWeek}
           />
         )}
 
@@ -994,6 +1017,7 @@ export default function App() {
             progressChange={sessionStartProgress ? diffCharacterProgress(sessionStartProgress, charProgress) : null}
             knownCount={charProgress.totals.known}
             title={lessonSummary ? 'Lesson complete' : undefined}
+            showSeal={!!lessonSummary}
             summaryLine={lessonSummary
               ? `${lessonSummary.minutes} min · ${lessonSummary.newCount} new ${lessonSummary.newCount === 1 ? 'character' : 'characters'}`
               : undefined}
@@ -1054,14 +1078,33 @@ export default function App() {
                   ) : (
                     <div className="mastery-grid-chips">
                       {mastery[activeMasteryTab].map((c) => (
-                        <div key={c.id} className="mastery-chip" title={`${c.pinyin} - ${c.meaning}`}>
+                        <LongPressHanzi as="div" key={c.id} className="mastery-chip" title={`${c.pinyin} - ${c.meaning}`} entry={c}>
                           <WritingBadge stats={c.stats} />
                           <span className="chip-char">{c.character}</span>
                           <span className="chip-py">{c.pinyin}</span>
-                        </div>
+                        </LongPressHanzi>
                       ))}
                     </div>
                   )}
+                </div>
+              </div>
+
+              <div className="card-internal-divider" />
+
+              <div>
+                <label className="box-section-label" style={{ marginBottom: '2px' }}>Appearance</label>
+                <div className="commitment-pill-row" role="group" aria-label="Appearance">
+                  {[['paper', 'Paper'], ['night', 'Night ink'], ['system', 'Match device']].map(([value, label]) => (
+                    <button
+                      key={value}
+                      type="button"
+                      className={`commitment-pill ${themePref === value ? 'active' : ''}`}
+                      aria-pressed={themePref === value}
+                      onClick={() => chooseTheme(value)}
+                    >
+                      {label}
+                    </button>
+                  ))}
                 </div>
               </div>
 

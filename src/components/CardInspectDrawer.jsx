@@ -1,4 +1,5 @@
 import { ColorPinyin } from '../utils/pinyinColor';
+import LongPressHanzi from './LongPressHanzi';
 
 export default function CardInspectDrawer({ result, onClose }) {
   const { character, pinyin, meaning, isSuccess } = result;
@@ -8,7 +9,7 @@ export default function CardInspectDrawer({ result, onClose }) {
       <div className="drawer-sheet" onClick={(e) => e.stopPropagation()}>
         <div className="drawer-handle" />
         <div className="card-inspect-header">
-          <span className="card-inspect-char">{character}</span>
+          <LongPressHanzi className="card-inspect-char" entry={{ character, pinyin, meaning }}>{character}</LongPressHanzi>
           <span className={`card-inspect-outcome ${isSuccess ? 'card-inspect-outcome--know' : 'card-inspect-outcome--again'}`}>
             {isSuccess ? 'Recalled' : 'Missed'}
           </span>

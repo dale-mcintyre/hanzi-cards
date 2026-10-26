@@ -1,6 +1,10 @@
 import { useState, useRef } from 'react';
+import { LONG_PRESS_MS } from './useLongPress';
 
-export default function useSwipeGesture({ onSwipeLeft, onSwipeRight, onSwipeUp, onTap }) {
+// Same drift allowance as a tap - a press that moves further is a swipe.
+const LONG_PRESS_TOLERANCE_PX = 10;
+
+export default function useSwipeGesture({ onSwipeLeft, onSwipeRight, onSwipeUp, onTap, onLongPress }) {
   const [dragX, setDragX] = useState(0);
   const [dragY, setDragY] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
@@ -16,6 +20,15 @@ export default function useSwipeGesture({ onSwipeLeft, onSwipeRight, onSwipeUp, 
   // caps re-renders to the display's actual frame rate.
   const pendingRef = useRef(null);
   const rafRef = useRef(null);
+  // A held, still press (onLongPress) ends the gesture there and then, so
+  // releasing afterwards is neither a tap nor a swipe.
+  const longPressTimerRef = useRef(null);
+  const longPressFiredRef = useRef(false);
+
+  const cancelLongPress = () => {
+    clearTimeout(longPressTimerRef.current);
+    longPressTimerRef.current = null;
+  };
 
   const flushPending = () => {
     rafRef.current = null;
@@ -40,12 +53,27 @@ export default function useSwipeGesture({ onSwipeLeft, onSwipeRight, onSwipeUp, 
 
     setIsDragging(true);
     startPosRef.current = { x: e.clientX, y: e.clientY };
+
+    longPressFiredRef.current = false;
+    cancelLongPress();
+    if (onLongPress) {
+      longPressTimerRef.current = setTimeout(() => {
+        longPressTimerRef.current = null;
+        longPressFiredRef.current = true;
+        pendingRef.current = null;
+        setIsDragging(false);
+        setDragX(0);
+        setDragY(0);
+        onLongPress();
+      }, LONG_PRESS_MS);
+    }
   };
 
   const handlePointerMove = (e) => {
     if (!isDragging) return;
     const diffX = e.clientX - startPosRef.current.x;
     const diffY = e.clientY - startPosRef.current.y;
+    if (Math.hypot(diffX, diffY) > LONG_PRESS_TOLERANCE_PX) cancelLongPress();
 
     const next = { x: dragX, y: dragY };
     if (Math.abs(diffX) > Math.abs(diffY)) {
@@ -61,7 +89,8 @@ export default function useSwipeGesture({ onSwipeLeft, onSwipeRight, onSwipeUp, 
   };
 
   const handlePointerUp = () => {
-    if (!isDragging) return;
+    cancelLongPress();
+    if (longPressFiredRef.current || !isDragging) return;
 
     // A pending frame's values haven't landed in state yet - use whatever
     // was last queued (falling back to current state) so the swipe-vs-tap
@@ -99,6 +128,8 @@ export default function useSwipeGesture({ onSwipeLeft, onSwipeRight, onSwipeUp, 
       onPointerDown: handlePointerDown,
       onPointerMove: handlePointerMove,
       onPointerUp: handlePointerUp,
+      // Keeps the browser's own long-press menu out of the way.
+      onContextMenu: onLongPress ? (e) => e.preventDefault() : undefined,
     },
   };
 }
